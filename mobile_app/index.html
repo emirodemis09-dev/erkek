@@ -1315,14 +1315,14 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 750px;
+    width: 780px;
     box-sizing: border-box;
     background: #ffffff; 
     color: #000000; 
-    padding: 20px 22px; 
+    padding: 18px 20px; 
     font-family: Consolas, "Courier New", Courier, monospace; 
-    font-size: 9.5px; 
-    line-height: 1.45; 
+    font-size: 8.8px; 
+    line-height: 1.42; 
     border: none; 
     box-shadow: 0 6px 24px rgba(0,0,0,0.45); 
     transform-origin: top left;
@@ -1361,6 +1361,7 @@
     background: #ffffff;
     width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
 }
 .dekont-table-box {
     width: 100%;
@@ -1370,45 +1371,44 @@
 .dekont-table-box td {
     padding: 0;
     vertical-align: top;
+    overflow: hidden;
 }
 .dekont-row {
     display: flex;
     align-items: baseline;
     white-space: nowrap;
-    font-size: 9.5px;
-    line-height: 1.45;
+    font-size: 8.8px;
+    line-height: 1.42;
     margin-bottom: 1.5px;
 }
 .d-k1-lbl {
-    width: 108px;
+    width: 98px;
     flex-shrink: 0;
     color: #000;
 }
 .d-k1-mid-lbl {
-    width: 124px;
+    width: 112px;
     flex-shrink: 0;
     color: #000;
 }
 .d-k2-lbl {
-    width: 155px;
+    width: 140px;
     flex-shrink: 0;
     color: #000;
 }
 .d-k2-sag-lbl {
-    width: 165px;
+    width: 138px;
     flex-shrink: 0;
     color: #000;
 }
 .d-sep {
-    width: 12px;
+    width: 10px;
     flex-shrink: 0;
     text-align: center;
     color: #000;
 }
 .d-val {
     flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
     color: #000;
 }
@@ -1417,14 +1417,17 @@
     min-width: 85px;
     max-width: 85px;
     text-align: right;
-    vertical-align: middle !important;
+    vertical-align: top !important;
+    padding-right: 4px;
+    box-sizing: border-box;
 }
 .dekont-qr-img {
-    width: 76px;
-    height: 76px;
+    width: 66px;
+    height: 66px;
     border: none;
     display: block;
     margin-left: auto;
+    margin-right: 0;
     image-rendering: pixelated;
     background: #ffffff;
 }
@@ -2266,7 +2269,7 @@
             const effectiveScale = baseDekontFitScale * currentDekontScale;
             paper.style.transform = `scale(${effectiveScale})`;
 
-            const paperWidth = 750;
+            const paperWidth = 780;
             const paperHeight = paper.offsetHeight || 720;
             wrapper.style.width = `${Math.round(paperWidth * effectiveScale)}px`;
             wrapper.style.height = `${Math.round(paperHeight * effectiveScale)}px`;
@@ -2284,7 +2287,7 @@
             const availableWidth = viewport.clientWidth - 12;
             if (availableWidth <= 0) return;
 
-            baseDekontFitScale = Math.min(1.0, Math.max(0.25, availableWidth / 750));
+            baseDekontFitScale = Math.min(1.0, Math.max(0.25, availableWidth / 780));
             currentDekontScale = 1.0;
             updateDekontZoom();
         }
@@ -2349,9 +2352,9 @@
                     <div class="dekont-box">
                         <table class="dekont-table-box">
                             <colgroup>
-                                <col style="width: 320px;">
-                                <col style="width: 310px;">
-                                <col style="width: 80px;">
+                                <col style="width: 39%;">
+                                <col style="width: 48%;">
+                                <col style="width: 13%;">
                             </colgroup>
                             <tr>
                                 <!-- Sol Blok -->
@@ -2386,8 +2389,8 @@
                     <div class="dekont-box">
                         <table class="dekont-table-box">
                             <colgroup>
-                                <col style="width: 440px;">
-                                <col style="width: 270px;">
+                                <col style="width: 56%;">
+                                <col style="width: 44%;">
                             </colgroup>
                             <tr>
                                 <!-- Sol Sütun -->
