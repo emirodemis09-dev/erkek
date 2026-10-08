@@ -1,0 +1,31 @@
+{
+  "account": {
+    "id": 1,
+    "customer_name": "mert akbaş",
+    "customer_no": "81047723",
+    "branch_name": "yarrak yarrak",
+    "account_no": "6721439",
+    "iban": "TR12312313123123123123123",
+    "balance": 123123
+  },
+  "transactions": [
+    {
+      "id": 1791482551061,
+      "account_id": 1,
+      "transaction_type": "GELEN FAST",
+      "title": "Ahmet Eryılmaz",
+      "sender_receiver_name": "Ahmet Eryılmaz",
+      "iban": "TR12312313123123123123123",
+      "amount": 123123,
+      "balance_after": 123123,
+      "category": "Gelen Transfer",
+      "date_str": "26.09.2026",
+      "time_str": "14:44:15",
+      "fast_ref_no": "1542545948",
+      "commission": 0,
+      "bsmv": 0,
+      "description": "Ahmet Eryılmaz-FAST-CEP",
+      "is_income": true
+    }
+  ]
+}

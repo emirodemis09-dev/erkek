@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yapı Kredi Admin Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <style>
+        :root {
+            --ykb-dark: #05192e;
+            --ykb-deep: #0a2446;
+            --ykb-mid: #0f325f;
+            --ykb-blue: #0a6ecb;
+            --ykb-blue-light: #dfeeff;
+            --ykb-green: #1f9d62;
+            --ykb-red: #d83a3a;
+            --ykb-bg: #f4f7fb;
+            --ykb-text: #17314f;
+            --ykb-muted: #687a91;
+            --ykb-card: #ffffff;
+            --ykb-shadow: 0 10px 25px rgba(12, 35, 70, 0.08);
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(180deg, #edf4ff 0%, #f9fbff 100%);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--ykb-text);
+        }
+
+        .topbar {
+            background: linear-gradient(120deg, var(--ykb-dark), var(--ykb-mid));
+            color: white;
+            box-shadow: var(--ykb-shadow);
+        }
+
+        .brand {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+
+        .card-custom {
+            border: none;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.92);
+            box-shadow: var(--ykb-shadow);
+        }
+
+        .btn-ykb {
+            background: linear-gradient(135deg, var(--ykb-blue), #0b82d9);
+            border: none;
+            color: white;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+        }
+
+        .btn-ykb:hover {
+            opacity: 0.97;
+            color: white;
+        }
+
+        .badge-income { background: #e9f9f2; color: var(--ykb-green); }
+        .badge-expense { background: #fdeaea; color: var(--ykb-red); }
+
+        .table > :not(caption) > * > * {
+            padding: 0.9rem 0.8rem;
+        }
+
+        .muted-note {
+            color: var(--ykb-muted);
+            font-size: 0.82rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand topbar py-3">
+        <div class="container-fluid px-4">
+            <div class="brand">YapıKredi</div>
+            <span class="badge bg-light text-primary rounded-pill px-3 py-2 fw-bold">
+                <i class="bi bi-circle-fill me-1 small"></i> API Canlı
+            </span>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card card-custom p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0 text-primary">Müşteri Bilgileri</h5>
+                        <span class="badge bg-primary-subtle text-primary">Aktif Hesap</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label muted-note">Müşteri Ad Soyad</label>
+                        <input id="accCustomerName" type="text" class="form-control form-control-lg" value="Kaan Taşkın" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label muted-note">Şube / Hesap</label>
+                        <input id="accBranch" type="text" class="form-control" value="ÇUKUROVA ŞUBESİ (1680) / 6721439" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label muted-note">IBAN</label>
+                        <input id="accIban" type="text" class="form-control" value="TR43 0006 2000 8915 0006 7214 39" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label muted-note">Kullanılabilir Bakiye</label>
+                        <div class="input-group input-group-lg">
+                            <input id="accBalance" type="number" step="0.01" class="form-control text-success fw-bold" value="35591.91" />
+                            <button class="btn btn-outline-primary" type="button" onclick="updateAccountInfo()">Güncelle</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom p-4">
+                    <h5 class="fw-bold text-primary mb-3">Yeni İşlem</h5>
+                    <form id="addTxForm" onsubmit="handleAddTransaction(event)">
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <button type="button" id="btnGiden" class="btn btn-danger w-100 fw-bold" onclick="setIncomeState(false)">
+                                    <i class="bi bi-arrow-up-right me-1"></i> Giden
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" id="btnGelen" class="btn btn-outline-success w-100 fw-bold" onclick="setIncomeState(true)">
+                                    <i class="bi bi-arrow-down-left me-1"></i> Gelen
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label muted-note">İşlem Türü</label>
+                            <select id="txType" class="form-select">
+                                <option>HESAPTAN FAST</option>
+                                <option>GELEN FAST</option>
+                                <option>HESAPTAN HAVALE</option>
+                                <option>KART ÖDEMESİ</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label muted-note">Alıcı / Gönderen</label>
+                            <input id="txName" type="text" class="form-control" placeholder="Örn: Eren Ürün" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label muted-note">Tutar</label>
+                            <input id="txAmount" type="number" step="0.01" class="form-control" placeholder="15000.00" required />
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label muted-note">Tarih</label>
+                                <input id="txDate" type="text" class="form-control" placeholder="26.09.2026" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label muted-note">Saat</label>
+                                <input id="txTime" type="text" class="form-control" placeholder="14:55:35" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label muted-note">Açıklama</label>
+                            <input id="txDesc" type="text" class="form-control" placeholder="FAST-CEP / Kredi ödemesi" />
+                        </div>
+
+                        <button class="btn btn-ykb w-100" type="submit">İşlemi Kaydet</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card card-custom p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold mb-0 text-primary">Canlı Hesap Hareketleri</h5>
+                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="loadData()">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Yenile
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>İsim</th>
+                                    <th>Tür</th>
+                                    <th class="text-end">Tutar</th>
+                                    <th class="text-end">Sil</th>
+                                </tr>
+                            </thead>
+                            <tbody id="txTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin && window.location.origin.startsWith('http') 
+            ? `${window.location.origin}/api` 
+            : 'http://127.0.0.1:8000/api';
+        let isIncome = false;
+
+        function setIncomeState(income) {
+            isIncome = income;
+            const giden = document.getElementById('btnGiden');
+            const gelen = document.getElementById('btnGelen');
+            if (income) {
+                gelen.className = 'btn btn-success w-100 fw-bold';
+                giden.className = 'btn btn-outline-danger w-100 fw-bold';
+                document.getElementById('txType').value = 'GELEN FAST';
+            } else {
+                giden.className = 'btn btn-danger w-100 fw-bold';
+                gelen.className = 'btn btn-outline-success w-100 fw-bold';
+                document.getElementById('txType').value = 'HESAPTAN FAST';
+            }
+        }
+
+        async function loadData() {
+            try {
+                const accRes = await fetch(`${API_BASE}/account`);
+                const acc = await accRes.json();
+                document.getElementById('accCustomerName').value = acc.customer_name;
+                document.getElementById('accBranch').value = `${acc.branch_name} / ${acc.account_no}`;
+                document.getElementById('accIban').value = acc.iban;
+                document.getElementById('accBalance').value = acc.balance;
+
+                const txRes = await fetch(`${API_BASE}/transactions`);
+                const txs = await txRes.json();
+                const tbody = document.getElementById('txTableBody');
+                tbody.innerHTML = '';
+
+                txs.forEach((t) => {
+                    const isPlus = Number(t.amount) > 0 || Boolean(t.is_income);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><span class="fw-bold">${t.date_str}</span><br><small class="muted-note">${t.time_str || '--:--:--'}</small></td>
+                        <td><strong>${t.sender_receiver_name || t.title}</strong><br><small class="muted-note">${t.transaction_type}</small></td>
+                        <td><span class="badge ${isPlus ? 'badge-income' : 'badge-expense'}">${isPlus ? 'Gelen' : 'Giden'}</span></td>
+                        <td class="text-end fw-bold ${isPlus ? 'text-success' : 'text-danger'}">${isPlus ? '+' : '-'}${Math.abs(Number(t.amount || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL</td>
+                        <td class="text-end"><button class="btn btn-sm btn-outline-danger" type="button" onclick="deleteTx(${t.id})"><i class="bi bi-trash"></i></button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('API error', error);
+            }
+        }
+
+        async function updateAccountInfo() {
+            const payload = {
+                customer_name: document.getElementById('accCustomerName').value,
+                branch_name: document.getElementById('accBranch').value.split(' / ')[0],
+                account_no: document.getElementById('accBranch').value.split(' / ')[1],
+                iban: document.getElementById('accIban').value,
+                balance: Number(document.getElementById('accBalance').value)
+            };
+
+            await fetch(`${API_BASE}/account/update`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            alert('Müşteri bilgisi güncellendi.');
+            loadData();
+        }
+
+        async function handleAddTransaction(e) {
+            e.preventDefault();
+            const payload = {
+                transaction_type: document.getElementById('txType').value,
+                sender_receiver_name: document.getElementById('txName').value,
+                title: document.getElementById('txName').value,
+                amount: Number(document.getElementById('txAmount').value),
+                description: document.getElementById('txDesc').value,
+                date_str: document.getElementById('txDate').value,
+                time_str: document.getElementById('txTime').value,
+                is_income: isIncome,
+                commission: isIncome ? 0 : 7.97,
+                bsmv: isIncome ? 0 : 0.40,
+                fast_ref_no: `1542${Date.now().toString().slice(-6)}`
+            };
+
+            await fetch(`${API_BASE}/admin/add_transaction`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            document.getElementById('txName').value = '';
+            document.getElementById('txAmount').value = '';
+            document.getElementById('txDesc').value = '';
+            loadData();
+        }
+
+        async function deleteTx(id) {
+            if (!confirm('Bu işlemi silmek istediğinize emin misiniz?')) return;
+            await fetch(`${API_BASE}/admin/transaction/${id}`, { method: 'DELETE' });
+            loadData();
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
+

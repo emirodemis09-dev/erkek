@@ -1,0 +1,15 @@
+# Android APK Decompilation & Tools (Vercel'e yüklenmemesi gereken büyük dosyalar)
+kiosk_decoded/
+garanti_decompiled/
+garanti_fake.apk
+apk_build/
+apk_unpack/
+*.apk
+*.idsig
+*.keystore
+*.jar
+*.tmp
+logs/
+node_modules/
+.pm2/
+.git/

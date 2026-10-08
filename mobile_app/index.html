@@ -1,0 +1,2520 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Yapı Kredi Mobil</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --ykb-bg: #000000;
+            --ykb-panel: #1a2333;
+            --ykb-card: #2d3642;
+            --ykb-cyan: #1ca3e0;
+            --ykb-cyan-soft: #dfeef7;
+            --ykb-text: #f3f7fb;
+            --ykb-muted: #b6c0cc;
+            --ykb-gray: #7c8898;
+            --ykb-dark: #0e1726;
+            --ykb-divider: rgba(255,255,255,0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            background: var(--ykb-bg);
+            color: var(--ykb-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            min-height: 100vh;
+            background: #414042;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .dark-home-panel {
+            position: relative;
+            z-index: 1;
+            padding-top: 8px;
+            padding-bottom: 38px;
+            background: #000;
+            border-radius: 0 0 24px 24px;
+        }
+
+        .lower-home-panel {
+            background: #414042;
+        }
+
+        .main-content-ykb.top-home-content {
+            padding-bottom: 0;
+        }
+
+        .app-header-ykb {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-height: 58px;
+            margin: 0 18px 10px;
+            padding: 0 12px;
+            background: #292929;
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 16px;
+        }
+
+        .menu-btn, .icon-btn {
+            border: none;
+            background: transparent;
+            color: var(--ykb-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-btn {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            flex: 0 0 36px;
+            color: var(--ykb-cyan);
+        }
+
+        .menu-btn i { font-size: 28px; }
+        .icon-btn i { font-size: 20px; }
+
+        .search-field {
+            flex: 1 1 auto;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            color: #85858b;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .search-field i {
+            font-size: 16px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .profile-ring {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 38px;
+            color: var(--ykb-cyan);
+            background: transparent;
+            border: 0;
+        }
+
+        .profile-ring i {
+            font-size: 24px;
+        }
+
+        .profile-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            flex: 0 0 38px;
+            background: #aeb9c9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64758d;
+            font-size: 22px;
+        }
+
+        .bank-toggle {
+            height: 50px;
+            position: relative;
+            background: #242424;
+            border: 0;
+            border-radius: 28px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 0;
+            margin: 0 18px 18px;
+            gap: 0;
+        }
+
+        .bank-toggle button {
+            border: none;
+            background: transparent;
+            color: var(--ykb-text);
+            padding: 0 8px;
+            border-radius: 28px;
+            font-size: 14px;
+            font-weight: 700;
+            opacity: 0.8;
+        }
+
+        .bank-toggle button.active {
+            background: #414141;
+            opacity: 1;
+        }
+
+        .bank-toggle .other-bank {
+            position: relative;
+        }
+
+        .new-badge {
+            position: absolute;
+            top: -8px;
+            right: 0;
+            padding: 3px 9px;
+            border-radius: 4px;
+            background: #ff553f;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .main-content-ykb {
+            padding: 0 18px 100px;
+        }
+
+        .section-label {
+            font-size: 18px;
+            font-weight: 800;
+            margin: 16px 0 12px;
+            color: var(--ykb-text);
+        }
+
+        .home-card {
+            position: relative;
+            background: #262626;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-left: 5px solid #0789c9;
+            border-radius: 16px;
+            padding: 10px 14px 12px 12px;
+            overflow: hidden;
+            min-height: 140px;
+        }
+
+        .account-line {
+            display: grid;
+            grid-template-columns: 58px minmax(0, 1fr) 20px;
+            align-items: center;
+            gap: 12px;
+            min-height: 62px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mini-tag {
+            position: relative;
+            width: 58px;
+            height: 52px;
+            background: var(--ykb-cyan);
+            color: white;
+            font-size: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+        }
+
+        .mini-tag::after {
+            content: "";
+            position: absolute;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #087fbd;
+            border: 2px solid #262626;
+        }
+
+        .account-name {
+            font-size: 16px;
+            color: #f4f4f4;
+            font-weight: 600;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .account-copy {
+            display: block;
+            width: 100%;
+            padding: 4px 0;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .account-copy:focus-visible {
+            outline: 2px solid var(--ykb-cyan);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+
+        .account-detail-page {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #000;
+            color: #f4f4f4;
+            padding-bottom: 20px;
+        }
+
+        .detail-header {
+            height: 54px;
+            padding: 0 18px;
+            display: grid;
+            grid-template-columns: 34px 34px 1fr 34px;
+            align-items: center;
+            gap: 7px;
+            background: #262626;
+        }
+
+        .detail-header button {
+            width: 32px;
+            height: 36px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: #0796dc;
+            font-size: 22px;
+        }
+
+        .detail-page-title {
+            margin: 0;
+            color: #f5f5f5;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        
+
+        .detail-content {
+            flex: 1;
+            padding: 0 20px;
+        }
+
+        .detail-account-summary {
+            display: grid;
+            grid-template-columns: 54px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 13px;
+            min-height: 88px;
+            margin: 0 -20px;
+            padding: 10px 20px;
+            border-bottom: 1px solid #555;
+        }
+
+        .detail-currency-icon {
+            position: relative;
+            width: 54px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            background: #078fd2;
+            color: white;
+            font-size: 23px;
+        }
+
+        .detail-currency-icon::after {
+            content: "";
+            position: absolute;
+            right: -7px;
+            top: 50%;
+            width: 15px;
+            height: 15px;
+            transform: translateY(-50%);
+            border: 2px solid #000;
+            border-radius: 50%;
+            background: #087fbd;
+        }
+
+        .detail-account-meta { min-width: 0; }
+
+        .detail-account-name {
+            margin: 0 0 3px;
+            color: #f3f3f3;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .detail-account-branch,
+        .detail-account-iban {
+            overflow-wrap: anywhere;
+            color: #bdbdbd;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .detail-account-type {
+            align-self: start;
+            padding-top: 7px;
+            color: #d4d4d4;
+            font-size: 12px;
+        }
+
+        .detail-balances { margin: 4px 0 0; }
+
+        .detail-balance-row {
+            min-height: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            color: #c8c8c8;
+            font-size: 13px;
+        }
+
+        .detail-balance-row strong {
+            color: #f5f5f5;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .detail-address-row {
+            width: calc(100% + 40px);
+            min-height: 72px;
+            margin: 7px -20px 0;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border: 0;
+            border-top: 1px solid #555;
+            border-bottom: 1px solid #555;
+            background: transparent;
+            color: #c8c8c8;
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.3;
+        }
+
+        .detail-address-row i { color: #078fd2; font-size: 20px; }
+
+        .detail-option-row {
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid #555;
+            color: #c8c8c8;
+            font-size: 13px;
+        }
+
+        .detail-switch {
+            position: relative;
+            flex: 0 0 50px;
+            width: 50px;
+            height: 32px;
+            padding: 0;
+            border: 0;
+            border-radius: 18px;
+            background: #414146;
+        }
+
+        .detail-switch::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #fff;
+            transition: transform 0.15s ease;
+        }
+
+        .detail-switch[aria-checked="true"] { background: #078fd2; }
+        .detail-switch[aria-checked="true"]::after { transform: translateX(18px); }
+
+        .detail-actions {
+            display: grid;
+            gap: 13px;
+            padding: 18px 20px 0;
+        }
+
+        .detail-action {
+            min-height: 43px;
+            width: 100%;
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 24px;
+            background: #078fd2;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .transactions-placeholder {
+            margin: 20px 0;
+            padding: 16px;
+            border-top: 1px solid #555;
+            border-bottom: 1px solid #555;
+            color: #c8c8c8;
+            font-size: 14px;
+        }
+
+        .activity-account-summary {
+            min-height: 66px;
+            margin: 0 -20px;
+            padding: 8px 20px;
+            display: grid;
+            grid-template-columns: 54px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #555;
+        }
+
+        .activity-account-number {
+            color: #d7d7d7;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .activity-account-type {
+            align-self: start;
+            padding-top: 4px;
+            color: #d4d4d4;
+            font-size: 12px;
+        }
+
+        .activity-balance {
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid #555;
+            color: #c8c8c8;
+            font-size: 13px;
+        }
+
+        .activity-balance strong { color: #f5f5f5; white-space: nowrap; }
+
+        .activity-toolbar {
+            min-height: 38px;
+            margin: 0 -20px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #555;
+            color: #078fd2;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .activity-filter {
+            border: 0;
+            background: transparent;
+            color: #b7c4d2;
+            font-size: 18px;
+        }
+
+        .activity-filter-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin: 8px 0;
+        }
+
+        .activity-filter-options[hidden] { display: none; }
+
+        .activity-filter-options button {
+            min-height: 34px;
+            padding: 5px 8px;
+            border: 1px solid #4b4b4b;
+            border-radius: 18px;
+            background: #222;
+            color: #c8c8c8;
+            font-size: 12px;
+        }
+
+        .activity-filter-options button[aria-pressed="true"] {
+            border-color: #078fd2;
+            background: #07334a;
+            color: #fff;
+        }
+
+        .pending-row {
+            min-height: 34px;
+            margin: 0 -20px;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #262626;
+            color: #c8c8c8;
+            font-size: 11px;
+        }
+
+        .pending-row strong { color: #f5f5f5; font-size: 12px; }
+
+        .activity-list { margin: 0 -20px; }
+
+        .activity-row {
+            min-height: 92px;
+            width: 100%;
+            padding: 9px 20px;
+            display: grid;
+            grid-template-columns: 62px minmax(0, 1fr) 92px;
+            align-items: stretch;
+            gap: 8px;
+            border-top: 0;
+            border-right: 0;
+            border-left: 0;
+            border-bottom: 1px solid #3b3b3b;
+            background: #000;
+            color: inherit;
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+            appearance: none;
+        }
+
+        .activity-row:nth-child(even) { background: #1d1d1d; }
+
+        .activity-date {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #555;
+            color: #c8c8c8;
+            line-height: 1.15;
+        }
+
+        .activity-date strong { color: #f4f4f4; font-size: 28px; font-weight: 400; }
+        .activity-date span { font-size: 12px; }
+
+        .activity-description {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: #c8c8c8;
+            font-size: 11px;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+        }
+
+        .activity-description-title { color: #f0f0f0; font-weight: 600; }
+        .activity-description-body { color: #bcbcbc; }
+
+        .activity-row-end {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0 2px;
+            color: #078fd2;
+        }
+
+        .activity-amount {
+            align-self: flex-end;
+            color: #f5f5f5;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .activity-amount.outgoing { color: #f15a45; }
+
+        .activity-empty {
+            padding: 24px 20px;
+            color: #c8c8c8;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .movement-detail-content {
+            flex: 1;
+            padding: 5px 8px 0;
+        }
+
+        .movement-detail-row {
+            display: grid;
+            grid-template-columns: minmax(96px, 35%) minmax(0, 1fr);
+            align-items: start;
+            gap: 10px;
+            padding: 4px 0;
+            font-size: 11px;
+            line-height: 1.3;
+        }
+
+        .movement-detail-row span:first-child { color: #c4c4c4; }
+        .movement-detail-row span:last-child {
+            overflow-wrap: anywhere;
+            color: #f5f5f5;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .movement-detail-row .outgoing { color: #f15a45 !important; }
+
+        .movement-receipt-action {
+            flex: 0 0 auto;
+            min-height: 43px;
+            margin: 12px 8px 20px;
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 24px;
+            background: #078fd2;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .demo-receipt-page {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #0d0f12;
+            color: #f4f4f4;
+            padding: 12px 14px 22px 14px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .demo-receipt-screen-wrapper {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            flex: 1;
+        }
+
+        .demo-receipt-card {
+            background: #1f2228;
+            border-radius: 22px;
+            padding: 10px 8px 10px 8px;
+            position: relative;
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45);
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dekont-page-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            z-index: 20;
+            background: rgba(14, 16, 20, 0.92);
+            backdrop-filter: blur(4px);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 14px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+            pointer-events: none;
+        }
+
+        .dekont-zoom-toolbar {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            background: rgba(14, 16, 20, 0.92);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 16px;
+            padding: 2px 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+        }
+
+        .dekont-zoom-btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .dekont-zoom-btn:hover, .dekont-zoom-btn:active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dekont-zoom-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: #d8e2ed;
+            padding: 0 6px;
+            min-width: 44px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .dekont-viewport {
+            width: 100%;
+            min-height: 380px;
+            max-height: 60vh;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 4px 2px;
+            border-radius: 8px;
+            background: transparent;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .dekont-scale-wrapper {
+            position: relative;
+            margin: 0 auto;
+            transition: width 0.15s ease-out, height 0.15s ease-out;
+        }
+
+        .demo-receipt-actions-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            padding: 0 2px;
+        }
+
+        .demo-receipt-blue-btn {
+            width: 100%;
+            height: 50px;
+            background: #0084ff;
+            color: #ffffff;
+            border: none;
+            border-radius: 28px;
+            font-size: 16.5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0, 132, 255, 0.35);
+            transition: background 0.15s, transform 0.1s, opacity 0.15s;
+        }
+
+        .demo-receipt-blue-btn:active {
+            background: #0073e6;
+            transform: scale(0.985);
+            opacity: 0.9;
+        }
+
+        .demo-share-status {
+            min-height: 18px;
+            margin: 6px 0 0;
+            color: #ffd28b;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Yapı Kredi Dekont Paylaşım / İndirme Bottom Sheet */
+        .dekont-sheet-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1050;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+        .dekont-sheet-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .dekont-bottom-sheet {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: #1c1f26;
+            border-top-left-radius: 26px;
+            border-top-right-radius: 26px;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.65);
+            z-index: 1060;
+            padding: 14px 18px 24px 18px;
+            box-sizing: border-box;
+            transform: translateY(105%);
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .dekont-bottom-sheet.active {
+            transform: translateY(0);
+        }
+        .dekont-sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 2px;
+            margin: 0 auto 14px auto;
+        }
+        .dekont-sheet-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .dekont-sheet-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(0, 132, 255, 0.15);
+            color: #0084ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        .dekont-sheet-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+        .dekont-sheet-subtitle {
+            font-size: 12px;
+            color: #9aabc3;
+            margin: 2px 0 0;
+        }
+        .dekont-sheet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .dekont-sheet-item {
+            width: 100%;
+            background: #262a34;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .dekont-sheet-item:active {
+            background: #303542;
+            transform: scale(0.99);
+        }
+        .dekont-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .dekont-item-icon.bg-blue {
+            background: #0084ff;
+            color: #ffffff;
+        }
+        .dekont-item-icon.bg-green {
+            background: #10b981;
+            color: #ffffff;
+        }
+        .dekont-item-text {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .dekont-item-title {
+            font-size: 14.5px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .dekont-item-desc {
+            font-size: 11.5px;
+            color: #a0a6b5;
+            margin-top: 2px;
+        }
+        .dekont-item-chevron {
+            color: #6c758d;
+            font-size: 16px;
+        }
+        .dekont-sheet-cancel {
+            width: 100%;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: none;
+            border-radius: 24px;
+            font-size: 15.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .dekont-sheet-cancel:active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .account-number {
+            font-size: 13px;
+            color: #b8b8b8;
+            letter-spacing: 0.2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .account-menu {
+            color: #9aabc3;
+            font-size: 20px;
+            align-self: start;
+            padding-top: 1px;
+        }
+
+        .balance-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            margin-top: 12px;
+        }
+
+        .balance-column {
+            text-align: center;
+            min-width: 0;
+        }
+
+        .balance-column + .balance-column {
+            border-left: 1px solid rgba(255,255,255,0.65);
+        }
+
+        .balance-label {
+            font-size: 13px;
+            color: #c2c2c2;
+            margin-top: 3px;
+        }
+
+        .balance-value {
+            font-size: 19px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .balance-value.long-balance {
+            font-size: 14px;
+        }
+
+        .account-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ghost-btn, .blue-btn {
+            height: 38px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.6);
+            background: transparent;
+            color: var(--ykb-text);
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .blue-btn {
+            background: linear-gradient(180deg, #22a8e6 0%, #0f9ad8 100%);
+            border-color: transparent;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+            margin: -24px 0 20px;
+        }
+
+        .quick-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+            color: var(--ykb-text);
+        }
+
+        .quick-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 11px;
+            background: #262626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #078fd2;
+            font-size: 24px;
+        }
+
+        .quick-label {
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .card-panel {
+            background: #262626;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-left: 5px solid #0789c9;
+            border-radius: 15px;
+            padding: 14px 14px 14px 12px;
+        }
+
+        .card-section-title { margin-top: 22px; }
+
+        .card-empty {
+            display: grid;
+            grid-template-columns: 92px minmax(0, 1fr);
+            align-items: center;
+            gap: 16px;
+        }
+
+        .card-illustration {
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #414141;
+            color: #9aabc3;
+            font-size: 42px;
+        }
+
+        .card-empty p {
+            margin: 0;
+            color: var(--ykb-text);
+            font-size: 17px;
+            line-height: 1.4;
+            font-weight: 700;
+        }
+
+        .cta-btn {
+            display: block;
+            width: 100%;
+            height: 42px;
+            border: 0;
+            background: #078ed0;
+            color: white;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-top: 12px;
+        }
+
+        .limit-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            min-height: 62px;
+            background: #262626;
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 13px;
+            padding: 10px 14px;
+            margin-top: 18px;
+        }
+
+        .limit-box .limit-label {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .limit-badge {
+            color: #58c7ed;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .limit-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #078fd2;
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .world-section {
+            margin: 22px -18px 0;
+            padding: 18px 14px 24px;
+            background: #414042;
+        }
+
+        .world-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-auto-rows: 76px;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .feature-box {
+            background: #242424;
+            border: 0;
+            border-radius: 12px;
+            min-height: 0;
+            padding: 8px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--ykb-text);
+            text-align: center;
+        }
+
+        .feature-box.world-intro {
+            grid-column: span 2;
+            grid-row: span 2;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 12px;
+            line-height: 1.25;
+        }
+
+        .feature-box .icon-oval {
+            width: 44px;
+            height: 44px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8db9ea;
+            background: transparent;
+            border: 0;
+            font-size: 34px;
+        }
+
+        .world-intro .icon-oval {
+            width: 62px;
+            height: 62px;
+            justify-content: flex-start;
+            font-size: 56px;
+            color: #80b6e7;
+            margin-bottom: 8px;
+        }
+
+        .tx-item {
+            background-color: rgba(255,255,255,0.04);
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .tx-title { font-size: 15px; font-weight: 700; color: var(--ykb-text); margin-bottom: 2px; }
+        .tx-subtitle { font-size: 12px; color: var(--ykb-gray); }
+        .tx-amount { font-size: 16px; font-weight: 800; }
+        .amount-minus { color: #ff5f7a; }
+        .amount-plus { color: #43d29f; }
+
+        .modal-ykb .modal-content {
+            background-color: #0d1e33;
+            color: white;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .dekont-paper {
+            background-color: white;
+            color: #111;
+            padding: 24px;
+            border-radius: 12px;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .dekont-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #002B66;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+        }
+        .dekont-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+        .dekont-table td { padding: 8px 4px; border-bottom: 1px solid #eee; }
+        .dekont-table td.title { font-weight: bold; color: #002B66; width: 42%; }
+    /* ORİJİNAL E-DEKONT STİLLERİ (YAPI KREDİ BİREBİR) */
+.dekont-paper-original { 
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 580px;
+    box-sizing: border-box;
+    background: #ffffff; 
+    color: #000000; 
+    padding: 16px 18px; 
+    font-family: 'Courier New', Courier, Consolas, monospace; 
+    font-size: 8.5px; 
+    line-height: 1.34; 
+    border: none; 
+    box-shadow: 0 6px 24px rgba(0,0,0,0.45); 
+    transform-origin: top left;
+    transition: transform 0.15s ease-out;
+}
+.dekont-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.dekont-ykb-brand img {
+    height: 30px;
+    width: auto;
+    display: block;
+}
+.dekont-gib-stamp img {
+    height: 50px;
+    width: auto;
+    display: block;
+}
+.dekont-fast-header {
+    font-size: 11px;
+    font-weight: bold;
+    font-family: 'Courier New', Courier, monospace;
+    color: #000000;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+.dekont-box {
+    border: 1.2px solid #000000;
+    margin-bottom: 6px;
+    padding: 6px 8px;
+    background: #ffffff;
+    width: 100%;
+    box-sizing: border-box;
+}
+.dekont-table-box {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+.dekont-table-box td {
+    padding: 0;
+    vertical-align: top;
+}
+.dekont-qr-cell {
+    width: 72px;
+    min-width: 72px;
+    max-width: 72px;
+    text-align: right;
+    vertical-align: middle !important;
+    padding-right: 2px;
+}
+.dekont-qr-img {
+    width: 66px;
+    height: 66px;
+    border: none;
+    display: block;
+    margin-left: auto;
+    image-rendering: pixelated;
+    background: #ffffff;
+}
+.dekont-line {
+    margin-bottom: 2.2px;
+    display: flex;
+    align-items: baseline;
+    white-space: nowrap;
+    font-size: 8.5px;
+    line-height: 1.25;
+}
+.dekont-line-compact {
+    font-size: 7.2px;
+    letter-spacing: -0.3px;
+}
+.dekont-k1-sol {
+    display: inline-block;
+    width: 80px;
+    flex-shrink: 0;
+    color: #000;
+}
+.dekont-k1-mid {
+    display: inline-block;
+    width: 88px;
+    flex-shrink: 0;
+    color: #000;
+}
+.dekont-k2-sol {
+    display: inline-block;
+    width: 106px;
+    flex-shrink: 0;
+    color: #000;
+}
+.dekont-k2-sag {
+    display: inline-block;
+    width: 120px;
+    flex-shrink: 0;
+    color: #000;
+}
+.dekont-desc-wrap {
+    margin-top: 6px;
+}
+.dekont-desc-top {
+    text-align: center;
+    margin-bottom: 5px;
+}
+.dekont-desc-title {
+    font-weight: bold;
+    font-size: 8.5px;
+    letter-spacing: 0.5px;
+}
+.dekont-desc-sub {
+    font-size: 8px;
+    line-height: 1.35;
+}
+.dekont-desc-bottom {
+    border-top: 1.2px solid #000;
+    padding-top: 5px;
+    font-size: 8px;
+    line-height: 1.35;
+    text-align: left;
+}
+.dekont-box-bottom {
+    width: 100%;
+    border: 1.2px solid #000;
+    border-collapse: collapse;
+    box-sizing: border-box;
+    font-size: 7.5px;
+    line-height: 1.35;
+}
+.dekont-bottom-left {
+    width: 48%;
+    padding: 6px 8px;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+.dekont-bottom-right {
+    width: 52%;
+    padding: 6px 8px;
+    border-left: 1.2px solid #000;
+    vertical-align: top;
+    box-sizing: border-box;
+}
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+    #originalDekontContent,
+    #originalDekontContent * {
+        visibility: visible !important;
+    }
+    #originalDekontContent {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 10px !important;
+    }
+}
+   </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="dark-home-panel">
+            <div class="app-header-ykb">
+                <button class="menu-btn" aria-label="Menü"><i class="bi bi-list"></i></button>
+                <div class="search-field"><span>Yapı Kredi Mobil'de Ara</span></div>
+                <div class="profile-ring"><i class="bi bi-bell"></i></div>
+                <div class="profile-avatar"><i class="bi bi-person-fill"></i></div>
+            </div>
+
+            <div class="bank-toggle">
+                <button class="active">Yapı Kredi</button>
+                <button class="other-bank">Diğer Bankalarım<span class="new-badge">Yeni</span></button>
+            </div>
+
+            <div class="main-content-ykb top-home-content">
+                <div class="section-label">Hesaplarım</div>
+
+                <div class="home-card">
+                    <div class="account-line">
+                        <div class="mini-tag">₺</div>
+                        <button class="account-copy" type="button" onclick="openAccountDetail()" aria-label="Hesap detayını aç">
+                            <div class="account-name">Vadesiz TL Hesabı</div>
+                            <div class="account-number" id="uiIban">34062568</div>
+                        </button>
+                        <i class="bi bi-three-dots-vertical account-menu" aria-label="Hesap seçenekleri"></i>
+                    </div>
+
+                    <div class="balance-pair">
+                        <div class="balance-column">
+                            <div class="balance-value" id="uiAvailableBalance">71,52 TL</div>
+                            <div class="balance-label">Kullanılabilir Bakiye</div>
+                        </div>
+                        <div class="balance-column">
+                            <div class="balance-value" id="uiCurrentBalance">71,52 TL</div>
+                            <div class="balance-label">Güncel Bakiye</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-label card-section-title">Kartlarım</div>
+                <div class="card-panel">
+                    <div class="card-empty">
+                        <div class="card-illustration"><i class="bi bi-credit-card"></i></div>
+                        <div>
+                            <p>Kredi kartınız bulunmamaktadır.</p>
+                            <button class="cta-btn">Hemen Başvur</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lower-home-panel">
+            <div class="main-content-ykb">
+            <div class="quick-grid">
+                <div class="quick-item">
+                    <div class="quick-icon"><i class="bi bi-pie-chart"></i></div>
+                    <div class="quick-label">Varlıklarım</div>
+                </div>
+                <div class="quick-item">
+                    <div class="quick-icon"><i class="bi bi-qr-code"></i></div>
+                    <div class="quick-label">Para Çek/<br>Yatır</div>
+                </div>
+                <div class="quick-item">
+                    <div class="quick-icon"><i class="bi bi-arrow-left-right"></i></div>
+                    <div class="quick-label">Son<br>Hareketler</div>
+                </div>
+                <div class="quick-item">
+                    <div class="quick-icon"><i class="bi bi-calendar3"></i></div>
+                    <div class="quick-label">Aylık Ödeme<br>Planım</div>
+                </div>
+            </div>
+
+            <div class="limit-box">
+                <div class="limit-label"><i class="bi bi-cash-stack limit-badge" aria-hidden="true"></i> Hazır Limitim</div>
+                <div class="limit-link">Limitini İncele <i class="bi bi-chevron-right" aria-hidden="true"></i></div>
+            </div>
+
+            <div class="world-section">
+                <div class="section-label" style="margin:0;">Benim Dünyam</div>
+
+                <div class="world-grid">
+                    <div class="feature-box world-intro">
+                        <div class="icon-oval"><i class="bi bi-heart-half"></i></div>
+                        <div>Ev, araç ve hayatınızı kolaylaştıran diğer ihtiyaçlarınız için</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon-oval"><i class="bi bi-house-heart-fill"></i></div>
+                        <div>Evim+</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon-oval"><i class="bi bi-car-front-fill"></i></div>
+                        <div>Aracım+</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon-oval"><i class="bi bi-suitcase2-fill"></i></div>
+                        <div>Tatilim+</div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="icon-oval"><i class="bi bi-bag-heart-fill"></i></div>
+                        <div>Özel</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="txList" style="margin-top: 18px;"></div>
+            </div>
+        </div>
+
+        <section class="account-detail-page" id="accountDetailPage" aria-labelledby="accountDetailTitle">
+            <header class="detail-header">
+                <button type="button" onclick="closeAccountDetail()" aria-label="Ana sayfaya dön"><i class="bi bi-chevron-left"></i></button>
+                <button type="button" aria-label="Menü"><i class="bi bi-list"></i></button>
+                <h1 class="detail-page-title" id="accountDetailTitle">Hesap Detayı</h1>
+                <button type="button" aria-label="Yardım"><i class="bi bi-question-circle"></i></button>
+            </header>
+            <div class="detail-content">
+                <div class="detail-account-summary">
+                    <div class="detail-currency-icon">₺</div>
+                    <div class="detail-account-meta">
+                        <h2 class="detail-account-name">Vadesiz TL Hesabı</h2>
+                        <div class="detail-account-branch" id="detailBranch">Şube bilgisi</div>
+                        <div class="detail-account-iban" id="detailIban">IBAN bilgisi</div>
+                    </div>
+                    <div class="detail-account-type">Vadesiz</div>
+                </div>
+
+                <div class="detail-balances">
+                    <div class="detail-balance-row"><span>Güncel Bakiye</span><strong id="detailCurrentBalance">71,52 TL</strong></div>
+                    <div class="detail-balance-row"><span>Esnek Hesap Limiti</span><strong id="detailOverdraftLimit">0,00 TL</strong></div>
+                    <div class="detail-balance-row"><span>Kullanılabilir Bakiye</span><strong id="detailAvailableBalance">71,52 TL</strong></div>
+                </div>
+
+                <button class="detail-address-row" type="button">
+                    <span>Hesabınıza Kolay Adres tanımlamak veya hesabınıza tanımlanmış Kolay Adreslerinizi görüntülemek için tıklayın.</span>
+                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </button>
+
+                <div class="detail-option-row">
+                    <span>Favori Hesap Tanımla</span>
+                    <button class="detail-switch" type="button" role="switch" aria-label="Favori hesap" aria-checked="false" onclick="toggleDetailSwitch(this)"></button>
+                </div>
+                <div class="detail-option-row">
+                    <span>Jet İşlemler Hesap QR Kodu Ekle</span>
+                    <button class="detail-switch" type="button" role="switch" aria-label="Jet işlemler QR kodu" aria-checked="true" onclick="toggleDetailSwitch(this)"></button>
+                </div>
+            </div>
+
+            <div class="detail-actions">
+                <button class="detail-action" type="button" onclick="openAccountTransactions()">Hesap Hareketleri</button>
+                <button class="detail-action" type="button">Karta Hesap Bağlama / Çıkarma</button>
+                <button class="detail-action" type="button">IBAN Paylaş</button>
+                <button class="detail-action" type="button">Hesap QR Kodu Göster/Paylaş</button>
+                <button class="detail-action" type="button">Daha Fazlası</button>
+            </div>
+        </section>
+
+        <section class="account-detail-page" id="accountTransactionsPage" aria-labelledby="accountTransactionsTitle">
+            <header class="detail-header">
+                <button type="button" onclick="closeAccountTransactions()" aria-label="Hesap detayına dön"><i class="bi bi-chevron-left"></i></button>
+                <button type="button" aria-label="Menü"><i class="bi bi-list"></i></button>
+                <h1 class="detail-page-title" id="accountTransactionsTitle">Hesap Hareketleri</h1>
+                <button type="button" aria-label="Yardım"><i class="bi bi-question-circle"></i></button>
+            </header>
+            <div class="detail-content">
+                <div class="activity-account-summary">
+                    <div class="detail-currency-icon">₺</div>
+                    <div class="detail-account-meta">
+                        <div class="detail-account-name">Vadesiz TL Hesabı</div>
+                        <div class="detail-account-branch" id="activityBranch">Şube bilgisi</div>
+                        <div class="detail-account-iban" id="activityIban">IBAN bilgisi</div>
+                    </div>
+                    <div class="activity-account-type">Vadesiz</div>
+                </div>
+                <div class="activity-balance"><span>Kullanılabilir Bakiye</span><strong id="activityAvailableBalance">71,52 TL</strong></div>
+                <div class="activity-toolbar"><span>Son 10 Hareket</span><button class="activity-filter" type="button" aria-label="Hareket filtresi" aria-expanded="false" aria-controls="activityFilterOptions" onclick="toggleActivityFilter(this)"><i class="bi bi-sliders2"></i></button></div>
+                <div class="activity-filter-options" id="activityFilterOptions" hidden>
+                    <button type="button" data-filter="all" aria-pressed="true" onclick="setActivityFilter('all')">Tümü</button>
+                    <button type="button" data-filter="incoming" aria-pressed="false" onclick="setActivityFilter('incoming')">Gelen</button>
+                    <button type="button" data-filter="outgoing" aria-pressed="false" onclick="setActivityFilter('outgoing')">Giden</button>
+                </div>
+                <div class="pending-row"><span>Diğer Bekleyen İşlemler</span><strong>0,00 TL</strong></div>
+                <div class="activity-list" id="accountTransactionsList"><div class="activity-empty">Henüz hesap hareketi bulunmuyor.</div></div>
+            </div>
+        </section>
+
+        <section class="account-detail-page" id="movementDetailPage" aria-labelledby="movementDetailTitle">
+            <header class="detail-header">
+                <button type="button" onclick="closeMovementDetail()" aria-label="Hesap hareketlerine dön"><i class="bi bi-chevron-left"></i></button>
+                <button type="button" aria-label="Menü"><i class="bi bi-list"></i></button>
+                <h1 class="detail-page-title" id="movementDetailTitle">Hesap Hareketleri</h1>
+                <button type="button" aria-label="Yardım"><i class="bi bi-question-circle"></i></button>
+            </header>
+            <div class="movement-detail-content">
+                <div class="movement-detail-row"><span>İşlem Tarihi</span><span id="movementDetailDate">-</span></div>
+                <div class="movement-detail-row"><span>İşlem Tipi</span><span id="movementDetailType">-</span></div>
+                <div class="movement-detail-row"><span>Kanal</span><span id="movementDetailChannel">-</span></div>
+                <div class="movement-detail-row"><span>Açıklama</span><span id="movementDetailDescription">-</span></div>
+                <div class="movement-detail-row"><span>İşlem Tutarı</span><span id="movementDetailAmount">-</span></div>
+                <div class="movement-detail-row"><span>Güncel Bakiye</span><span id="movementDetailBalance">-</span></div>
+            </div>
+            <button class="movement-receipt-action" type="button" onclick="showOriginalDekont()">Dekont Görüntüle / Paylaş</button>
+        </section>
+
+        <section class="account-detail-page demo-receipt-page" id="demoReceiptPage" aria-label="Dekont Önizleme">
+            <div class="demo-receipt-screen-wrapper">
+                <div class="demo-receipt-card">
+                    <!-- Sayfa Numarası (1/1 Rozeti) -->
+                    <div class="dekont-page-badge">1/1</div>
+
+                    <!-- Büyütme / Küçültme Araç Çubuğu -->
+                    <div class="dekont-zoom-toolbar">
+                        <button type="button" class="dekont-zoom-btn" onclick="zoomDekont(-0.25)" title="Küçült" aria-label="Küçült">
+                            <i class="bi bi-dash-lg"></i>
+                        </button>
+                        <span id="dekontZoomVal" class="dekont-zoom-text" onclick="resetDekontZoom()" title="Yakınlaştırmayı sıfırla">100%</span>
+                        <button type="button" class="dekont-zoom-btn" onclick="zoomDekont(0.25)" title="Büyüt" aria-label="Büyüt">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- Dekont Görüntüleme & Kaydırma Kutusu -->
+                    <div class="dekont-viewport" id="dekontViewport" ondblclick="toggleDekontZoom()">
+                        <div class="dekont-scale-wrapper" id="dekontScaleWrapper">
+                            <div class="dekont-paper-original" id="originalDekontContent"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Birebir Yapı Kredi Mavi Butonları (Orijinal 2 Buton) -->
+                <div class="demo-receipt-actions-bottom">
+                    <button class="demo-receipt-blue-btn" type="button" onclick="openDekontShareSheet()">Dekont Paylaş</button>
+                    <button class="demo-receipt-blue-btn" type="button" onclick="closeDemoReceipt()">Tamam</button>
+                </div>
+                <p class="demo-share-status" id="demoShareStatus" aria-live="polite"></p>
+            </div>
+
+            <!-- Yapı Kredi Dekont Paylaşım ve İndirme Bottom Sheet -->
+            <div class="dekont-sheet-backdrop" id="dekontSheetBackdrop" onclick="closeDekontShareSheet()"></div>
+            <div class="dekont-bottom-sheet" id="dekontShareSheet" aria-hidden="true" role="dialog" aria-labelledby="sheetTitle">
+                <div class="dekont-sheet-handle"></div>
+                <div class="dekont-sheet-header">
+                    <div class="dekont-sheet-icon"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+                    <div class="dekont-sheet-info">
+                        <h3 class="dekont-sheet-title" id="sheetTitle">e-Dekont Paylaşımı</h3>
+                        <p class="dekont-sheet-subtitle" id="sheetDocNum">PDF Belgesi</p>
+                    </div>
+                </div>
+
+                <div class="dekont-sheet-options">
+                    <button type="button" class="dekont-sheet-item" onclick="triggerSheetDownload()">
+                        <div class="dekont-item-icon bg-blue"><i class="bi bi-arrow-down-circle-fill"></i></div>
+                        <div class="dekont-item-text">
+                            <span class="dekont-item-title">PDF Olarak İndir</span>
+                            <span class="dekont-item-desc">Dekont belgesini cihazınıza .pdf olarak kaydedin</span>
+                        </div>
+                        <i class="bi bi-chevron-right dekont-item-chevron"></i>
+                    </button>
+
+                    <button type="button" class="dekont-sheet-item" onclick="triggerSheetShare()">
+                        <div class="dekont-item-icon bg-green"><i class="bi bi-share-fill"></i></div>
+                        <div class="dekont-item-text">
+                            <span class="dekont-item-title">Dekontu Paylaş</span>
+                            <span class="dekont-item-desc">WhatsApp, e-posta veya diğer uygulamalarla paylaşın</span>
+                        </div>
+                        <i class="bi bi-chevron-right dekont-item-chevron"></i>
+                    </button>
+                </div>
+
+                <button type="button" class="dekont-sheet-cancel" onclick="closeDekontShareSheet()">Vazgeç</button>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="modal fade modal-ykb" id="detailModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-2">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-white">İşlem Detayı</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalContent"></div>
+                    <button class="btn btn-success w-100 py-3 mt-3 fw-bold rounded-3 fs-6" onclick="showOriginalDekont()">
+                        <i class="bi bi-file-earmark-pdf-fill me-2"></i> Yapı Kredi PDF Dekont Göster
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/html2pdf.bundle.min.js"></script>
+    <script src="/dekont_assets.js"></script>
+    <script>
+        const API_BASE = window.location.origin && window.location.origin.startsWith('http') 
+            ? `${window.location.origin}/api` 
+            : 'http://127.0.0.1:8000/api';
+        let currentAccount = null;
+        let currentSelectedTx = null;
+        let currentMovementTransaction = null;
+        let currentAccountTransactions = [];
+        let activeTransactionFilter = 'all';
+
+        function openAccountDetail() {
+            document.querySelector('.dark-home-panel').style.display = 'none';
+            document.querySelector('.lower-home-panel').style.display = 'none';
+            document.getElementById('accountDetailPage').style.display = 'flex';
+            window.scrollTo(0, 0);
+        }
+
+        function closeAccountDetail() {
+            document.querySelector('.dark-home-panel').style.display = '';
+            document.querySelector('.lower-home-panel').style.display = '';
+            document.getElementById('accountDetailPage').style.display = 'none';
+            window.scrollTo(0, 0);
+        }
+
+        function openAccountTransactions() {
+            document.getElementById('accountDetailPage').style.display = 'none';
+            document.getElementById('accountTransactionsPage').style.display = 'flex';
+            window.scrollTo(0, 0);
+        }
+
+        function closeAccountTransactions() {
+            document.getElementById('accountTransactionsPage').style.display = 'none';
+            document.getElementById('accountDetailPage').style.display = 'flex';
+            window.scrollTo(0, 0);
+        }
+
+        function openMovementDetail(transaction) {
+            currentMovementTransaction = transaction;
+            const numericAmount = Number(transaction.amount) || 0;
+            const amount = `${numericAmount < 0 ? '-' : ''}${Math.abs(numericAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL`;
+            const setDetailText = (id, value) => {
+                document.getElementById(id).textContent = value || '-';
+            };
+
+            setDetailText('movementDetailAmount', amount);
+            document.getElementById('movementDetailAmount').classList.toggle('outgoing', numericAmount < 0);
+            setDetailText('movementDetailType', transaction.category || transaction.transaction_type);
+            setDetailText('movementDetailDate', String(transaction.date_str || '-').replaceAll('.', '/') );
+            setDetailText('movementDetailChannel', 'Internet - Mobil');
+            setDetailText('movementDetailDescription', transaction.description);
+            setDetailText('movementDetailBalance', `${Number(transaction.balance_after || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL`);
+
+            document.getElementById('accountTransactionsPage').style.display = 'none';
+            document.getElementById('movementDetailPage').style.display = 'flex';
+            window.scrollTo(0, 0);
+        }
+
+        let previousPageBeforeDekont = 'movementDetailPage';
+
+        function openDemoReceipt() {
+            showOriginalDekont();
+        }
+
+        async function downloadDekontPDF() {
+            const statusEl = document.getElementById('demoShareStatus');
+            const t = currentMovementTransaction || currentSelectedTx;
+            const docNum = (t && t.fast_ref_no) || ('SYJ' + Date.now().toString().slice(-8));
+            const fileName = `YapiKredi_eDekont_${docNum}.pdf`;
+
+            if (statusEl) statusEl.textContent = 'PDF hazırlanıyor...';
+
+            const paper = document.getElementById('originalDekontContent');
+            if (!paper) {
+                window.print();
+                return;
+            }
+
+            try {
+                if (typeof html2pdf !== 'undefined') {
+                    const clone = paper.cloneNode(true);
+                    clone.style.transform = 'none';
+                    clone.style.position = 'static';
+                    clone.style.width = '620px';
+                    clone.style.boxShadow = 'none';
+                    clone.style.margin = '0 auto';
+
+                    const opt = {
+                        margin: [8, 8, 8, 8],
+                        filename: fileName,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true, logging: false },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    await html2pdf().set(opt).from(clone).save();
+                    if (statusEl) {
+                        statusEl.textContent = `PDF başarıyla indirildi: ${fileName}`;
+                        setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 3500);
+                    }
+                } else {
+                    window.print();
+                    if (statusEl) statusEl.textContent = '';
+                }
+            } catch (err) {
+                console.error('PDF indirme hatası:', err);
+                window.print();
+                if (statusEl) statusEl.textContent = '';
+            }
+        }
+
+        function openDekontShareSheet() {
+            const sheet = document.getElementById('dekontShareSheet');
+            const backdrop = document.getElementById('dekontSheetBackdrop');
+            const t = currentMovementTransaction || currentSelectedTx;
+            const docNum = (t && t.fast_ref_no) || ('SYJ' + Date.now().toString().slice(-8));
+            const docEl = document.getElementById('sheetDocNum');
+            if (docEl) docEl.textContent = `Belge No: ${docNum} (PDF)`;
+
+            if (sheet && backdrop) {
+                sheet.classList.add('active');
+                backdrop.classList.add('active');
+                sheet.setAttribute('aria-hidden', 'false');
+            }
+        }
+
+        function closeDekontShareSheet() {
+            const sheet = document.getElementById('dekontShareSheet');
+            const backdrop = document.getElementById('dekontSheetBackdrop');
+            if (sheet && backdrop) {
+                sheet.classList.remove('active');
+                backdrop.classList.remove('active');
+                sheet.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        async function triggerSheetDownload() {
+            closeDekontShareSheet();
+            await downloadDekontPDF();
+        }
+
+        async function triggerSheetShare() {
+            closeDekontShareSheet();
+            await shareDemoReceipt();
+        }
+
+        async function shareDemoReceipt() {
+            const t = currentMovementTransaction || currentSelectedTx;
+            const docNum = (t && t.fast_ref_no) || ('SYJ' + Date.now().toString().slice(-8));
+            const fileName = `YapiKredi_eDekont_${docNum}.pdf`;
+            const statusEl = document.getElementById('demoShareStatus');
+            if (statusEl) statusEl.textContent = 'Paylaşım hazırlanıyor...';
+
+            const paper = document.getElementById('originalDekontContent');
+            if (!paper) {
+                await downloadDekontPDF();
+                return;
+            }
+
+            try {
+                if (typeof html2pdf !== 'undefined' && navigator.share) {
+                    const clone = paper.cloneNode(true);
+                    clone.style.transform = 'none';
+                    clone.style.position = 'static';
+                    clone.style.width = '620px';
+                    clone.style.boxShadow = 'none';
+                    clone.style.margin = '0 auto';
+
+                    const opt = {
+                        margin: [8, 8, 8, 8],
+                        filename: fileName,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true, logging: false },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    };
+
+                    const pdfBlob = await html2pdf().set(opt).from(clone).output('blob');
+                    const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: 'Yapı Kredi e-Dekont',
+                            text: `Yapı Kredi Mobil e-Dekont (${fileName})`,
+                            files: [file]
+                        });
+                        if (statusEl) statusEl.textContent = '';
+                        return;
+                    }
+                }
+                await downloadDekontPDF();
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.warn('Share error, downloading PDF:', error);
+                    await downloadDekontPDF();
+                }
+                if (statusEl) statusEl.textContent = '';
+            }
+        }
+
+        function closeDemoReceipt() {
+            const receiptPage = document.getElementById('demoReceiptPage');
+            if (receiptPage) receiptPage.style.display = 'none';
+            
+            if (previousPageBeforeDekont === 'movementDetailPage') {
+                const el = document.getElementById('movementDetailPage');
+                if (el) el.style.display = 'flex';
+            } else if (previousPageBeforeDekont === 'accountTransactionsPage') {
+                const el = document.getElementById('accountTransactionsPage');
+                if (el) el.style.display = 'flex';
+            } else if (previousPageBeforeDekont === 'accountDetailPage') {
+                const el = document.getElementById('accountDetailPage');
+                if (el) el.style.display = 'flex';
+            } else {
+                const homeTop = document.querySelector('.dark-home-panel');
+                const homeBottom = document.querySelector('.lower-home-panel');
+                if (homeTop) homeTop.style.display = '';
+                if (homeBottom) homeBottom.style.display = '';
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function closeMovementDetail() {
+            document.getElementById('movementDetailPage').style.display = 'none';
+            document.getElementById('accountTransactionsPage').style.display = 'flex';
+            window.scrollTo(0, 0);
+        }
+
+        function toggleDetailSwitch(button) {
+            button.setAttribute('aria-checked', button.getAttribute('aria-checked') !== 'true');
+        }
+
+        function toggleActivityFilter(button) {
+            const options = document.getElementById('activityFilterOptions');
+            options.hidden = !options.hidden;
+            button.setAttribute('aria-expanded', String(!options.hidden));
+        }
+
+        function setActivityFilter(filter) {
+            activeTransactionFilter = filter;
+            document.querySelectorAll('#activityFilterOptions button').forEach((button) => {
+                button.setAttribute('aria-pressed', String(button.dataset.filter === filter));
+            });
+            renderAccountTransactions(currentAccountTransactions);
+        }
+
+        async function loadMobileApp() {
+            try {
+                const accRes = await fetch(`${API_BASE}/account`);
+                const acc = await accRes.json();
+                currentAccount = acc;
+
+                const setText = (id, value) => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = value;
+                };
+
+                setText('uiIban', acc.account_no || acc.iban || '34062568');
+                const balanceText = acc.balance.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL';
+                setText('uiAvailableBalance', balanceText);
+                setText('uiCurrentBalance', balanceText);
+                setText('detailAccountNumber', acc.account_no || '34062568');
+                setText('detailIban', acc.iban || '-');
+                setText('detailBranch', acc.branch_name || '-');
+                setText('detailCurrentBalance', balanceText);
+                setText('detailAvailableBalance', balanceText);
+                setText('detailOverdraftLimit', (acc.overdraft_limit || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL');
+                setText('activityBranch', acc.branch_name || '-');
+                setText('activityIban', acc.iban || '-');
+                setText('activityAvailableBalance', balanceText);
+                document.querySelectorAll('.balance-value').forEach((el) => {
+                    el.classList.toggle('long-balance', balanceText.length > 12);
+                });
+
+                const txRes = await fetch(`${API_BASE}/transactions`);
+                const txs = await txRes.json();
+
+                currentAccountTransactions = txs;
+                renderAccountTransactions(txs);
+
+                const container = document.getElementById('txList');
+                container.innerHTML = '';
+
+                txs.forEach(t => {
+                    const isPlus = t.amount > 0 || t.is_income;
+                    const amtStr = (Math.abs(t.amount)).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL';
+                    const div = document.createElement('div');
+                    div.className = 'tx-item';
+                    div.onclick = () => openTxDetail(t, acc);
+                    div.innerHTML = `
+                        <div>
+                            <div class="tx-title">${t.title}</div>
+                            <div class="tx-subtitle">${t.transaction_type} • ${t.date_str}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="tx-amount ${isPlus ? 'amount-plus' : 'amount-minus'}">${isPlus ? '+' : '-'}${amtStr}</div>
+                            <div class="tx-subtitle">${t.balance_after ? (t.balance_after.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' TL') : ''}</div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Mobile API Connection error:', err);
+            }
+        }
+
+        function renderAccountTransactions(transactions) {
+            const container = document.getElementById('accountTransactionsList');
+            if (!container) return;
+
+            const filteredTransactions = transactions.filter((transaction) => {
+                const amount = Number(transaction.amount) || 0;
+                if (activeTransactionFilter === 'incoming') return transaction.is_income || amount > 0;
+                if (activeTransactionFilter === 'outgoing') return !transaction.is_income && amount < 0;
+                return true;
+            });
+            const getTimestamp = (transaction) => {
+                const dateParts = String(transaction.date_str || '').match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+                if (!dateParts) return 0;
+
+                const timeParts = String(transaction.time_str || '').match(/^(\d{1,2})[:.](\d{2})(?:[:.](\d{2}))?$/);
+                return new Date(
+                    Number(dateParts[3]),
+                    Number(dateParts[2]) - 1,
+                    Number(dateParts[1]),
+                    Number(timeParts?.[1] || 0),
+                    Number(timeParts?.[2] || 0),
+                    Number(timeParts?.[3] || 0)
+                ).getTime();
+            };
+
+            const recentTransactions = [...filteredTransactions]
+                .sort((a, b) => getTimestamp(b) - getTimestamp(a))
+                .slice(0, 10);
+            if (recentTransactions.length === 0) {
+                const emptyMessage = activeTransactionFilter === 'all'
+                    ? 'Henüz hesap hareketi bulunmuyor.'
+                    : activeTransactionFilter === 'incoming'
+                        ? 'Gelen hareket bulunmuyor.'
+                        : 'Giden hareket bulunmuyor.';
+                container.innerHTML = `<div class="activity-empty">${emptyMessage}</div>`;
+                return;
+            }
+
+            const monthNames = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+            container.replaceChildren();
+
+            recentTransactions.forEach((transaction) => {
+                const dateParts = String(transaction.date_str || '').match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+                const day = dateParts ? dateParts[1].padStart(2, '0') : '--';
+                const month = dateParts ? monthNames[Number(dateParts[2]) - 1] || '' : '';
+                const year = dateParts ? dateParts[3] : '';
+                const numericAmount = Number(transaction.amount) || 0;
+                const amount = `${numericAmount < 0 ? '-' : ''}${Math.abs(numericAmount).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL`;
+                const row = document.createElement('button');
+                row.type = 'button';
+                row.className = 'activity-row';
+
+                const date = document.createElement('div');
+                date.className = 'activity-date';
+                date.innerHTML = `<strong>${day}</strong><span>${month}</span><span>${year}</span>`;
+
+                const description = document.createElement('div');
+                description.className = 'activity-description';
+                const title = document.createElement('span');
+                title.className = 'activity-description-title';
+                title.textContent = transaction.title || transaction.sender_receiver_name || transaction.transaction_type || 'İşlem';
+                description.appendChild(title);
+
+                const descriptionText = transaction.description || transaction.transaction_type;
+                if (descriptionText && descriptionText !== title.textContent) {
+                    const detail = document.createElement('span');
+                    detail.className = 'activity-description-body';
+                    detail.textContent = descriptionText;
+                    description.appendChild(detail);
+                }
+
+                const end = document.createElement('span');
+                end.className = 'activity-row-end';
+                end.innerHTML = '<i class="bi bi-chevron-right" aria-hidden="true"></i>';
+
+                const amountLabel = document.createElement('strong');
+                amountLabel.className = `activity-amount${numericAmount < 0 ? ' outgoing' : ''}`;
+                amountLabel.textContent = amount;
+                end.appendChild(amountLabel);
+
+                row.setAttribute('aria-label', `İşlem detayı: ${title.textContent}, ${amount}`);
+                row.addEventListener('click', () => openMovementDetail(transaction));
+                row.append(date, description, end);
+                container.appendChild(row);
+            });
+        }
+
+        function openTxDetail(t, acc) {
+            currentSelectedTx = { ...t, account: acc };
+            const isPlus = t.amount > 0 || t.is_income;
+            const amtStr = (Math.abs(t.amount)).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL';
+
+            document.getElementById('modalContent').innerHTML = `
+                <div class="text-center mb-3">
+                    <div style="font-size: 13px; color: var(--ykb-gray);">${t.transaction_type}</div>
+                    <div class="fs-1 fw-bold ${isPlus ? 'text-success' : 'text-danger'}">${isPlus ? '+' : '-'}${amtStr}</div>
+                    <span class="badge bg-secondary mt-1">${t.date_str} - ${t.time_str || '14:55:35'}</span>
+                </div>
+                <div class="p-3 rounded-3" style="background-color: rgba(255,255,255,0.05); font-size: 13px;">
+                    <div class="d-flex justify-content-between mb-2"><span class="text-muted">Alacaklı/Gönderen:</span> <strong>${t.sender_receiver_name}</strong></div>
+                    <div class="d-flex justify-content-between mb-2"><span class="text-muted">Açıklama:</span> <span>${t.description}</span></div>
+                    <div class="d-flex justify-content-between mb-2"><span class="text-muted">FAST Referans No:</span> <span>${t.fast_ref_no || '1542174497'}</span></div>
+                    <div class="d-flex justify-content-between"><span class="text-muted">Komisyon / BSMV:</span> <span>${t.commission || 7.97} TL / ${t.bsmv || 0.40} TL</span></div>
+                </div>
+            `;
+
+            new bootstrap.Modal(document.getElementById('detailModal')).show();
+        }
+
+        function showDekontPaper() { return; }
+
+        let currentDekontScale = 1.0;
+        let baseDekontFitScale = 1.0;
+
+        function zoomDekont(delta) {
+            currentDekontScale = Math.min(2.5, Math.max(0.5, Math.round((currentDekontScale + delta) * 100) / 100));
+            updateDekontZoom();
+        }
+
+        function resetDekontZoom() {
+            currentDekontScale = 1.0;
+            updateDekontZoom();
+        }
+
+        function toggleDekontZoom() {
+            if (currentDekontScale > 1.2) {
+                currentDekontScale = 1.0;
+            } else {
+                currentDekontScale = 1.75;
+            }
+            updateDekontZoom();
+        }
+
+        function updateDekontZoom() {
+            const paper = document.getElementById('originalDekontContent');
+            const wrapper = document.getElementById('dekontScaleWrapper');
+            const zoomVal = document.getElementById('dekontZoomVal');
+            if (!paper || !wrapper) return;
+
+            const effectiveScale = baseDekontFitScale * currentDekontScale;
+            paper.style.transform = `scale(${effectiveScale})`;
+
+            const paperWidth = 580;
+            const paperHeight = paper.offsetHeight || 680;
+            wrapper.style.width = `${Math.round(paperWidth * effectiveScale)}px`;
+            wrapper.style.height = `${Math.round(paperHeight * effectiveScale)}px`;
+
+            if (zoomVal) {
+                zoomVal.textContent = `${Math.round(currentDekontScale * 100)}%`;
+            }
+        }
+
+        function calculateBaseFit() {
+            const viewport = document.getElementById('dekontViewport');
+            const paper = document.getElementById('originalDekontContent');
+            if (!viewport || !paper) return;
+
+            const availableWidth = viewport.clientWidth - 12;
+            if (availableWidth <= 0) return;
+
+            baseDekontFitScale = Math.min(1.0, Math.max(0.35, availableWidth / 580));
+            currentDekontScale = 1.0;
+            updateDekontZoom();
+        }
+
+        function showOriginalDekont() {
+            const t = currentMovementTransaction || currentSelectedTx;
+            if (!t) return;
+            const acc = currentAccount || (currentSelectedTx && currentSelectedTx.account) || {};
+            const now = new Date();
+
+            // Gerçek UUID (ETTN)
+            const ettn = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+
+            const txDate = t.date_str || `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
+            const txTime = t.time_str || `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            const serialNo = `${Math.floor(Math.random()*900)+100}-${Math.floor(Math.random()*9000000)+1000000} / ${Math.floor(Math.random()*9000000000000)+1000000000000}`;
+            const docNumber = `SYJ${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${Math.floor(Math.random()*90000)+10000}`;
+            const sorguNo = `${Math.floor(Math.random()*9000000000)+1000000000}`;
+            const isIncome = Boolean(t.is_income || Number(t.amount) > 0);
+            const numAmount = Math.abs(Number(t.amount || 0));
+            const commission = Number(t.commission !== undefined ? t.commission : (isIncome ? 0 : 7.97));
+            const bsmv = Number(t.bsmv !== undefined ? t.bsmv : (isIncome ? 0 : 0.40));
+            const totalDeduction = (numAmount + commission + bsmv).toFixed(2);
+
+            const customerName = (acc.customer_name || 'KAAN TAŞKIN').toUpperCase();
+            const customerNo = acc.customer_no || '76611300';
+            const accountNo = acc.account_no || '34062568';
+            const accIban = acc.iban || 'TR89 0006 7010 0000 0034 0625 68';
+
+            const senderName = isIncome ? (t.sender_receiver_name || t.title || 'GÖNDEREN').toUpperCase() : customerName;
+            const receiverName = isIncome ? customerName : (t.sender_receiver_name || t.title || 'ALICI').toUpperCase();
+            const receiverIban = isIncome ? accIban : (t.iban || 'TR500015700000000157939759');
+            const receiverBank = isIncome ? 'Yapı ve Kredi Bankası A.Ş.' : 'Enpara Bank A.Ş.';
+            const descText = (t.description || (t.sender_receiver_name || t.title || 'İŞLEM') + '-FAST-CEP').toUpperCase();
+
+            // HD Assetler & Resmi Orijinal Karekod (Tam, Kesilme ve Taşma Yok)
+            const ykbLogoSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.ykbLogo) || '/assets/ykb_logo.png';
+            const stampSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.stamp) || '/assets/edekont_stamp.png';
+            const qrSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.qr) || '/assets/dekont_qr.png';
+
+            const paperEl = document.getElementById('originalDekontContent');
+            if (paperEl) {
+                paperEl.innerHTML = `
+                    <!-- ÜST LOGO & BAŞLIK ALANI (HD ASSETLER) -->
+                    <div class="dekont-top-row">
+                        <div class="dekont-ykb-brand">
+                            <img src="${ykbLogoSrc}" alt="Yapı Kredi">
+                        </div>
+
+                        <div class="dekont-gib-stamp">
+                            <img src="${stampSrc}" alt="e-Dekont">
+                        </div>
+
+                        <div class="dekont-fast-header">FAST GÖNDERİMİ</div>
+                    </div>
+
+                    <!-- 1. KUTU (ÜST BİLGİLER + ORİJİNAL HD KAREKOD) -->
+                    <div class="dekont-box">
+                        <table class="dekont-table-box">
+                            <colgroup>
+                                <col style="width: 38%;">
+                                <col style="width: 46%;">
+                                <col style="width: 16%;">
+                            </colgroup>
+                            <tr>
+                                <!-- Sol Blok -->
+                                <td>
+                                    <div class="dekont-line"><span class="dekont-k1-sol">MÜŞTERİ NO</span>: ${customerNo}</div>
+                                    <div class="dekont-line"><span class="dekont-k1-sol">TCKN</span>: ***********</div>
+                                    <div class="dekont-line"><span class="dekont-k1-sol">IBAN NO</span>: ${accIban}</div>
+                                    <div class="dekont-line"><span class="dekont-k1-sol">İŞLEM TARİHİ</span>: ${txDate} ${txTime}</div>
+                                    <div class="dekont-line"><span class="dekont-k1-sol">VALÖR</span>: ${txDate}</div>
+                                    <div class="dekont-line"><span class="dekont-k1-sol">DEKONT TİPİ</span>: EFT &nbsp;&nbsp;&nbsp;&nbsp; SENARYO : DEKONT</div>
+                                </td>
+
+                                <!-- Orta Blok -->
+                                <td>
+                                    <div class="dekont-line"><span class="dekont-k1-mid">İŞLEM REF</span>: ${t.fast_ref_no || '1542785514'}</div>
+                                    <div class="dekont-line dekont-line-compact"><span class="dekont-k1-mid">SIRA NO/ID</span>: ${serialNo}</div>
+                                    <div class="dekont-line"><span class="dekont-k1-mid">PERSONEL SİCİL</span>: INT001</div>
+                                    <div class="dekont-line"><span class="dekont-k1-mid">BELGE NUMARASI</span>: ${docNumber}</div>
+                                    <div class="dekont-line"><span class="dekont-k1-mid">BELGE TARİHİ</span>: ${txDate}</div>
+                                    <div class="dekont-line dekont-line-compact"><span class="dekont-k1-mid">ETTN</span>: ${ettn}</div>
+                                </td>
+
+                                <!-- Sağ Blok: ORİJİNAL HD KAREKOD (EKSİKSİZ, ÇERÇEVESİZ, TAM İÇERİDE) -->
+                                <td class="dekont-qr-cell">
+                                    <img class="dekont-qr-img" src="${qrSrc}" alt="Karekod">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- 2. KUTU (İŞLEM DETAYLARI & AÇIKLAMA) -->
+                    <div class="dekont-box">
+                        <table class="dekont-table-box">
+                            <colgroup>
+                                <col style="width: 58%;">
+                                <col style="width: 42%;">
+                            </colgroup>
+                            <tr>
+                                <!-- Sol Sütun -->
+                                <td>
+                                    <div class="dekont-line"><span class="dekont-k2-sol">${isIncome ? 'GELEN' : 'GİDEN'} FAST TUTARI</span>: ${isIncome ? '+' : '-'}${numAmount.toLocaleString('tr-TR', {minimumFractionDigits: 2})}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sol">DÖVİZ CİNSİ</span>: TL</div>
+                                    <div class="dekont-line dekont-line-compact"><span class="dekont-k2-sol">GÖNDEREN HESAP NO</span>: ${accountNo}/IBAN:${accIban}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sol">GÖNDEREN ADI</span>: ${senderName}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sol">ALICI BANKA</span>: ${receiverBank}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sol">ALICI ŞUBE</span>: -</div>
+                                    <div class="dekont-line dekont-line-compact"><span class="dekont-k2-sol">ALICI HESAP</span>: ${receiverIban}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sol">ALICI ADI</span>: ${receiverName}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sol">ALICI TCKN/VD/VKN</span>: -</div>
+                                </td>
+
+                                <!-- Sağ Sütun -->
+                                <td>
+                                    <div class="dekont-line"><span class="dekont-k2-sag">VERGİ</span>: -${bsmv.toFixed(2)}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sag">KOMİSYON</span>: -${commission.toFixed(2)}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sag">TOPLAM TAHSİLAT TUTARI</span>: ${isIncome ? '+' + numAmount.toLocaleString('tr-TR', {minimumFractionDigits: 2}) : '-' + totalDeduction}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sag">ÖDEMENİN KAYNAĞI</span>: İnternet Bankacılığı</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sag">MESAJ TÜRÜ</span>: Bireysel Ödeme</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sag">SORGU NO</span>: ${sorguNo}</div>
+                                    <div class="dekont-line"><span class="dekont-k2-sag">KOLAY ADRES</span>: -</div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Açıklama Alanı (Orijinal YKB Formatı) -->
+                        <div class="dekont-desc-wrap">
+                            <div class="dekont-desc-top">
+                                <div class="dekont-desc-title">AÇIKLAMA</div>
+                                <div class="dekont-desc-sub">YUKARIDAKİ TUTAR HESABINIZA BORÇ/ALACAK KAYDEDİLMİŞTİR.</div>
+                            </div>
+                            <div class="dekont-desc-bottom">
+                                AÇIKLAMA:ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ - FAST/ ${descText}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. KUTU (YASAL FOOTER & İMZA SAHİBİ) -->
+                    <table class="dekont-box-bottom">
+                        <tr>
+                            <td class="dekont-bottom-left">
+                                <div style="font-weight: bold; margin-bottom: 22px;">${customerName}</div>
+                                <div>e-Dekont izni kapsamında elektronik ortamda üretilmiştir.</div>
+                            </td>
+                            <td class="dekont-bottom-right">
+                                <div>Ticari Unvan: Yapı ve Kredi Bankası A.Ş.</div>
+                                <div>Büyük Mükellefler VD: 9370020892 Web Adresi: <a href="https://www.yapikredi.com.tr" target="_blank" style="color:#000; text-decoration:none;">www.yapikredi.com.tr</a></div>
+                                <div>Ticaret Sicil Numarası: 32736 İşletmenin Merkezi: Yapı Kredi</div>
+                                <div>Plaza D Blok 34330 Levent - İstanbul Mersis No: 0937002089200741</div>
+                                <div style="font-weight: bold; margin-top: 10px;">SİSTEM</div>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+            }
+
+            // Hangi ekrandan gelindiğini tespit et ve gizle
+            previousPageBeforeDekont = 'home';
+            const activePages = ['movementDetailPage', 'accountTransactionsPage', 'accountDetailPage'];
+            for (const pId of activePages) {
+                const el = document.getElementById(pId);
+                if (el && el.style.display !== 'none' && el.style.display !== '') {
+                    previousPageBeforeDekont = pId;
+                    el.style.display = 'none';
+                    break;
+                }
+            }
+
+            // Ana sayfa panellerini her halükarda gizle
+            const homeTop = document.querySelector('.dark-home-panel');
+            const homeBottom = document.querySelector('.lower-home-panel');
+            if (homeTop) homeTop.style.display = 'none';
+            if (homeBottom) homeBottom.style.display = 'none';
+
+            // Modal açıksa kapat
+            const detailModalEl = document.getElementById('detailModal');
+            if (detailModalEl) {
+                const oldModal = bootstrap.Modal.getInstance(detailModalEl);
+                if (oldModal) oldModal.hide();
+            }
+
+            // Dekont sayfasını göster
+            const receiptPage = document.getElementById('demoReceiptPage');
+            if (receiptPage) {
+                receiptPage.style.display = 'flex';
+                window.scrollTo(0, 0);
+            }
+
+            // Sayfaya ve ekrana tam oturt
+            setTimeout(() => {
+                calculateBaseFit();
+            }, 60);
+
+            // ResizeObserver ile otomatik sığdırma
+            if (window.ResizeObserver) {
+                const vp = document.getElementById('dekontViewport');
+                if (vp && !vp.__observerAttached) {
+                    vp.__observerAttached = true;
+                    new ResizeObserver(() => {
+                        const page = document.getElementById('demoReceiptPage');
+                        if (page && page.style.display === 'flex' && currentDekontScale === 1.0) {
+                            calculateBaseFit();
+                        }
+                    }).observe(vp);
+                }
+            }
+        }
+
+        // Panning ve gesture desteği
+        (function initDekontPanAndZoom() {
+            window.addEventListener('load', () => {
+                const vp = document.getElementById('dekontViewport');
+                if (!vp) return;
+                let isDown = false;
+                let startX, startY, sLeft, sTop;
+                vp.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    vp.style.cursor = 'grabbing';
+                    startX = e.pageX - vp.offsetLeft;
+                    startY = e.pageY - vp.offsetTop;
+                    sLeft = vp.scrollLeft;
+                    sTop = vp.scrollTop;
+                });
+                vp.addEventListener('mouseleave', () => { isDown = false; vp.style.cursor = 'grab'; });
+                vp.addEventListener('mouseup', () => { isDown = false; vp.style.cursor = 'grab'; });
+                vp.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - vp.offsetLeft;
+                    const y = e.pageY - vp.offsetTop;
+                    vp.scrollLeft = sLeft - (x - startX);
+                    vp.scrollTop = sTop - (y - startY);
+                });
+                vp.addEventListener('wheel', (e) => {
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        zoomDekont(e.deltaY < 0 ? 0.2 : -0.2);
+                    }
+                }, { passive: false });
+            });
+            window.addEventListener('resize', () => {
+                const page = document.getElementById('demoReceiptPage');
+                if (page && page.style.display === 'flex') {
+                    calculateBaseFit();
+                }
+            });
+        })();
+
+        loadMobileApp().then(() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('dekont') === '1' || window.location.hash === '#dekont') {
+                if (currentAccountTransactions && currentAccountTransactions.length > 0) {
+                    currentMovementTransaction = currentAccountTransactions[0];
+                }
+                showOriginalDekont();
+            }
+        });
+        setInterval(loadMobileApp, 2000);
+    </script>
+</body>
+</html>
