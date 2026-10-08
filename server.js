@@ -157,7 +157,10 @@ async function requestHandler(req, res) {
 
     const rawPath = req.headers['x-matched-path'] || req.headers['x-forwarded-uri'] || req.url || '/';
     const url = new URL(rawPath, `http://${req.headers.host || 'localhost'}`);
-    let pathname = url.pathname;
+    const routeParam = url.searchParams.get('__route');
+    let pathname = routeParam !== null
+        ? (routeParam ? (routeParam.startsWith('/') ? routeParam : '/' + routeParam) : '/')
+        : url.pathname;
 
     // Normalize trailing slash (except root)
     if (pathname.length > 1 && pathname.endsWith('/')) {
