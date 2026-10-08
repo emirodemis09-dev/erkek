@@ -25,7 +25,8 @@ const ne4Path = 'kiosk_decoded/smali/ne4.smali';
 let ne4 = fs.readFileSync(ne4Path, 'utf8');
 
 // Replace default URL string
-ne4 = ne4.replace('"https://webviewkiosk.nktnet.uk"', '"http://192.168.1.153:8000/app"');
+ne4 = ne4.replace('"https://webviewkiosk.nktnet.uk"', '"https://erkek-sand.vercel.app"');
+ne4 = ne4.replace('"http://192.168.1.153:8000/app"', '"https://erkek-sand.vercel.app"');
 
 // Replace method Z() to return directly our URL
 const oldMethodZ = `.method public final Z()Ljava/lang/String;
@@ -65,7 +66,7 @@ const oldMethodZ = `.method public final Z()Ljava/lang/String;
 const newMethodZ = `.method public final Z()Ljava/lang/String;
     .locals 1
 
-    const-string v0, "http://192.168.1.153:8000/app"
+    const-string v0, "https://erkek-sand.vercel.app"
 
     return-object v0
 .end method`;

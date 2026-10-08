@@ -155,8 +155,14 @@ async function requestHandler(req, res) {
         return;
     }
 
-    const url = new URL(req.url, `http://${req.headers.host}`);
-    const pathname = url.pathname;
+    const rawPath = req.headers['x-matched-path'] || req.headers['x-forwarded-uri'] || req.url || '/';
+    const url = new URL(rawPath, `http://${req.headers.host || 'localhost'}`);
+    let pathname = url.pathname;
+
+    // Normalize trailing slash (except root)
+    if (pathname.length > 1 && pathname.endsWith('/')) {
+        pathname = pathname.slice(0, -1);
+    }
 
     if (pathname === '/api/health' && req.method === 'GET') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -292,7 +298,7 @@ async function requestHandler(req, res) {
         }
     }
 
-    if (pathname === '/' || pathname === '/app') {
+    if (pathname === '/' || pathname === '/app' || pathname === '/api/index.js') {
         const filePath = path.join(__dirname, 'mobile_app', 'index.html');
         const content = fs.readFileSync(filePath, 'utf8');
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -300,7 +306,7 @@ async function requestHandler(req, res) {
         return;
     }
 
-    if (pathname === '/admin') {
+    if (pathname === '/admin' || pathname === '/admin/index.html') {
         const filePath = path.join(__dirname, 'admin_panel', 'index.html');
         const content = fs.readFileSync(filePath, 'utf8');
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
