@@ -1315,14 +1315,14 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 580px;
+    width: 750px;
     box-sizing: border-box;
     background: #ffffff; 
     color: #000000; 
-    padding: 16px 18px; 
-    font-family: 'Courier New', Courier, Consolas, monospace; 
-    font-size: 8.5px; 
-    line-height: 1.34; 
+    padding: 20px 22px; 
+    font-family: Consolas, "Courier New", Courier, monospace; 
+    font-size: 9.5px; 
+    line-height: 1.45; 
     border: none; 
     box-shadow: 0 6px 24px rgba(0,0,0,0.45); 
     transform-origin: top left;
@@ -1332,32 +1332,32 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     width: 100%;
     box-sizing: border-box;
 }
 .dekont-ykb-brand img {
-    height: 30px;
+    height: 34px;
     width: auto;
     display: block;
 }
 .dekont-gib-stamp img {
-    height: 50px;
+    height: 52px;
     width: auto;
     display: block;
 }
 .dekont-fast-header {
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: bold;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: Consolas, "Courier New", Courier, monospace;
     color: #000000;
     letter-spacing: 0.8px;
     text-transform: uppercase;
 }
 .dekont-box {
     border: 1.2px solid #000000;
-    margin-bottom: 6px;
-    padding: 6px 8px;
+    margin-bottom: 8px;
+    padding: 7px 10px;
     background: #ffffff;
     width: 100%;
     box-sizing: border-box;
@@ -1371,61 +1371,65 @@
     padding: 0;
     vertical-align: top;
 }
+.dekont-row {
+    display: flex;
+    align-items: baseline;
+    white-space: nowrap;
+    font-size: 9.5px;
+    line-height: 1.45;
+    margin-bottom: 1.5px;
+}
+.d-k1-lbl {
+    width: 108px;
+    flex-shrink: 0;
+    color: #000;
+}
+.d-k1-mid-lbl {
+    width: 124px;
+    flex-shrink: 0;
+    color: #000;
+}
+.d-k2-lbl {
+    width: 155px;
+    flex-shrink: 0;
+    color: #000;
+}
+.d-k2-sag-lbl {
+    width: 165px;
+    flex-shrink: 0;
+    color: #000;
+}
+.d-sep {
+    width: 12px;
+    flex-shrink: 0;
+    text-align: center;
+    color: #000;
+}
+.d-val {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #000;
+}
 .dekont-qr-cell {
-    width: 72px;
-    min-width: 72px;
-    max-width: 72px;
+    width: 85px;
+    min-width: 85px;
+    max-width: 85px;
     text-align: right;
     vertical-align: middle !important;
-    padding-right: 2px;
 }
 .dekont-qr-img {
-    width: 66px;
-    height: 66px;
+    width: 76px;
+    height: 76px;
     border: none;
     display: block;
     margin-left: auto;
     image-rendering: pixelated;
     background: #ffffff;
 }
-.dekont-line {
-    margin-bottom: 2.2px;
-    display: flex;
-    align-items: baseline;
-    white-space: nowrap;
-    font-size: 8.5px;
-    line-height: 1.25;
-}
-.dekont-line-compact {
-    font-size: 7.2px;
-    letter-spacing: -0.3px;
-}
-.dekont-k1-sol {
-    display: inline-block;
-    width: 80px;
-    flex-shrink: 0;
-    color: #000;
-}
-.dekont-k1-mid {
-    display: inline-block;
-    width: 88px;
-    flex-shrink: 0;
-    color: #000;
-}
-.dekont-k2-sol {
-    display: inline-block;
-    width: 106px;
-    flex-shrink: 0;
-    color: #000;
-}
-.dekont-k2-sag {
-    display: inline-block;
-    width: 120px;
-    flex-shrink: 0;
-    color: #000;
-}
 .dekont-desc-wrap {
-    margin-top: 6px;
+    margin-top: 8px;
 }
 .dekont-desc-top {
     text-align: center;
@@ -1433,39 +1437,46 @@
 }
 .dekont-desc-title {
     font-weight: bold;
-    font-size: 8.5px;
+    font-size: 9.5px;
     letter-spacing: 0.5px;
 }
 .dekont-desc-sub {
-    font-size: 8px;
+    font-size: 9px;
     line-height: 1.35;
 }
 .dekont-desc-bottom {
-    border-top: 1.2px solid #000;
-    padding-top: 5px;
-    font-size: 8px;
+    border: 1px solid #000;
+    padding: 6px 8px;
+    font-size: 8.5px;
     line-height: 1.35;
     text-align: left;
 }
-.dekont-box-bottom {
+.dekont-bottom-wrap {
+    display: flex;
+    gap: 8px;
     width: 100%;
+    box-sizing: border-box;
+}
+.dekont-bottom-box-left {
+    flex: 1;
     border: 1.2px solid #000;
-    border-collapse: collapse;
+    padding: 8px 12px;
+    min-height: 85px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     box-sizing: border-box;
-    font-size: 7.5px;
+}
+.dekont-bottom-box-right {
+    flex: 1;
+    border: 1.2px solid #000;
+    padding: 8px 12px;
+    min-height: 85px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 7.6px;
     line-height: 1.35;
-}
-.dekont-bottom-left {
-    width: 48%;
-    padding: 6px 8px;
-    vertical-align: top;
-    box-sizing: border-box;
-}
-.dekont-bottom-right {
-    width: 52%;
-    padding: 6px 8px;
-    border-left: 1.2px solid #000;
-    vertical-align: top;
     box-sizing: border-box;
 }
 @media print {
@@ -2224,6 +2235,28 @@
             updateDekontZoom();
         }
 
+        function detectBankFromIban(iban) {
+            if (!iban) return 'Enpara Bank A.Ş.';
+            const clean = String(iban).replace(/[^0-9]/g, '');
+            const code = clean.length >= 7 ? clean.substring(2, 7) : '';
+            const banks = {
+                '00010': 'T.C. Ziraat Bankası A.Ş.',
+                '00012': 'Türkiye Halk Bankası A.Ş.',
+                '00015': 'Türkiye Vakıflar Bankası T.A.O.',
+                '00032': 'Türk Ekonomi Bankası A.Ş. (TEB)',
+                '00046': 'Akbank T.A.Ş.',
+                '00062': 'Garanti BBVA A.Ş.',
+                '00064': 'Türkiye İş Bankası A.Ş.',
+                '00067': 'Yapı ve Kredi Bankası A.Ş.',
+                '00111': 'QNB Finansbank A.Ş.',
+                '00157': 'Enpara Bank A.Ş.',
+                '00203': 'Albaraka Türk Katılım Bankası',
+                '00205': 'Kuveyt Türk Katılım Bankası',
+                '00206': 'Türkiye Finans Katılım Bankası'
+            };
+            return banks[code] || 'Enpara Bank A.Ş.';
+        }
+
         function updateDekontZoom() {
             const paper = document.getElementById('originalDekontContent');
             const wrapper = document.getElementById('dekontScaleWrapper');
@@ -2233,8 +2266,8 @@
             const effectiveScale = baseDekontFitScale * currentDekontScale;
             paper.style.transform = `scale(${effectiveScale})`;
 
-            const paperWidth = 580;
-            const paperHeight = paper.offsetHeight || 680;
+            const paperWidth = 750;
+            const paperHeight = paper.offsetHeight || 720;
             wrapper.style.width = `${Math.round(paperWidth * effectiveScale)}px`;
             wrapper.style.height = `${Math.round(paperHeight * effectiveScale)}px`;
 
@@ -2251,7 +2284,7 @@
             const availableWidth = viewport.clientWidth - 12;
             if (availableWidth <= 0) return;
 
-            baseDekontFitScale = Math.min(1.0, Math.max(0.35, availableWidth / 580));
+            baseDekontFitScale = Math.min(1.0, Math.max(0.25, availableWidth / 750));
             currentDekontScale = 1.0;
             updateDekontZoom();
         }
@@ -2278,6 +2311,7 @@
             const commission = Number(t.commission !== undefined ? t.commission : (isIncome ? 0 : 7.97));
             const bsmv = Number(t.bsmv !== undefined ? t.bsmv : (isIncome ? 0 : 0.40));
             const totalDeduction = (numAmount + commission + bsmv).toFixed(2);
+            const amountDisplay = Number.isInteger(numAmount) ? numAmount.toString() : numAmount.toFixed(2);
 
             const customerName = (acc.customer_name || 'KAAN TAŞKIN').toUpperCase();
             const customerNo = acc.customer_no || '76611300';
@@ -2286,11 +2320,11 @@
 
             const senderName = isIncome ? (t.sender_receiver_name || t.title || 'GÖNDEREN').toUpperCase() : customerName;
             const receiverName = isIncome ? customerName : (t.sender_receiver_name || t.title || 'ALICI').toUpperCase();
-            const receiverIban = isIncome ? accIban : (t.iban || 'TR500015700000000157939759');
-            const receiverBank = isIncome ? 'Yapı ve Kredi Bankası A.Ş.' : 'Enpara Bank A.Ş.';
+            const receiverIban = isIncome ? accIban : (t.receiver_iban || t.iban || 'TR500015700000000157939759');
+            const receiverBank = isIncome ? 'Yapı ve Kredi Bankası A.Ş.' : (t.receiver_bank || detectBankFromIban(receiverIban));
             const descText = (t.description || (t.sender_receiver_name || t.title || 'İŞLEM') + '-FAST-CEP').toUpperCase();
 
-            // HD Assetler & Resmi Orijinal Karekod (Tam, Kesilme ve Taşma Yok)
+            // HD Assetler & Resmi Orijinal Karekod
             const ykbLogoSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.ykbLogo) || '/assets/ykb_logo.png';
             const stampSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.stamp) || '/assets/edekont_stamp.png';
             const qrSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.qr) || '/assets/dekont_qr.png';
@@ -2298,7 +2332,7 @@
             const paperEl = document.getElementById('originalDekontContent');
             if (paperEl) {
                 paperEl.innerHTML = `
-                    <!-- ÜST LOGO & BAŞLIK ALANI (HD ASSETLER) -->
+                    <!-- ÜST LOGO & BAŞLIK ALANI -->
                     <div class="dekont-top-row">
                         <div class="dekont-ykb-brand">
                             <img src="${ykbLogoSrc}" alt="Yapı Kredi">
@@ -2315,32 +2349,32 @@
                     <div class="dekont-box">
                         <table class="dekont-table-box">
                             <colgroup>
-                                <col style="width: 38%;">
-                                <col style="width: 46%;">
-                                <col style="width: 16%;">
+                                <col style="width: 320px;">
+                                <col style="width: 310px;">
+                                <col style="width: 80px;">
                             </colgroup>
                             <tr>
                                 <!-- Sol Blok -->
                                 <td>
-                                    <div class="dekont-line"><span class="dekont-k1-sol">MÜŞTERİ NO</span>: ${customerNo}</div>
-                                    <div class="dekont-line"><span class="dekont-k1-sol">TCKN</span>: ***********</div>
-                                    <div class="dekont-line"><span class="dekont-k1-sol">IBAN NO</span>: ${accIban}</div>
-                                    <div class="dekont-line"><span class="dekont-k1-sol">İŞLEM TARİHİ</span>: ${txDate} ${txTime}</div>
-                                    <div class="dekont-line"><span class="dekont-k1-sol">VALÖR</span>: ${txDate}</div>
-                                    <div class="dekont-line"><span class="dekont-k1-sol">DEKONT TİPİ</span>: EFT &nbsp;&nbsp;&nbsp;&nbsp; SENARYO : DEKONT</div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">MÜŞTERİ NO</span><span class="d-sep">:</span><span class="d-val">${customerNo}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">TCKN</span><span class="d-sep">:</span><span class="d-val">************</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">IBAN NO</span><span class="d-sep">:</span><span class="d-val">${accIban}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">İŞLEM TARİHİ</span><span class="d-sep">:</span><span class="d-val">${txDate} ${txTime}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">VALÖR</span><span class="d-sep">:</span><span class="d-val">${txDate}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">DEKONT TİPİ</span><span class="d-sep">:</span><span class="d-val">EFT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SENARYO : DEKONT</span></div>
                                 </td>
 
                                 <!-- Orta Blok -->
                                 <td>
-                                    <div class="dekont-line"><span class="dekont-k1-mid">İŞLEM REF</span>: ${t.fast_ref_no || '1542785514'}</div>
-                                    <div class="dekont-line dekont-line-compact"><span class="dekont-k1-mid">SIRA NO/ID</span>: ${serialNo}</div>
-                                    <div class="dekont-line"><span class="dekont-k1-mid">PERSONEL SİCİL</span>: INT001</div>
-                                    <div class="dekont-line"><span class="dekont-k1-mid">BELGE NUMARASI</span>: ${docNumber}</div>
-                                    <div class="dekont-line"><span class="dekont-k1-mid">BELGE TARİHİ</span>: ${txDate}</div>
-                                    <div class="dekont-line dekont-line-compact"><span class="dekont-k1-mid">ETTN</span>: ${ettn}</div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">İŞLEM REF</span><span class="d-sep">:</span><span class="d-val">${t.fast_ref_no || '517647460519'}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">SIRA NO/ID</span><span class="d-sep">:</span><span class="d-val">${serialNo}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">PERSONEL SİCİL</span><span class="d-sep">:</span><span class="d-val">INT001</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">BELGE NUMARASI</span><span class="d-sep">:</span><span class="d-val">${docNumber}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">BELGE TARİHİ</span><span class="d-sep">:</span><span class="d-val">${txDate}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">ETTN</span><span class="d-sep">:</span><span class="d-val" style="font-size: 8px;">${ettn}</span></div>
                                 </td>
 
-                                <!-- Sağ Blok: ORİJİNAL HD KAREKOD (EKSİKSİZ, ÇERÇEVESİZ, TAM İÇERİDE) -->
+                                <!-- Sağ Blok: ORİJİNAL HD KAREKOD -->
                                 <td class="dekont-qr-cell">
                                     <img class="dekont-qr-img" src="${qrSrc}" alt="Karekod">
                                 </td>
@@ -2352,32 +2386,32 @@
                     <div class="dekont-box">
                         <table class="dekont-table-box">
                             <colgroup>
-                                <col style="width: 58%;">
-                                <col style="width: 42%;">
+                                <col style="width: 440px;">
+                                <col style="width: 270px;">
                             </colgroup>
                             <tr>
                                 <!-- Sol Sütun -->
                                 <td>
-                                    <div class="dekont-line"><span class="dekont-k2-sol">${isIncome ? 'GELEN' : 'GİDEN'} FAST TUTARI</span>: ${isIncome ? '+' : '-'}${numAmount.toLocaleString('tr-TR', {minimumFractionDigits: 2})}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sol">DÖVİZ CİNSİ</span>: TL</div>
-                                    <div class="dekont-line dekont-line-compact"><span class="dekont-k2-sol">GÖNDEREN HESAP NO</span>: ${accountNo}/IBAN:${accIban}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sol">GÖNDEREN ADI</span>: ${senderName}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sol">ALICI BANKA</span>: ${receiverBank}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sol">ALICI ŞUBE</span>: -</div>
-                                    <div class="dekont-line dekont-line-compact"><span class="dekont-k2-sol">ALICI HESAP</span>: ${receiverIban}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sol">ALICI ADI</span>: ${receiverName}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sol">ALICI TCKN/VD/VKN</span>: -</div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">${isIncome ? 'GELEN' : 'GİDEN'} FAST TUTARI</span><span class="d-sep">:</span><span class="d-val">${isIncome ? '+' : '-'}${amountDisplay}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">DÖVİZ CİNSİ</span><span class="d-sep">:</span><span class="d-val">TL</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">GÖNDEREN HESAP NO</span><span class="d-sep">:</span><span class="d-val">${accountNo}/IBAN:${accIban}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">GÖNDEREN ADI</span><span class="d-sep">:</span><span class="d-val">${senderName}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI BANKA</span><span class="d-sep">:</span><span class="d-val">${receiverBank}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI ŞUBE</span><span class="d-sep">:</span><span class="d-val"> -</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI HESAP</span><span class="d-sep">:</span><span class="d-val">${receiverIban}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI ADI</span><span class="d-sep">:</span><span class="d-val">${receiverName}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI TCKN/VD/VKN</span><span class="d-sep">:</span><span class="d-val"> -</span></div>
                                 </td>
 
                                 <!-- Sağ Sütun -->
                                 <td>
-                                    <div class="dekont-line"><span class="dekont-k2-sag">VERGİ</span>: -${bsmv.toFixed(2)}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sag">KOMİSYON</span>: -${commission.toFixed(2)}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sag">TOPLAM TAHSİLAT TUTARI</span>: ${isIncome ? '+' + numAmount.toLocaleString('tr-TR', {minimumFractionDigits: 2}) : '-' + totalDeduction}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sag">ÖDEMENİN KAYNAĞI</span>: İnternet Bankacılığı</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sag">MESAJ TÜRÜ</span>: Bireysel Ödeme</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sag">SORGU NO</span>: ${sorguNo}</div>
-                                    <div class="dekont-line"><span class="dekont-k2-sag">KOLAY ADRES</span>: -</div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">VERGİ</span><span class="d-sep">:</span><span class="d-val">${isIncome ? '0.00' : '-' + bsmv.toFixed(2)}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">KOMİSYON</span><span class="d-sep">:</span><span class="d-val">${isIncome ? '0.00' : '-' + commission.toFixed(2)}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">TOPLAM TAHSİLAT TUTARI</span><span class="d-sep">:</span><span class="d-val">${isIncome ? '+' + amountDisplay : '-' + totalDeduction}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">ÖDEMENİN KAYNAĞI</span><span class="d-sep">:</span><span class="d-val">İnternet Bankacılığı</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">MESAJ TÜRÜ</span><span class="d-sep">:</span><span class="d-val">Bireysel Ödeme</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">SORGU NO</span><span class="d-sep">:</span><span class="d-val">${sorguNo}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">KOLAY ADRES</span><span class="d-sep">:</span><span class="d-val"> -</span></div>
                                 </td>
                             </tr>
                         </table>
@@ -2386,7 +2420,9 @@
                         <div class="dekont-desc-wrap">
                             <div class="dekont-desc-top">
                                 <div class="dekont-desc-title">AÇIKLAMA</div>
-                                <div class="dekont-desc-sub">YUKARIDAKİ TUTAR HESABINIZA BORÇ/ALACAK KAYDEDİLMİŞTİR.</div>
+                            </div>
+                            <div style="border-top: 1px solid #000; margin: 6px 0; text-align: center; font-size: 9px; padding-top: 4px;">
+                                YUKARIDAKİ TUTAR HESABINIZA BORÇ/ALACAK KAYDEDİLMİŞTİR.
                             </div>
                             <div class="dekont-desc-bottom">
                                 AÇIKLAMA:ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ - FAST/ ${descText}
@@ -2395,21 +2431,24 @@
                     </div>
 
                     <!-- 3. KUTU (YASAL FOOTER & İMZA SAHİBİ) -->
-                    <table class="dekont-box-bottom">
-                        <tr>
-                            <td class="dekont-bottom-left">
-                                <div style="font-weight: bold; margin-bottom: 22px;">${customerName}</div>
-                                <div>e-Dekont izni kapsamında elektronik ortamda üretilmiştir.</div>
-                            </td>
-                            <td class="dekont-bottom-right">
+                    <div class="dekont-bottom-wrap">
+                        <!-- Sol Kutu -->
+                        <div class="dekont-bottom-box-left">
+                            <div style="font-weight: bold; font-size: 9.5px; margin-bottom: 25px;">${senderName}</div>
+                            <div style="font-size: 8px;">e-Dekont izni kapsamında elektronik ortamda üretilmiştir.</div>
+                        </div>
+
+                        <!-- Sağ Kutu -->
+                        <div class="dekont-bottom-box-right">
+                            <div>
                                 <div>Ticari Unvan: Yapı ve Kredi Bankası A.Ş.</div>
-                                <div>Büyük Mükellefler VD: 9370020892 Web Adresi: <a href="https://www.yapikredi.com.tr" target="_blank" style="color:#000; text-decoration:none;">www.yapikredi.com.tr</a></div>
+                                <div>Büyük Mükellefler VD: 9370020892 Web Adresi: <a href="https://www.yapikredi.com.tr" target="_blank" style="color:#0a6ecb; text-decoration:none;">www.yapikredi.com.tr</a></div>
                                 <div>Ticaret Sicil Numarası: 32736 İşletmenin Merkezi: Yapı Kredi</div>
                                 <div>Plaza D Blok 34330 Levent - İstanbul Mersis No: 0937002089200741</div>
-                                <div style="font-weight: bold; margin-top: 10px;">SİSTEM</div>
-                            </td>
-                        </tr>
-                    </table>
+                            </div>
+                            <div style="font-weight: bold; margin-top: 8px; font-size: 9px;">SİSTEM</div>
+                        </div>
+                    </div>
                 `;
             }
 

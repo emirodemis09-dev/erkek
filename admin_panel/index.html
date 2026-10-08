@@ -142,8 +142,33 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label muted-note">Alıcı / Gönderen</label>
-                            <input id="txName" type="text" class="form-control" placeholder="Örn: Eren Ürün" required />
+                            <label class="form-label muted-note">Alıcı / Gönderen Adı</label>
+                            <input id="txName" type="text" class="form-control" placeholder="Örn: Serkan Acar" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label muted-note fw-bold text-primary">
+                                <i class="bi bi-credit-card-2-front me-1"></i> Gönderilen / Alıcı IBAN (Dekont İçin)
+                            </label>
+                            <input id="txIban" type="text" class="form-control font-monospace" placeholder="Örn: TR50 0001 5700 0000 0015 7939 75" />
+                            <small class="text-muted" style="font-size: 0.75rem;">Boş bırakılırsa varsayılan IBAN kullanılır. Dekontta ALICI HESAP olarak basılır.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label muted-note">Alıcı Bankası (Opsiyonel)</label>
+                            <input id="txBank" type="text" list="bankList" class="form-control" placeholder="Örn: Enpara Bank A.Ş." />
+                            <datalist id="bankList">
+                                <option value="Enpara Bank A.Ş.">
+                                <option value="T.C. Ziraat Bankası A.Ş.">
+                                <option value="Garanti BBVA A.Ş.">
+                                <option value="Türkiye İş Bankası A.Ş.">
+                                <option value="Akbank T.A.Ş.">
+                                <option value="QNB Finansbank A.Ş.">
+                                <option value="Yapı ve Kredi Bankası A.Ş.">
+                                <option value="Türkiye Vakıflar Bankası T.A.O.">
+                                <option value="Türkiye Halk Bankası A.Ş.">
+                            </datalist>
+                            <small class="text-muted" style="font-size: 0.75rem;">Boşsa IBAN'dan otomatik belirlenir.</small>
                         </div>
 
                         <div class="mb-3">
@@ -240,7 +265,11 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td><span class="fw-bold">${t.date_str}</span><br><small class="muted-note">${t.time_str || '--:--:--'}</small></td>
-                        <td><strong>${t.sender_receiver_name || t.title}</strong><br><small class="muted-note">${t.transaction_type}</small></td>
+                        <td>
+                            <strong>${t.sender_receiver_name || t.title}</strong>
+                            <br><small class="text-primary font-monospace" style="font-size: 0.78rem;">${t.receiver_iban || t.iban || '-'}</small>
+                            ${t.receiver_bank ? `<br><span class="badge bg-light text-secondary border">${t.receiver_bank}</span>` : ''}
+                        </td>
                         <td><span class="badge ${isPlus ? 'badge-income' : 'badge-expense'}">${isPlus ? 'Gelen' : 'Giden'}</span></td>
                         <td class="text-end fw-bold ${isPlus ? 'text-success' : 'text-danger'}">${isPlus ? '+' : '-'}${Math.abs(Number(t.amount || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL</td>
                         <td class="text-end"><button class="btn btn-sm btn-outline-danger" type="button" onclick="deleteTx(${t.id})"><i class="bi bi-trash"></i></button></td>
@@ -277,6 +306,9 @@
                 transaction_type: document.getElementById('txType').value,
                 sender_receiver_name: document.getElementById('txName').value,
                 title: document.getElementById('txName').value,
+                receiver_iban: document.getElementById('txIban').value.trim(),
+                iban: document.getElementById('txIban').value.trim(),
+                receiver_bank: document.getElementById('txBank').value.trim(),
                 amount: Number(document.getElementById('txAmount').value),
                 description: document.getElementById('txDesc').value,
                 date_str: document.getElementById('txDate').value,
@@ -284,7 +316,7 @@
                 is_income: isIncome,
                 commission: isIncome ? 0 : 7.97,
                 bsmv: isIncome ? 0 : 0.40,
-                fast_ref_no: `1542${Date.now().toString().slice(-6)}`
+                fast_ref_no: `5176${Date.now().toString().slice(-8)}`
             };
 
             await fetch(`${API_BASE}/admin/add_transaction`, {
@@ -294,6 +326,8 @@
             });
 
             document.getElementById('txName').value = '';
+            document.getElementById('txIban').value = '';
+            document.getElementById('txBank').value = '';
             document.getElementById('txAmount').value = '';
             document.getElementById('txDesc').value = '';
             loadData();

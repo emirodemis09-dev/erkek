@@ -116,13 +116,38 @@ function parseBody(req) {
     });
 }
 
+function detectBankFromIban(iban) {
+    if (!iban) return 'Enpara Bank A.Ş.';
+    const clean = String(iban).replace(/[^0-9]/g, '');
+    const code = clean.length >= 7 ? clean.substring(2, 7) : '';
+    const banks = {
+        '00010': 'T.C. Ziraat Bankası A.Ş.',
+        '00012': 'Türkiye Halk Bankası A.Ş.',
+        '00015': 'Türkiye Vakıflar Bankası T.A.O.',
+        '00032': 'Türk Ekonomi Bankası A.Ş. (TEB)',
+        '00046': 'Akbank T.A.Ş.',
+        '00062': 'Garanti BBVA A.Ş.',
+        '00064': 'Türkiye İş Bankası A.Ş.',
+        '00067': 'Yapı ve Kredi Bankası A.Ş.',
+        '00111': 'QNB Finansbank A.Ş.',
+        '00157': 'Enpara Bank A.Ş.',
+        '00203': 'Albaraka Türk Katılım Bankası',
+        '00205': 'Kuveyt Türk Katılım Bankası',
+        '00206': 'Türkiye Finans Katılım Bankası'
+    };
+    return banks[code] || 'Enpara Bank A.Ş.';
+}
+
 function buildTransaction(input, override = {}) {
     const now = new Date();
     const amountValue = Number(input.amount || 0);
     const signedAmount = input.is_income ? Math.abs(amountValue) : -Math.abs(amountValue);
     const dateStr = input.date_str || `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
     const timeStr = input.time_str || `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-    const refNo = input.fast_ref_no || `1542${now.getTime().toString().slice(-6)}`;
+    const refNo = input.fast_ref_no || `5176${now.getTime().toString().slice(-8)}`;
+
+    const rIban = input.receiver_iban || input.iban || (input.is_income ? db.account.iban : 'TR500015700000000157939759');
+    const rBank = input.receiver_bank || (input.is_income ? 'Yapı ve Kredi Bankası A.Ş.' : detectBankFromIban(rIban));
 
     return {
         id: override.id || Date.now() + Math.floor(Math.random() * 10000),
@@ -130,15 +155,17 @@ function buildTransaction(input, override = {}) {
         transaction_type: input.transaction_type || 'HESAPTAN FAST',
         title: input.title || input.sender_receiver_name || 'İşlem',
         sender_receiver_name: input.sender_receiver_name || input.title || 'İşlem',
-        iban: input.iban || db.account.iban,
+        iban: rIban,
+        receiver_iban: rIban,
+        receiver_bank: rBank,
         amount: signedAmount,
         balance_after: Number((db.account.balance + signedAmount).toFixed(2)),
         category: input.is_income ? 'Gelen Transfer' : 'Para Transferi',
         date_str: dateStr,
         time_str: timeStr,
         fast_ref_no: refNo,
-        commission: Number(input.commission ?? 7.97),
-        bsmv: Number(input.bsmv ?? 0.40),
+        commission: Number(input.commission ?? (input.is_income ? 0 : 7.97)),
+        bsmv: Number(input.bsmv ?? (input.is_income ? 0 : 0.40)),
         description: input.description || `${input.sender_receiver_name || 'İşlem'}-FAST-CEP`,
         is_income: Boolean(input.is_income)
     };
