@@ -320,7 +320,10 @@ async function requestHandler(req, res) {
     }
 
     if (pathname.endsWith('.js')) {
-        const filePath = path.join(__dirname, 'mobile_app', path.basename(pathname));
+        let filePath = path.join(__dirname, 'mobile_app', path.basename(pathname));
+        if (!fs.existsSync(filePath)) {
+            filePath = path.join(__dirname, 'admin_panel', path.basename(pathname));
+        }
         if (fs.existsSync(filePath)) {
             res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8' });
             fs.createReadStream(filePath).pipe(res);
