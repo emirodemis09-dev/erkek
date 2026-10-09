@@ -192,6 +192,18 @@
                             <input id="txDesc" type="text" class="form-control" placeholder="FAST-CEP / Kredi ödemesi" />
                         </div>
 
+                        <div class="card p-3 mb-3 bg-light border-0 rounded-3 shadow-sm" id="autoFeeGroup">
+                            <div class="form-check form-switch mb-1">
+                                <input class="form-check-input" type="checkbox" id="autoFeeCheck" checked />
+                                <label class="form-check-label fw-bold text-dark" for="autoFeeCheck" style="font-size: 0.88rem;">
+                                    <i class="bi bi-magic text-primary me-1"></i> Otomatik İşlem Ücreti & BSMV Ekle
+                                </label>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.76rem;">
+                                Gönderim yapıldığında FAST Ücreti (-7,97 TL) ve BSMV (-0,40 TL) otomatik eklenir ve bakiyeden düşülür.
+                            </small>
+                        </div>
+
                         <button class="btn btn-ykb w-100" type="submit">İşlemi Kaydet</button>
                     </form>
                 </div>
@@ -200,7 +212,12 @@
             <div class="col-lg-7">
                 <div class="card card-custom p-4">
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                        <h5 class="fw-bold mb-0 text-primary">Canlı Hesap Hareketleri</h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <h5 class="fw-bold mb-0 text-primary">Canlı Hesap Hareketleri</h5>
+                            <span class="badge bg-success-subtle text-success border border-success px-2 py-1" style="font-size: 0.72rem;">
+                                <i class="bi bi-shield-check me-1"></i> Kalıcı Hafıza Aktif
+                            </span>
+                        </div>
                         <div class="d-flex gap-2">
                             <button class="btn btn-danger btn-sm fw-bold shadow-sm" type="button" onclick="openStatementPdfModal()">
                                 <i class="bi bi-file-earmark-pdf-fill me-1"></i> Hesap Hareketleri PDF
@@ -286,46 +303,102 @@
             isIncome = income;
             const giden = document.getElementById('btnGiden');
             const gelen = document.getElementById('btnGelen');
+            const autoFeeGroup = document.getElementById('autoFeeGroup');
+
             if (income) {
                 gelen.className = 'btn btn-success w-100 fw-bold';
                 giden.className = 'btn btn-outline-danger w-100 fw-bold';
                 document.getElementById('txType').value = 'GELEN FAST';
+                if (autoFeeGroup) autoFeeGroup.style.display = 'none';
             } else {
                 giden.className = 'btn btn-danger w-100 fw-bold';
                 gelen.className = 'btn btn-outline-success w-100 fw-bold';
                 document.getElementById('txType').value = 'HESAPTAN FAST';
+                if (autoFeeGroup) autoFeeGroup.style.display = 'block';
             }
         }
 
+        const VAULT_KEY = 'YKB_VAULT_MASTER_V2';
+
         async function loadData() {
             try {
+                // 1. Yerel kalıcı hafızayı kontrol et (Vercel lambdaları sıfırlansa bile veriler asla kaybolmaz)
+                let localVault = null;
+                try {
+                    const rawVault = localStorage.getItem(VAULT_KEY);
+                    if (rawVault) localVault = JSON.parse(rawVault);
+                } catch(e) {}
+
+                // 2. Sunucudan verileri çek
                 const accRes = await fetch(`${API_BASE}/account`);
-                const acc = await accRes.json();
+                let acc = await accRes.json();
+
+                const txRes = await fetch(`${API_BASE}/transactions`);
+                let txs = await txRes.json();
+
+                // 3. Sıfırlanma / veri kaybı koruması: Sunucu boş veya sıfırlanmışsa yerel hafızadan otomatik geri yükle
+                if (localVault && Array.isArray(localVault.transactions) && localVault.transactions.length > 0) {
+                    if (!Array.isArray(txs) || txs.length === 0) {
+                        console.warn('[YKB] Sunucu sıfırlanmış, yerel hafızadan anında geri yükleniyor...');
+                        const syncRes = await fetch(`${API_BASE}/admin/sync_db`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                account: localVault.account || acc,
+                                transactions: localVault.transactions
+                            })
+                        });
+                        const syncData = await syncRes.json();
+                        if (syncData && syncData.account) {
+                            acc = syncData.account;
+                            txs = localVault.transactions;
+                        }
+                    }
+                }
+
                 currentAccount = acc;
+                currentTransactions = txs;
+
+                // 4. Güncel durumu yerel kalıcı hafızaya sabitle
+                localStorage.setItem(VAULT_KEY, JSON.stringify({
+                    account: currentAccount,
+                    transactions: currentTransactions,
+                    updatedAt: Date.now()
+                }));
+
+                // Form alanlarını güncelle
                 document.getElementById('accCustomerName').value = acc.customer_name;
                 document.getElementById('accBranch').value = `${acc.branch_name} / ${acc.account_no}`;
                 document.getElementById('accIban').value = acc.iban;
                 document.getElementById('accBalance').value = acc.balance;
 
-                const txRes = await fetch(`${API_BASE}/transactions`);
-                const txs = await txRes.json();
-                currentTransactions = txs;
                 const tbody = document.getElementById('txTableBody');
                 tbody.innerHTML = '';
 
                 txs.forEach((t) => {
                     const isPlus = Number(t.amount) > 0 || Boolean(t.is_income);
+                    const isFee = Boolean(t.is_fee) || (t.category === 'Ücret ve Komisyonlar' || t.category === 'Vergiler ve Fonlar');
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td><span class="fw-bold">${t.date_str}</span><br><small class="muted-note">${t.time_str || '--:--:--'}</small></td>
                         <td>
                             <strong>${t.sender_receiver_name || t.title}</strong>
-                            <br><small class="text-primary font-monospace" style="font-size: 0.78rem;">${t.receiver_iban || t.iban || '-'}</small>
+                            ${t.receiver_iban ? `<br><small class="text-primary font-monospace" style="font-size: 0.78rem;">${t.receiver_iban}</small>` : ''}
                             ${t.receiver_bank ? `<br><span class="badge bg-light text-secondary border">${t.receiver_bank}</span>` : ''}
                         </td>
-                        <td><span class="badge ${isPlus ? 'badge-income' : 'badge-expense'}">${isPlus ? 'Gelen' : 'Giden'}</span></td>
-                        <td class="text-end fw-bold ${isPlus ? 'text-success' : 'text-danger'}">${isPlus ? '+' : '-'}${Math.abs(Number(t.amount || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL</td>
-                        <td class="text-end"><button class="btn btn-sm btn-outline-danger" type="button" onclick="deleteTx(${t.id})"><i class="bi bi-trash"></i></button></td>
+                        <td>
+                            <span class="badge ${isFee ? 'bg-secondary' : isPlus ? 'badge-income' : 'badge-expense'}">
+                                ${isFee ? 'Ücret' : isPlus ? 'Gelen' : 'Giden'}
+                            </span>
+                        </td>
+                        <td class="text-end fw-bold ${isPlus ? 'text-success' : 'text-danger'}">
+                            ${isPlus ? '+' : '-'}${Math.abs(Number(t.amount || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-outline-danger" type="button" onclick="deleteTx(${t.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
                     `;
                     tbody.appendChild(row);
                 });
@@ -349,12 +422,25 @@
                 body: JSON.stringify(payload)
             });
 
+            // Yerel hafızayı güncelle
+            try {
+                const rawVault = localStorage.getItem(VAULT_KEY);
+                if (rawVault) {
+                    const vault = JSON.parse(rawVault);
+                    vault.account = Object.assign(vault.account || {}, payload);
+                    localStorage.setItem(VAULT_KEY, JSON.stringify(vault));
+                }
+            } catch(e) {}
+
             alert('Müşteri bilgisi güncellendi.');
             loadData();
         }
 
         async function handleAddTransaction(e) {
             e.preventDefault();
+            const autoFeeCheck = document.getElementById('autoFeeCheck');
+            const autoFees = autoFeeCheck ? autoFeeCheck.checked : true;
+
             const payload = {
                 transaction_type: document.getElementById('txType').value,
                 sender_receiver_name: document.getElementById('txName').value,
@@ -369,7 +455,8 @@
                 is_income: isIncome,
                 commission: isIncome ? 0 : 7.97,
                 bsmv: isIncome ? 0 : 0.40,
-                fast_ref_no: `5176${Date.now().toString().slice(-8)}`
+                fast_ref_no: `5176${Date.now().toString().slice(-8)}`,
+                auto_fees: autoFees
             };
 
             await fetch(`${API_BASE}/admin/add_transaction`, {
@@ -389,6 +476,17 @@
         async function deleteTx(id) {
             if (!confirm('Bu işlemi silmek istediğinize emin misiniz?')) return;
             await fetch(`${API_BASE}/admin/transaction/${id}`, { method: 'DELETE' });
+
+            // Yerel hafızadan da temizle
+            try {
+                const rawVault = localStorage.getItem(VAULT_KEY);
+                if (rawVault) {
+                    const vault = JSON.parse(rawVault);
+                    vault.transactions = vault.transactions.filter(t => t.id !== id && t.parent_id !== id);
+                    localStorage.setItem(VAULT_KEY, JSON.stringify(vault));
+                }
+            } catch(e) {}
+
             loadData();
         }
 
@@ -425,7 +523,7 @@
                 branch_name: 'ÇUKUROVA ŞUBESİ (1680)',
                 account_no: '6721439',
                 iban: 'TR89 0006 7010 0000 0034 0625 68',
-                balance: 121123
+                balance: 121114.63
             };
 
             const txs = currentTransactions && currentTransactions.length > 0 
@@ -451,176 +549,205 @@
             const latestTxDate = txs[0]?.date_str || '';
             const dateRange = getThreeMonthRange(latestTxDate);
 
-            // Geriye dönük matematiksel bakiye takibi
-            let runningBal = Number(acc.balance || 0);
-            let rowsHtml = '';
+            // Birebir Yapı Kredi satır normalizasyonu:
+            let normalizedRows = [];
 
             txs.forEach((tx) => {
                 const isInc = Boolean(tx.is_income) || Number(tx.amount || 0) > 0;
-                const dStr = (tx.date_str || '').replace(/\./g, '/').replace(/-/g, '/');
-                let tStr = tx.time_str || '12:00:00';
-                if (tStr.length === 5) tStr += ':00';
+                const isFee = Boolean(tx.is_fee) || (tx.category === 'Ücret ve Komisyonlar' || tx.category === 'Vergiler ve Fonlar' || (tx.title && (tx.title.includes('ÜCRETİ') || tx.title.includes('BSMV'))));
 
-                const rawAmount = Math.abs(Number(tx.amount || 0));
+                if (isFee) {
+                    normalizedRows.push({
+                        date_str: (tx.date_str || '').replace(/\./g, '/').replace(/-/g, '/'),
+                        time_str: tx.time_str || '12:00:00',
+                        operation: 'Diğer',
+                        channel: 'Internet - Mobil',
+                        description: tx.description || tx.title,
+                        amount: -Math.abs(Number(tx.amount || 0)),
+                        is_income: false
+                    });
+                } else if (!isInc) {
+                    const hasSubFeesInList = txs.some(t => t.parent_id === tx.id);
+                    if (hasSubFeesInList) {
+                        const nameVal = (tx.sender_receiver_name || tx.title || 'Alıcı').trim();
+                        const isHavale = tx.transaction_type && tx.transaction_type.toUpperCase().includes('HAVALE');
+                        const mainTitle = isHavale ? `GİDEN HAVALE - ${nameVal}` : `GİDEN FAST - ${nameVal.toLowerCase()}`;
+                        normalizedRows.push({
+                            date_str: (tx.date_str || '').replace(/\./g, '/').replace(/-/g, '/'),
+                            time_str: tx.time_str || '12:00:00',
+                            operation: 'Para Gönder',
+                            channel: 'Internet - Mobil',
+                            description: tx.description && tx.description.startsWith('GİDEN') ? tx.description : mainTitle,
+                            amount: -Math.abs(Number(tx.amount || 0)),
+                            is_income: false
+                        });
+                    } else {
+                        // Eski tek satırlık transferleri birebir 3 Yapı Kredi satırına genişlet
+                        const isHavale = tx.transaction_type && tx.transaction_type.toUpperCase().includes('HAVALE');
+                        const bsmv = isHavale ? 0.20 : Number(tx.bsmv || 0.40);
+                        const fee = isHavale ? 3.99 : Number(tx.commission || 7.97);
+                        const nameVal = (tx.sender_receiver_name || tx.title || 'Alıcı').trim();
+                        const bsmvTitle = isHavale
+                            ? `BSMV HAVALE ÜCRETİ-${tx.fast_ref_no || tx.id || '100880148305'}`
+                            : `BSMV ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ-FAST/${nameVal.toLowerCase()}`;
+                        const feeTitle = isHavale
+                            ? `HAVALE ÜCRETİ-${tx.fast_ref_no || tx.id || '100880148305'}`
+                            : `ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ-FAST/${nameVal.toLowerCase()}`;
+                        const mainTitle = isHavale
+                            ? `GİDEN HAVALE - ${nameVal}`
+                            : `GİDEN FAST - ${nameVal.toLowerCase()}`;
+                        const dStr = (tx.date_str || '').replace(/\./g, '/').replace(/-/g, '/');
+                        const tStr = tx.time_str || '12:00:00';
 
-                if (!isInc) {
-                    const isHavale = tx.transaction_type && tx.transaction_type.toUpperCase().includes('HAVALE');
-                    const bsmv = isHavale ? 0.20 : Number(tx.bsmv || 0.40);
-                    const fee = isHavale ? 3.99 : Number(tx.commission || 7.97);
-
-                    const nameVal = (tx.sender_receiver_name || tx.title || 'Alıcı').trim();
-                    const bsmvTitle = isHavale
-                        ? `BSMV HAVALE ÜCRETİ-${tx.fast_ref_no || tx.id || '100880148305'}`
-                        : `BSMV ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ-FAST/${nameVal.toLowerCase()}`;
-                    const feeTitle = isHavale
-                        ? `HAVALE ÜCRETİ-${tx.fast_ref_no || tx.id || '100880148305'}`
-                        : `ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ-FAST/${nameVal.toLowerCase()}`;
-                    const mainTitle = isHavale
-                        ? `GİDEN HAVALE - ${nameVal}`
-                        : `GİDEN FAST - ${nameVal.toLowerCase()}`;
-
-                    const balStep1 = runningBal; // son bakiye (BSMV sonrası)
-                    const balStep2 = balStep1 + bsmv; // Komisyon sonrası
-                    const balStep3 = balStep2 + fee; // Transfer sonrası
-                    const balBeforeAll = balStep3 + rawAmount; // Transfer öncesi
-
-                    // Satır 1: BSMV
-                    rowsHtml += `
-                        <tr style="border-bottom: 1px dashed #777;">
-                            <td style="padding: 3px 2px; vertical-align: top;">${dStr}</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">${tStr}</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">Diğer</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">Internet - Mobil</td>
-                            <td style="padding: 3px 4px; vertical-align: top; word-break: break-word;">${bsmvTitle}</td>
-                            <td style="padding: 3px 2px; vertical-align: top; text-align: right; white-space: nowrap;">-${formatMoneyTr(bsmv)} TL</td>
-                            <td style="padding: 3px 2px; vertical-align: top; text-align: right; white-space: nowrap;">${formatMoneyTr(balStep1)} TL</td>
-                        </tr>
-                    `;
-
-                    // Satır 2: Komisyon / EFT Ücreti
-                    rowsHtml += `
-                        <tr style="border-bottom: 1px dashed #777;">
-                            <td style="padding: 3px 2px; vertical-align: top;">${dStr}</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">${tStr}</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">Diğer</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">Internet - Mobil</td>
-                            <td style="padding: 3px 4px; vertical-align: top; word-break: break-word;">${feeTitle}</td>
-                            <td style="padding: 3px 2px; vertical-align: top; text-align: right; white-space: nowrap;">-${formatMoneyTr(fee)} TL</td>
-                            <td style="padding: 3px 2px; vertical-align: top; text-align: right; white-space: nowrap;">${formatMoneyTr(balStep2)} TL</td>
-                        </tr>
-                    `;
-
-                    // Satır 3: Ana Transfer
-                    rowsHtml += `
-                        <tr style="border-bottom: 1px dashed #777;">
-                            <td style="padding: 3px 2px; vertical-align: top;">${dStr}</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">${tStr}</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">Para Gönder</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">Internet - Mobil</td>
-                            <td style="padding: 3px 4px; vertical-align: top; word-break: break-word;">${mainTitle}</td>
-                            <td style="padding: 3px 2px; vertical-align: top; text-align: right; white-space: nowrap;">-${formatMoneyTr(rawAmount)} TL</td>
-                            <td style="padding: 3px 2px; vertical-align: top; text-align: right; white-space: nowrap;">${formatMoneyTr(balStep3)} TL</td>
-                        </tr>
-                    `;
-
-                    runningBal = balBeforeAll;
+                        normalizedRows.push({
+                            date_str: dStr,
+                            time_str: tStr,
+                            operation: 'Diğer',
+                            channel: 'Internet - Mobil',
+                            description: bsmvTitle,
+                            amount: -bsmv,
+                            is_income: false
+                        });
+                        normalizedRows.push({
+                            date_str: dStr,
+                            time_str: tStr,
+                            operation: 'Diğer',
+                            channel: 'Internet - Mobil',
+                            description: feeTitle,
+                            amount: -fee,
+                            is_income: false
+                        });
+                        normalizedRows.push({
+                            date_str: dStr,
+                            time_str: tStr,
+                            operation: 'Para Gönder',
+                            channel: 'Internet - Mobil',
+                            description: mainTitle,
+                            amount: -Math.abs(Number(tx.amount || 0)),
+                            is_income: false
+                        });
+                    }
                 } else {
                     const isHavale = tx.transaction_type && tx.transaction_type.toUpperCase().includes('HAVALE');
                     const nameVal = (tx.sender_receiver_name || tx.title || 'Gönderen').trim().toLocaleUpperCase('tr-TR');
                     const mainTitle = isHavale
                         ? `GELEN HAVALE - ${nameVal} - ${nameVal} tarafından aktarılan`
                         : `GELEN FAST - ${nameVal} - ${nameVal} tarafından aktarılan`;
-
-                    const balStep = runningBal;
-                    const balBefore = balStep - rawAmount;
-
-                    rowsHtml += `
-                        <tr style="border-bottom: 1px dashed #777;">
-                            <td style="padding: 3px 2px; vertical-align: top;">${dStr}</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">${tStr}</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">Para Gönder</td>
-                            <td style="padding: 3px 2px; vertical-align: top;">Diğer</td>
-                            <td style="padding: 3px 4px; vertical-align: top; word-break: break-word;">${mainTitle}</td>
-                            <td style="padding: 3px 2px; vertical-align: top; text-align: right; white-space: nowrap;">${formatMoneyTr(rawAmount)} TL</td>
-                            <td style="padding: 3px 2px; vertical-align: top; text-align: right; white-space: nowrap;">${formatMoneyTr(balStep)} TL</td>
-                        </tr>
-                    `;
-
-                    runningBal = balBefore;
+                    normalizedRows.push({
+                        date_str: (tx.date_str || '').replace(/\./g, '/').replace(/-/g, '/'),
+                        time_str: tx.time_str || '12:00:00',
+                        operation: 'Para Gönder',
+                        channel: 'Diğer',
+                        description: tx.description && tx.description.startsWith('GELEN') ? tx.description : mainTitle,
+                        amount: Math.abs(Number(tx.amount || 0)),
+                        is_income: true
+                    });
                 }
+            });
+
+            // Geriye dönük kuruşu kuruşuna bakiye matematiği
+            let runningBal = Number(acc.balance || 0);
+            let rowsHtml = '';
+
+            normalizedRows.forEach((row) => {
+                let timeFormatted = row.time_str;
+                if (timeFormatted.length === 5) timeFormatted += ':00';
+
+                const displayedBal = runningBal;
+                if (row.is_income) {
+                    runningBal = Number((runningBal - row.amount).toFixed(2));
+                } else {
+                    runningBal = Number((runningBal + Math.abs(row.amount)).toFixed(2));
+                }
+
+                const amountStr = row.is_income
+                    ? `${formatMoneyTr(row.amount)} TL`
+                    : `-${formatMoneyTr(Math.abs(row.amount))} TL`;
+
+                rowsHtml += `
+                    <tr style="border-bottom: 1px dashed #777;">
+                        <td style="padding: 3.5px 2px; vertical-align: top;">${row.date_str}</td>
+                        <td style="padding: 3.5px 2px; vertical-align: top;">${timeFormatted}</td>
+                        <td style="padding: 3.5px 2px; vertical-align: top;">${row.operation}</td>
+                        <td style="padding: 3.5px 2px; vertical-align: top;">${row.channel}</td>
+                        <td style="padding: 3.5px 4px; vertical-align: top; word-break: break-word; line-height: 1.35;">${row.description}</td>
+                        <td style="padding: 3.5px 2px; vertical-align: top; text-align: right; white-space: nowrap;">${amountStr}</td>
+                        <td style="padding: 3.5px 2px; vertical-align: top; text-align: right; white-space: nowrap;">${formatMoneyTr(displayedBal)} TL</td>
+                    </tr>
+                `;
             });
 
             return `
                 <div style="background: #ffffff; color: #000; font-family: Arial, Helvetica, sans-serif; width: 780px; margin: 0 auto; padding: 28px 32px; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-                    <!-- HEADER -->
+                    <!-- HEADER: LOGO & BAŞLIK -->
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
                         <div>
-                            <img src="${logoSrc}" alt="Yapı Kredi" style="height: 38px; display: block;" />
+                            <img src="${logoSrc}" alt="Yapı Kredi" style="height: 42px; width: auto; display: block;" />
                         </div>
-                        <div style="font-size: 20px; font-weight: 700; color: #000; letter-spacing: -0.2px;">
+                        <div style="font-size: 21px; font-weight: 700; color: #000; font-family: Arial, Helvetica, sans-serif; letter-spacing: -0.2px;">
                             Hesap Hareketleri
                         </div>
                     </div>
                     
-                    <div style="border-top: 1px solid #d1d5db; margin-bottom: 16px;"></div>
+                    <div style="border-top: 1px solid #d5d5d5; margin-bottom: 18px;"></div>
 
-                    <!-- CUSTOMER DETAILS -->
-                    <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 22px; color: #000;">
+                    <!-- MÜŞTERİ BİLGİLERİ -->
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 22px; color: #000; font-family: Arial, Helvetica, sans-serif;">
                         <tbody>
                             <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; width: 22%; padding: 3px 0;">Müşteri Adı Soyadı</td>
-                                <td style="width: 78%; padding: 3px 0;">: ${customerNameUpper}</td>
+                                <td style="font-weight: 700; width: 22%; padding: 2.5px 0;">Müşteri Adı Soyadı</td>
+                                <td style="width: 78%; padding: 2.5px 0;">: ${customerNameUpper}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; padding: 3px 0;">Müşteri Numarası</td>
-                                <td style="padding: 3px 0;">: ${customerNo}</td>
+                                <td style="font-weight: 700; padding: 2.5px 0;">Müşteri Numarası</td>
+                                <td style="padding: 2.5px 0;">: ${customerNo}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; padding: 3px 0;">Şube</td>
-                                <td style="padding: 3px 0;">: ${branchStr}</td>
+                                <td style="font-weight: 700; padding: 2.5px 0;">Şube</td>
+                                <td style="padding: 2.5px 0;">: ${branchStr}</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; padding: 3px 0;">Hesap Adı</td>
-                                <td style="padding: 3px 0;">: Vadesiz TL Hesabı</td>
+                                <td style="font-weight: 700; padding: 2.5px 0;">Hesap Adı</td>
+                                <td style="padding: 2.5px 0;">: Vadesiz TL Hesabı</td>
                             </tr>
                             <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; padding: 3px 0;">IBAN/Hesap No</td>
-                                <td style="padding: 3px 0;">: ${cleanIban}</td>
+                                <td style="font-weight: 700; padding: 2.5px 0;">IBAN/Hesap No</td>
+                                <td style="padding: 2.5px 0;">: ${cleanIban}</td>
                             </tr>
                             <tr style="border-bottom: 1px dotted #888;">
-                                <td style="font-weight: 700; padding: 3px 0;">Kullanılabilir Bakiye</td>
-                                <td style="padding: 3px 0;">: ${formattedBalance} TL</td>
+                                <td style="font-weight: 700; padding: 2.5px 0;">Kullanılabilir Bakiye</td>
+                                <td style="padding: 2.5px 0;">: ${formattedBalance} TL</td>
                             </tr>
                             <tr style="border-bottom: 1px dotted #888;">
-                                <td style="font-weight: 700; padding: 3px 0;">Tarih Aralığı</td>
-                                <td style="padding: 3px 0;">: ${dateRange}</td>
+                                <td style="font-weight: 700; padding: 2.5px 0;">Tarih Aralığı</td>
+                                <td style="padding: 2.5px 0;">: ${dateRange}</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <!-- TRANSACTIONS TABLE -->
-                    <table style="width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; color: #000;">
+                    <!-- HAREKETLER TABLOSU -->
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; table-layout: fixed; color: #000; font-family: Arial, Helvetica, sans-serif;">
                         <thead>
-                            <tr style="border-bottom: 1px solid #000; font-weight: 700;">
-                                <th style="width: 11%; text-align: left; padding: 4px 2px;">Tarih</th>
+                            <tr style="border-bottom: 1px solid #000; font-weight: 700; font-size: 11px;">
+                                <th style="width: 10%; text-align: left; padding: 4px 2px;">Tarih</th>
                                 <th style="width: 9%; text-align: left; padding: 4px 2px;">Saat</th>
                                 <th style="width: 11%; text-align: left; padding: 4px 2px;">İşlem</th>
                                 <th style="width: 14%; text-align: left; padding: 4px 2px;">Kanal</th>
-                                <th style="width: 33%; text-align: left; padding: 4px 4px;">Açıklama</th>
-                                <th style="width: 11%; text-align: right; padding: 4px 2px;">İşlem Tutarı</th>
-                                <th style="width: 11%; text-align: right; padding: 4px 2px;">Bakiye</th>
+                                <th style="width: 36%; text-align: left; padding: 4px 4px;">Açıklama</th>
+                                <th style="width: 10%; text-align: right; padding: 4px 2px;">İşlem Tutarı</th>
+                                <th style="width: 10%; text-align: right; padding: 4px 2px;">Bakiye</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- ROW 0: Diğer Bekleyen İşlemler -->
+                            <!-- SATIR 0: Diğer Bekleyen İşlemler -->
                             <tr style="border-bottom: 1px dashed #777;">
-                                <td style="padding: 3px 2px;">-</td>
-                                <td style="padding: 3px 2px;">-</td>
-                                <td style="padding: 3px 2px;">-</td>
-                                <td style="padding: 3px 2px;">-</td>
-                                <td style="padding: 3px 4px;">Diğer Bekleyen İşlemler</td>
-                                <td style="padding: 3px 2px; text-align: right;">0,00 TL</td>
-                                <td style="padding: 3px 2px; text-align: right;">-</td>
+                                <td style="padding: 3.5px 2px;">-</td>
+                                <td style="padding: 3.5px 2px;">-</td>
+                                <td style="padding: 3.5px 2px;">-</td>
+                                <td style="padding: 3.5px 2px;">-</td>
+                                <td style="padding: 3.5px 4px;">Diğer Bekleyen İşlemler</td>
+                                <td style="padding: 3.5px 2px; text-align: right;">0,00 TL</td>
+                                <td style="padding: 3.5px 2px; text-align: right;">-</td>
                             </tr>
                             ${rowsHtml}
                         </tbody>

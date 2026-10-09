@@ -2073,8 +2073,19 @@
                     el.classList.toggle('long-balance', balanceText.length > 12);
                 });
 
-                const txRes = await fetch(`${API_BASE}/transactions`);
-                const txs = await txRes.json();
+                let txs = await txRes.json();
+
+                const MOBILE_CACHE_KEY = 'YKB_MOBILE_TX_CACHE_V2';
+                if (Array.isArray(txs) && txs.length > 0) {
+                    try { localStorage.setItem(MOBILE_CACHE_KEY, JSON.stringify({ account: acc, txs })); } catch(e) {}
+                } else {
+                    try {
+                        const cached = JSON.parse(localStorage.getItem(MOBILE_CACHE_KEY) || 'null');
+                        if (cached && cached.txs && cached.txs.length > 0) {
+                            txs = cached.txs;
+                        }
+                    } catch(e) {}
+                }
 
                 currentAccountTransactions = txs;
                 renderAccountTransactions(txs);

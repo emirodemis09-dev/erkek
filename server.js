@@ -283,12 +283,88 @@ async function requestHandler(req, res) {
     if (pathname === '/api/admin/add_transaction' && req.method === 'POST') {
         try {
             const input = await parseBody(req);
-            const newTx = buildTransaction(input);
-            db.account.balance = Number((db.account.balance + newTx.amount).toFixed(2));
-            db.transactions.unshift(newTx);
+            const isIncome = input.is_income === undefined ? Number(input.amount || 0) > 0 : Boolean(input.is_income);
+            const mainTx = buildTransaction(input);
+            const autoFees = input.auto_fees !== false;
+
+            const transactionsToAdd = [mainTx];
+            let totalDeduction = mainTx.amount; // negative for expense
+
+            if (!isIncome && autoFees) {
+                const isHavale = mainTx.transaction_type && mainTx.transaction_type.toUpperCase().includes('HAVALE');
+                const bsmvAmount = isHavale ? 0.20 : Number(input.bsmv || 0.40);
+                const feeAmount = isHavale ? 3.99 : Number(input.commission || 7.97);
+                const nameVal = (mainTx.sender_receiver_name || mainTx.title || 'Alıcı').trim();
+
+                const feeTx = {
+                    id: mainTx.id + 1,
+                    parent_id: mainTx.id,
+                    account_id: 1,
+                    transaction_type: 'Diğer',
+                    title: isHavale 
+                        ? `HAVALE ÜCRETİ-${mainTx.fast_ref_no || '100880148305'}` 
+                        : `ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ-FAST/${nameVal.toLowerCase()}`,
+                    sender_receiver_name: isHavale ? 'HAVALE ÜCRETİ' : 'EFT / FAST Ücreti',
+                    iban: '',
+                    receiver_iban: '',
+                    receiver_bank: '',
+                    amount: -feeAmount,
+                    balance_after: Number((db.account.balance - feeAmount).toFixed(2)),
+                    category: 'Ücret ve Komisyonlar',
+                    date_str: mainTx.date_str,
+                    time_str: mainTx.time_str,
+                    fast_ref_no: mainTx.fast_ref_no,
+                    commission: 0,
+                    bsmv: 0,
+                    description: isHavale 
+                        ? `HAVALE ÜCRETİ-${mainTx.fast_ref_no || '100880148305'}` 
+                        : `ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ-FAST/${nameVal.toLowerCase()}`,
+                    is_income: false,
+                    is_fee: true
+                };
+
+                const bsmvTx = {
+                    id: mainTx.id + 2,
+                    parent_id: mainTx.id,
+                    account_id: 1,
+                    transaction_type: 'Diğer',
+                    title: isHavale 
+                        ? `BSMV HAVALE ÜCRETİ-${mainTx.fast_ref_no || '100880148305'}` 
+                        : `BSMV ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ-FAST/${nameVal.toLowerCase()}`,
+                    sender_receiver_name: isHavale ? 'BSMV HAVALE ÜCRETİ' : 'BSMV Ücreti',
+                    iban: '',
+                    receiver_iban: '',
+                    receiver_bank: '',
+                    amount: -bsmvAmount,
+                    balance_after: Number((db.account.balance - feeAmount - bsmvAmount).toFixed(2)),
+                    category: 'Vergiler ve Fonlar',
+                    date_str: mainTx.date_str,
+                    time_str: mainTx.time_str,
+                    fast_ref_no: mainTx.fast_ref_no,
+                    commission: 0,
+                    bsmv: 0,
+                    description: isHavale 
+                        ? `BSMV HAVALE ÜCRETİ-${mainTx.fast_ref_no || '100880148305'}` 
+                        : `BSMV ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ-FAST/${nameVal.toLowerCase()}`,
+                    is_income: false,
+                    is_fee: true
+                };
+
+                totalDeduction = Number((totalDeduction - feeAmount - bsmvAmount).toFixed(2));
+                // En yeni en üstte görünecek sıra: BSMV, sonra FAST Ücreti, sonra Ana Transfer
+                transactionsToAdd.unshift(feeTx);
+                transactionsToAdd.unshift(bsmvTx);
+            }
+
+            db.account.balance = Number((db.account.balance + totalDeduction).toFixed(2));
+            db.transactions.unshift(...transactionsToAdd);
             saveDB();
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: 'success', new_balance: db.account.balance, transaction: newTx }));
+            res.end(JSON.stringify({ 
+                status: 'success', 
+                new_balance: db.account.balance, 
+                transactions: transactionsToAdd 
+            }));
         } catch (error) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ status: 'error', message: 'İşlem eklenemedi.' }));
@@ -296,12 +372,40 @@ async function requestHandler(req, res) {
         return;
     }
 
+    if (pathname === '/api/admin/sync_db' && req.method === 'POST') {
+        try {
+            const data = await parseBody(req);
+            if (data && data.account && Array.isArray(data.transactions)) {
+                db.account = data.account;
+                db.transactions = data.transactions;
+                saveDB();
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ status: 'synced', account: db.account, count: db.transactions.length }));
+                return;
+            }
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'error', message: 'Geçersiz veri.' }));
+        } catch (error) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ status: 'error', message: 'Sync başarısız.' }));
+        }
+        return;
+    }
+
     if (pathname.startsWith('/api/admin/transaction/') && req.method === 'DELETE') {
         const id = Number(pathname.split('/').pop());
-        db.transactions = db.transactions.filter(t => t.id !== id);
-        saveDB();
+        const txToDelete = db.transactions.find(t => t.id === id);
+        if (txToDelete) {
+            db.account.balance = Number((db.account.balance - txToDelete.amount).toFixed(2));
+            const associatedFees = db.transactions.filter(t => t.parent_id === id);
+            associatedFees.forEach(f => {
+                db.account.balance = Number((db.account.balance - f.amount).toFixed(2));
+            });
+            db.transactions = db.transactions.filter(t => t.id !== id && t.parent_id !== id);
+            saveDB();
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'deleted', id }));
+        res.end(JSON.stringify({ status: 'deleted', id, new_balance: db.account.balance }));
         return;
     }
 
