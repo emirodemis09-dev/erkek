@@ -530,9 +530,11 @@
                 ? [...currentTransactions].sort((a, b) => (b.id || 0) - (a.id || 0))
                 : [];
 
-            const logoSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.ykbLogo)
-                ? window.DEKONT_ASSETS.ykbLogo
-                : 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Yap%C4%B1_Kredi_logo.svg/320px-Yap%C4%B1_Kredi_logo.svg.png';
+            const logoSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.statementLogo)
+                ? window.DEKONT_ASSETS.statementLogo
+                : ((window.DEKONT_ASSETS && window.DEKONT_ASSETS.ykbLogo)
+                    ? window.DEKONT_ASSETS.ykbLogo
+                    : 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Yap%C4%B1_Kredi_logo.svg/320px-Yap%C4%B1_Kredi_logo.svg.png');
 
             const customerNameUpper = (acc.customer_name || 'Kaan Taşkın').toLocaleUpperCase('tr-TR');
             const customerNo = acc.customer_no || '76611300';
@@ -665,12 +667,12 @@
                     : `-${formatMoneyTr(Math.abs(row.amount))} TL`;
 
                 rowsHtml += `
-                    <tr style="border-bottom: 1px dashed #777;">
+                    <tr style="border-bottom: 1px dashed #777777;">
                         <td style="padding: 3.5px 2px; vertical-align: top;">${row.date_str}</td>
                         <td style="padding: 3.5px 2px; vertical-align: top;">${timeFormatted}</td>
                         <td style="padding: 3.5px 2px; vertical-align: top;">${row.operation}</td>
                         <td style="padding: 3.5px 2px; vertical-align: top;">${row.channel}</td>
-                        <td style="padding: 3.5px 4px; vertical-align: top; word-break: break-word; line-height: 1.35;">${row.description}</td>
+                        <td style="padding: 3.5px 2px; vertical-align: top; word-break: break-word; line-height: 1.35;">${row.description}</td>
                         <td style="padding: 3.5px 2px; vertical-align: top; text-align: right; white-space: nowrap;">${amountStr}</td>
                         <td style="padding: 3.5px 2px; vertical-align: top; text-align: right; white-space: nowrap;">${formatMoneyTr(displayedBal)} TL</td>
                     </tr>
@@ -678,74 +680,85 @@
             });
 
             return `
-                <div style="background: #ffffff; color: #000; font-family: Arial, Helvetica, sans-serif; width: 780px; margin: 0 auto; padding: 28px 32px; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                <div style="background: #ffffff; color: #000; font-family: Arial, Helvetica, sans-serif; width: 790px; margin: 0 auto; padding: 28px 36px 36px 35px; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
                     <!-- HEADER: LOGO & BAŞLIK -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                        <div>
-                            <img src="${logoSrc}" alt="Yapı Kredi" style="height: 42px; width: auto; display: block;" />
-                        </div>
-                        <div style="font-size: 21px; font-weight: 700; color: #000; font-family: Arial, Helvetica, sans-serif; letter-spacing: -0.2px;">
+                    <div style="position: relative; height: 50px; margin-bottom: 24px; display: flex; align-items: center;">
+                        <img src="${logoSrc}" alt="Yapı Kredi" style="width: 216px; height: 50px; display: block;" />
+                        <div style="position: absolute; left: 357px; top: 16px; font-size: 19px; font-weight: 700; color: #000; font-family: Arial, Helvetica, sans-serif; letter-spacing: -0.2px;">
                             Hesap Hareketleri
                         </div>
                     </div>
                     
-                    <div style="border-top: 1px solid #d5d5d5; margin-bottom: 18px;"></div>
+                    <div style="width: 100%; border-top: 1px solid #bfbfbf; margin-bottom: 28px;"></div>
 
                     <!-- MÜŞTERİ BİLGİLERİ -->
-                    <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 22px; color: #000; font-family: Arial, Helvetica, sans-serif;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 28px; color: #000; font-family: Arial, Helvetica, sans-serif;">
+                        <colgroup>
+                            <col style="width: 246px;">
+                            <col style="width: 473px;">
+                        </colgroup>
                         <tbody>
-                            <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; width: 22%; padding: 2.5px 0;">Müşteri Adı Soyadı</td>
-                                <td style="width: 78%; padding: 2.5px 0;">: ${customerNameUpper}</td>
+                            <tr style="border-bottom: 1px solid #bfbfbf; height: 17px;">
+                                <td style="font-weight: 700; padding: 1.5px 0;">Müşteri Adı Soyadı</td>
+                                <td style="padding: 1.5px 0;">: ${customerNameUpper}</td>
                             </tr>
-                            <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; padding: 2.5px 0;">Müşteri Numarası</td>
-                                <td style="padding: 2.5px 0;">: ${customerNo}</td>
+                            <tr style="border-bottom: 1px solid #bfbfbf; height: 17px;">
+                                <td style="font-weight: 700; padding: 1.5px 0;">Müşteri Numarası</td>
+                                <td style="padding: 1.5px 0;">: ${customerNo}</td>
                             </tr>
-                            <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; padding: 2.5px 0;">Şube</td>
-                                <td style="padding: 2.5px 0;">: ${branchStr}</td>
+                            <tr style="border-bottom: 1px solid #bfbfbf; height: 17px;">
+                                <td style="font-weight: 700; padding: 1.5px 0;">Şube</td>
+                                <td style="padding: 1.5px 0;">: ${branchStr}</td>
                             </tr>
-                            <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; padding: 2.5px 0;">Hesap Adı</td>
-                                <td style="padding: 2.5px 0;">: Vadesiz TL Hesabı</td>
+                            <tr style="border-bottom: 1px solid #bfbfbf; height: 17px;">
+                                <td style="font-weight: 700; padding: 1.5px 0;">Hesap Adı</td>
+                                <td style="padding: 1.5px 0;">: Vadesiz TL Hesabı</td>
                             </tr>
-                            <tr style="border-bottom: 1px solid #e0e0e0;">
-                                <td style="font-weight: 700; padding: 2.5px 0;">IBAN/Hesap No</td>
-                                <td style="padding: 2.5px 0;">: ${cleanIban}</td>
+                            <tr style="border-bottom: 1px solid #bfbfbf; height: 17px;">
+                                <td style="font-weight: 700; padding: 1.5px 0;">IBAN/Hesap No</td>
+                                <td style="padding: 1.5px 0;">: ${cleanIban}</td>
                             </tr>
-                            <tr style="border-bottom: 1px dotted #888;">
-                                <td style="font-weight: 700; padding: 2.5px 0;">Kullanılabilir Bakiye</td>
-                                <td style="padding: 2.5px 0;">: ${formattedBalance} TL</td>
+                            <tr style="border-bottom: 1px dotted #888888; height: 17px;">
+                                <td style="font-weight: 700; padding: 1.5px 0;">Kullanılabilir Bakiye</td>
+                                <td style="padding: 1.5px 0;">: ${formattedBalance} TL</td>
                             </tr>
-                            <tr style="border-bottom: 1px dotted #888;">
-                                <td style="font-weight: 700; padding: 2.5px 0;">Tarih Aralığı</td>
-                                <td style="padding: 2.5px 0;">: ${dateRange}</td>
+                            <tr style="border-bottom: 1px dotted #888888; height: 17px;">
+                                <td style="font-weight: 700; padding: 1.5px 0;">Tarih Aralığı</td>
+                                <td style="padding: 1.5px 0;">: ${dateRange}</td>
                             </tr>
                         </tbody>
                     </table>
 
                     <!-- HAREKETLER TABLOSU -->
                     <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; table-layout: fixed; color: #000; font-family: Arial, Helvetica, sans-serif;">
+                        <colgroup>
+                            <col style="width: 76px;">
+                            <col style="width: 76px;">
+                            <col style="width: 85px;">
+                            <col style="width: 94px;">
+                            <col style="width: 234px;">
+                            <col style="width: 85px;">
+                            <col style="width: 69px;">
+                        </colgroup>
                         <thead>
-                            <tr style="border-bottom: 1px solid #000; font-weight: 700; font-size: 11px;">
-                                <th style="width: 10%; text-align: left; padding: 4px 2px;">Tarih</th>
-                                <th style="width: 9%; text-align: left; padding: 4px 2px;">Saat</th>
-                                <th style="width: 11%; text-align: left; padding: 4px 2px;">İşlem</th>
-                                <th style="width: 14%; text-align: left; padding: 4px 2px;">Kanal</th>
-                                <th style="width: 36%; text-align: left; padding: 4px 4px;">Açıklama</th>
-                                <th style="width: 10%; text-align: right; padding: 4px 2px;">İşlem Tutarı</th>
-                                <th style="width: 10%; text-align: right; padding: 4px 2px;">Bakiye</th>
+                            <tr style="border-bottom: 1.5px solid #000000; font-weight: 700; font-size: 11px;">
+                                <th style="text-align: left; padding: 4px 2px;">Tarih</th>
+                                <th style="text-align: left; padding: 4px 2px;">Saat</th>
+                                <th style="text-align: left; padding: 4px 2px;">İşlem</th>
+                                <th style="text-align: left; padding: 4px 2px;">Kanal</th>
+                                <th style="text-align: left; padding: 4px 2px;">Açıklama</th>
+                                <th style="text-align: right; padding: 4px 2px;">İşlem Tutarı</th>
+                                <th style="text-align: right; padding: 4px 2px;">Bakiye</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- SATIR 0: Diğer Bekleyen İşlemler -->
-                            <tr style="border-bottom: 1px dashed #777;">
+                            <tr style="border-bottom: 1px dashed #777777;">
                                 <td style="padding: 3.5px 2px;">-</td>
                                 <td style="padding: 3.5px 2px;">-</td>
                                 <td style="padding: 3.5px 2px;">-</td>
                                 <td style="padding: 3.5px 2px;">-</td>
-                                <td style="padding: 3.5px 4px;">Diğer Bekleyen İşlemler</td>
+                                <td style="padding: 3.5px 2px;">Diğer Bekleyen İşlemler</td>
                                 <td style="padding: 3.5px 2px; text-align: right;">0,00 TL</td>
                                 <td style="padding: 3.5px 2px; text-align: right;">-</td>
                             </tr>
