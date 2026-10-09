@@ -2073,7 +2073,15 @@
                     el.classList.toggle('long-balance', balanceText.length > 12);
                 });
 
-                let txs = await txRes.json();
+                let txs = [];
+                try {
+                    const txRes = await fetch(`${API_BASE}/transactions`);
+                    if (txRes.ok) {
+                        txs = await txRes.json();
+                    }
+                } catch (e) {
+                    console.warn('Transactions fetch error:', e);
+                }
 
                 const MOBILE_CACHE_KEY = 'YKB_MOBILE_TX_CACHE_V2';
                 if (Array.isArray(txs) && txs.length > 0) {
@@ -2091,26 +2099,27 @@
                 renderAccountTransactions(txs);
 
                 const container = document.getElementById('txList');
-                container.innerHTML = '';
-
-                txs.forEach(t => {
-                    const isPlus = t.amount > 0 || t.is_income;
-                    const amtStr = (Math.abs(t.amount)).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL';
-                    const div = document.createElement('div');
-                    div.className = 'tx-item';
-                    div.onclick = () => openTxDetail(t, acc);
-                    div.innerHTML = `
-                        <div>
-                            <div class="tx-title">${t.title}</div>
-                            <div class="tx-subtitle">${t.transaction_type} • ${t.date_str}</div>
-                        </div>
-                        <div class="text-end">
-                            <div class="tx-amount ${isPlus ? 'amount-plus' : 'amount-minus'}">${isPlus ? '+' : '-'}${amtStr}</div>
-                            <div class="tx-subtitle">${t.balance_after ? (t.balance_after.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' TL') : ''}</div>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
+                if (container) {
+                    container.innerHTML = '';
+                    txs.forEach(t => {
+                        const isPlus = t.amount > 0 || t.is_income;
+                        const amtStr = (Math.abs(t.amount)).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL';
+                        const div = document.createElement('div');
+                        div.className = 'tx-item';
+                        div.onclick = () => openTxDetail(t, acc);
+                        div.innerHTML = `
+                            <div>
+                                <div class="tx-title">${t.title}</div>
+                                <div class="tx-subtitle">${t.transaction_type} • ${t.date_str}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="tx-amount ${isPlus ? 'amount-plus' : 'amount-minus'}">${isPlus ? '+' : '-'}${amtStr}</div>
+                                <div class="tx-subtitle">${t.balance_after ? (t.balance_after.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' TL') : ''}</div>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
             } catch (err) {
                 console.error('Mobile API Connection error:', err);
             }
@@ -2127,11 +2136,11 @@
                 return true;
             });
             const getTimestamp = (transaction) => {
-                const dateParts = String(transaction.date_str || '').match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-                if (!dateParts) return 0;
+                const dateParts = String(transaction.date_str || '').replace(/\//g, '.').match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+                if (!dateParts) return Number(transaction.id) || 0;
 
                 const timeParts = String(transaction.time_str || '').match(/^(\d{1,2})[:.](\d{2})(?:[:.](\d{2}))?$/);
-                return new Date(
+                const d = new Date(
                     Number(dateParts[3]),
                     Number(dateParts[2]) - 1,
                     Number(dateParts[1]),
@@ -2139,10 +2148,16 @@
                     Number(timeParts?.[2] || 0),
                     Number(timeParts?.[3] || 0)
                 ).getTime();
+                return isNaN(d) ? (Number(transaction.id) || 0) : d;
             };
 
             const recentTransactions = [...filteredTransactions]
-                .sort((a, b) => getTimestamp(b) - getTimestamp(a))
+                .sort((a, b) => {
+                    const tsB = getTimestamp(b);
+                    const tsA = getTimestamp(a);
+                    if (tsB !== tsA) return tsB - tsA;
+                    return (Number(b.id) || 0) - (Number(a.id) || 0);
+                })
                 .slice(0, 10);
             if (recentTransactions.length === 0) {
                 const emptyMessage = activeTransactionFilter === 'all'
