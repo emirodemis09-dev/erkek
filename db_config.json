@@ -1,3 +1,5 @@
 {
-  "type": "local"
+  "type": "supabase",
+  "url": "https://uijxolkclvjwiivaxghd.supabase.co",
+  "apiKey": "sb_publishable_JLeCokscSeiYsUE5o3G1iQ_thhbbnVN"
 }

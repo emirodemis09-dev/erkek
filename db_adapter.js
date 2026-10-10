@@ -109,19 +109,10 @@ async function testConnection(config) {
 
         if (config.type === 'supabase') {
             const key = config.key || config.apiKey;
-            if (!config.url || !key) throw new Error('Supabase URL ve API Key (anon veya service_role) gereklidir.');
+            if (!config.url || !key) throw new Error('Supabase URL ve API Key gereklidir.');
             const baseUrl = config.url.replace(/\/$/, '');
-            const testUrl = `${baseUrl}/rest/v1/`;
-            const res = await fetch(testUrl, {
-                headers: {
-                    apikey: key,
-                    Authorization: `Bearer ${key}`
-                },
-                signal: AbortSignal.timeout(5000)
-            });
-            if (!res.ok) throw new Error(`Supabase API Hatası: ${res.status} ${res.statusText}`);
 
-            // vault tablosunun varlığını kontrol et
+            // vault tablosunun varlığını ve kimlik doğrulamasını kontrol et
             const tableCheck = await fetch(`${baseUrl}/rest/v1/vault?select=id&limit=1`, {
                 headers: {
                     apikey: key,
@@ -131,14 +122,23 @@ async function testConnection(config) {
             });
 
             const latency = Date.now() - startTime;
-            if (!tableCheck.ok) {
-                return {
-                    success: true,
-                    tableMissing: true,
-                    message: `Supabase bağlantısı doğrulandı! (${latency}ms) Not: "vault" tablosunu henüz oluşturmadıysanız SQL Editor'den oluşturun.`,
-                    latency
-                };
+            if (tableCheck.status === 401 || tableCheck.status === 403) {
+                throw new Error('Yetkilendirme hatası: Supabase API anahtarı geçersiz.');
             }
+
+            if (!tableCheck.ok) {
+                const errJson = await tableCheck.json().catch(() => ({}));
+                if (errJson && errJson.code === 'PGRST205') {
+                    return {
+                        success: false,
+                        tableMissing: true,
+                        message: `Supabase API anahtarı doğrulandı! (${latency}ms) Ancak "vault" tablosu henüz yok. Lütfen Supabase SQL Editor'den tabloyu oluşturun.`,
+                        latency
+                    };
+                }
+                throw new Error(`Supabase Hatası (${tableCheck.status}): ${errJson.message || tableCheck.statusText}`);
+            }
+
             return { success: true, message: `Supabase ve vault tablosu başarıyla bağlandı! (${latency}ms)`, latency };
         }
 
