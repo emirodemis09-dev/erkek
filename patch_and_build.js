@@ -143,7 +143,7 @@ if (signedFiles.length === 0) {
 }
 
 const signedApkPath = path.join(signTempDir, signedFiles[0]);
-const outApk = 'C:\\Users\\PC\\Desktop\\YapiKrediMobil_v9.0.apk';
+const outApk = 'C:\\Users\\PC\\Desktop\\YapiKrediMobil_v10.0.apk';
 const desktopDefault = 'C:\\Users\\PC\\Desktop\\YapiKrediMobil.apk';
 
 fs.copyFileSync(signedApkPath, outApk);
@@ -155,7 +155,7 @@ fs.rmSync(signTempDir, { recursive: true });
 
 const stat = fs.statSync(outApk);
 console.log('\n======================================================');
-console.log('BAŞARILI: YapiKrediMobil_v9.0.apk MASAÜSTÜNDE HAZIR!');
+console.log('BAŞARILI: YapiKrediMobil_v10.0.apk MASAÜSTÜNDE HAZIR!');
 console.log('Boyut:', Math.round(stat.size / 1024 / 1024 * 100) / 100, 'MB');
 console.log('Konum: ' + outApk);
 console.log('Alternatif: ' + desktopDefault);

