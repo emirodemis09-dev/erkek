@@ -2,7 +2,7 @@
   "version": 2,
   "functions": {
     "api/index.js": {
-      "includeFiles": "mobile_app/**,admin_panel/**,database.json"
+      "includeFiles": "mobile_app/**,admin_panel/**,database.json,db_adapter.js,db_config.json"
     }
   },
   "rewrites": [

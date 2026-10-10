@@ -73,15 +73,188 @@
             color: var(--ykb-muted);
             font-size: 0.82rem;
         }
+
+        /* ORİJİNAL YKB E-DEKONT STİLLERİ */
+        .dekont-paper-original {
+            width: 780px;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #ffffff; 
+            color: #000000; 
+            padding: 18px 20px; 
+            font-family: Consolas, "Courier New", Courier, monospace; 
+            font-size: 8.8px; 
+            line-height: 1.42; 
+            border: 1px solid #d0d0d0; 
+            box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .dekont-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .dekont-ykb-brand img {
+            height: 34px;
+            width: auto;
+            display: block;
+        }
+        .dekont-gib-stamp img {
+            height: 52px;
+            width: auto;
+            display: block;
+        }
+        .dekont-fast-header {
+            font-size: 11.5px;
+            font-weight: bold;
+            font-family: Consolas, "Courier New", Courier, monospace;
+            color: #000000;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        .dekont-box {
+            border: 1.2px solid #000000;
+            margin-bottom: 8px;
+            padding: 7px 10px;
+            background: #ffffff;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .dekont-table-box {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .dekont-table-box td {
+            padding: 0;
+            vertical-align: top;
+            overflow: hidden;
+        }
+        .dekont-row {
+            display: flex;
+            align-items: baseline;
+            white-space: nowrap;
+            font-size: 8.8px;
+            line-height: 1.42;
+            margin-bottom: 1.5px;
+        }
+        .d-k1-lbl {
+            width: 98px;
+            flex-shrink: 0;
+            color: #000;
+        }
+        .d-k1-mid-lbl {
+            width: 112px;
+            flex-shrink: 0;
+            color: #000;
+        }
+        .d-k2-lbl {
+            width: 140px;
+            flex-shrink: 0;
+            color: #000;
+        }
+        .d-k2-sag-lbl {
+            width: 138px;
+            flex-shrink: 0;
+            color: #000;
+        }
+        .d-sep {
+            width: 10px;
+            flex-shrink: 0;
+            text-align: center;
+            color: #000;
+        }
+        .d-val {
+            flex: 1;
+            white-space: nowrap;
+            color: #000;
+        }
+        .dekont-qr-cell {
+            width: 85px;
+            min-width: 85px;
+            max-width: 85px;
+            text-align: right;
+            vertical-align: top !important;
+            padding-right: 4px;
+            box-sizing: border-box;
+        }
+        .dekont-qr-img {
+            width: 66px;
+            height: 66px;
+            border: none;
+            display: block;
+            margin-left: auto;
+            margin-right: 0;
+            image-rendering: pixelated;
+            background: #ffffff;
+        }
+        .dekont-desc-wrap {
+            margin-top: 8px;
+        }
+        .dekont-desc-top {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .dekont-desc-title {
+            font-weight: bold;
+            font-size: 9.5px;
+            letter-spacing: 0.5px;
+        }
+        .dekont-desc-bottom {
+            border: 1px solid #000;
+            padding: 6px 8px;
+            font-size: 8.5px;
+            line-height: 1.35;
+            text-align: left;
+        }
+        .dekont-bottom-wrap {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .dekont-bottom-box-left {
+            flex: 1;
+            border: 1.2px solid #000;
+            padding: 8px 12px;
+            min-height: 85px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+        }
+        .dekont-bottom-box-right {
+            flex: 1;
+            border: 1.2px solid #000;
+            padding: 8px 12px;
+            min-height: 85px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 7.6px;
+            line-height: 1.35;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand topbar py-3">
         <div class="container-fluid px-4">
             <div class="brand">YapıKredi</div>
-            <span class="badge bg-light text-primary rounded-pill px-3 py-2 fw-bold">
-                <i class="bi bi-circle-fill me-1 small"></i> API Canlı
-            </span>
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-light rounded-pill px-3 fw-bold" type="button" onclick="openDbConfigModal()">
+                    <i class="bi bi-database-fill-gear me-1"></i> <span id="dbStatusBadge">Veritabanı: Kontrol Ediliyor...</span>
+                </button>
+                <span class="badge bg-light text-primary rounded-pill px-3 py-2 fw-bold">
+                    <i class="bi bi-circle-fill me-1 small"></i> API Canlı
+                </span>
+            </div>
         </div>
     </nav>
 
@@ -236,7 +409,7 @@
                                     <th>İsim</th>
                                     <th>Tür</th>
                                     <th class="text-end">Tutar</th>
-                                    <th class="text-end">Sil</th>
+                                    <th class="text-end">İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody id="txTableBody"></tbody>
@@ -284,6 +457,128 @@
         </div>
     </div>
 
+    <!-- Modal for Transaction e-Dekont PDF -->
+    <div class="modal fade" id="dekontPdfModal" tabindex="-1" aria-labelledby="dekontPdfModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-white border-bottom py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-file-earmark-check-fill text-primary fs-3"></i>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0 text-dark" id="dekontPdfModalLabel">Yapı Kredi e-Dekont</h5>
+                            <small class="text-muted" id="dekontDocSubtitle">Resmi e-Dekont formatında 1:1 orijinal PDF</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-primary btn-sm fw-bold px-3 shadow-sm" onclick="downloadCurrentDekontPdf()">
+                            <i class="bi bi-download me-1"></i> PDF İndir
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm fw-bold px-3" onclick="printCurrentDekont()">
+                            <i class="bi bi-printer-fill me-1"></i> Yazdır
+                        </button>
+                        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                    </div>
+                </div>
+                <div class="modal-body p-4 bg-light d-flex justify-content-center">
+                    <div class="shadow-sm border rounded bg-white p-2" style="max-width: 820px; width: 100%; overflow-x: auto;">
+                        <div id="dekontPaper"></div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-white border-top py-2">
+                    <small class="text-muted me-auto">
+                        <i class="bi bi-shield-check me-1"></i> Bu dekont resmi Yapı Kredi elektronik ortam onaylı e-dekont standartlarına uygundur.
+                    </small>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Cloud Database Configuration -->
+    <div class="modal fade" id="dbConfigModal" tabindex="-1" aria-labelledby="dbConfigModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-white border-bottom py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-database-fill-gear text-primary fs-3"></i>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0 text-dark" id="dbConfigModalLabel">Kalıcı Bulut Veritabanı Ayarları</h5>
+                            <small class="text-muted">Vercel lambdaları sıfırlansa bile verileriniz asla silinmez</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-info border-0 shadow-sm d-flex align-items-start gap-3 mb-4">
+                        <i class="bi bi-info-circle-fill fs-4 text-primary mt-1"></i>
+                        <div class="small">
+                            <strong>Kalıcı Veritabanı Nasıl Çalışır?</strong><br>
+                            Vercel sunucusuz mimaride çalıştığı için geçici dosyaları ara sıra sıfırlayabilir. Bir bulut veritabanı (MongoDB Atlas, Upstash Redis veya Supabase) bağladığınızda eklediğiniz tüm bakiye ve hesap hareketleri kalıcı olarak bulutta saklanır ve asla kendi kendine silinmez.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Veritabanı Türü</label>
+                        <select id="dbTypeSelect" class="form-select form-select-lg" onchange="handleDbTypeChange()">
+                            <option value="mongodb">MongoDB Atlas (Önerilen - Ücretsiz M0 Cluster)</option>
+                            <option value="upstash">Upstash Redis / Vercel KV (REST API)</option>
+                            <option value="supabase">Supabase PostgreSQL (REST API)</option>
+                            <option value="firebase">Firebase Realtime Database</option>
+                            <option value="local">Yerel Depolama (Tarayıcı Akıllı Hafıza Koruması)</option>
+                        </select>
+                    </div>
+
+                    <!-- MongoDB Fields -->
+                    <div id="dbMongoFields" class="mb-3">
+                        <label class="form-label fw-bold">MongoDB Connection String (URI)</label>
+                        <input id="dbMongoUri" type="text" class="form-control" placeholder="mongodb+srv://kullanici:sifre@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority" />
+                        <div class="form-text">MongoDB Atlas panelinden aldığınız standart bağlantı linki.</div>
+                        <div class="mt-2">
+                            <label class="form-label small text-muted">Veritabanı Adı (Opsiyonel)</label>
+                            <input id="dbMongoName" type="text" class="form-control form-control-sm" value="yapi_kredi" />
+                        </div>
+                    </div>
+
+                    <!-- Upstash Fields -->
+                    <div id="dbUpstashFields" class="mb-3" style="display: none;">
+                        <label class="form-label fw-bold">Upstash REST URL</label>
+                        <input id="dbUpstashUrl" type="text" class="form-control mb-2" placeholder="https://xxxx.upstash.io" />
+                        <label class="form-label fw-bold">Upstash REST Token</label>
+                        <input id="dbUpstashToken" type="password" class="form-control" placeholder="AX... (REST Token)" />
+                    </div>
+
+                    <!-- Supabase Fields -->
+                    <div id="dbSupabaseFields" class="mb-3" style="display: none;">
+                        <label class="form-label fw-bold">Supabase Project URL</label>
+                        <input id="dbSupabaseUrl" type="text" class="form-control mb-2" placeholder="https://xxxx.supabase.co" />
+                        <label class="form-label fw-bold">Supabase API Key (Anon / Service)</label>
+                        <input id="dbSupabaseKey" type="password" class="form-control" placeholder="eyJhbGciOi..." />
+                    </div>
+
+                    <!-- Firebase Fields -->
+                    <div id="dbFirebaseFields" class="mb-3" style="display: none;">
+                        <label class="form-label fw-bold">Firebase Realtime Database URL</label>
+                        <input id="dbFirebaseUrl" type="text" class="form-control" placeholder="https://proje-id-default-rtdb.firebaseio.com" />
+                    </div>
+
+                    <!-- Test Result Box -->
+                    <div id="dbTestResult" class="mt-3" style="display: none;"></div>
+                </div>
+                <div class="modal-footer bg-light border-top d-flex justify-content-between py-3">
+                    <button type="button" class="btn btn-outline-primary fw-bold" onclick="testDbConnection()">
+                        <i class="bi bi-lightning-charge me-1"></i> Bağlantıyı Test Et
+                    </button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                        <button type="button" class="btn btn-success fw-bold px-4" onclick="saveDbConnection()">
+                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Kaydet ve Buluta Aktar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- External Libraries for Modal & PDF -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/dekont_assets.js"></script>
@@ -322,11 +617,14 @@
 
         async function loadData() {
             try {
-                // 1. Yerel kalıcı hafızayı kontrol et (Vercel lambdaları sıfırlansa bile veriler asla kaybolmaz)
+                // 1. Yerel kalıcı hafızayı ve silinmiş ID listesini kontrol et
                 let localVault = null;
+                let deletedIds = new Set();
                 try {
                     const rawVault = localStorage.getItem(VAULT_KEY);
                     if (rawVault) localVault = JSON.parse(rawVault);
+                    const rawDel = localStorage.getItem('YKB_DELETED_TX_IDS');
+                    if (rawDel) deletedIds = new Set(JSON.parse(rawDel));
                 } catch(e) {}
 
                 // 2. Sunucudan verileri çek
@@ -336,22 +634,32 @@
                 const txRes = await fetch(`${API_BASE}/transactions`);
                 let txs = await txRes.json();
 
-                // 3. Sıfırlanma / veri kaybı koruması: Sunucu boş veya sıfırlanmışsa yerel hafızadan otomatik geri yükle
+                // 3. Sıfırlanma / veri kaybı koruması (Smart Forward-Merge):
+                // Sunucuda eksik olan ancak localVault'ta bulunan (ve silinmemiş) işlemler varsa sunucuyla anında birleştir
                 if (localVault && Array.isArray(localVault.transactions) && localVault.transactions.length > 0) {
-                    if (!Array.isArray(txs) || txs.length === 0) {
-                        console.warn('[YKB] Sunucu sıfırlanmış, yerel hafızadan anında geri yükleniyor...');
-                        const syncRes = await fetch(`${API_BASE}/admin/sync_db`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                account: localVault.account || acc,
-                                transactions: localVault.transactions
-                            })
-                        });
-                        const syncData = await syncRes.json();
-                        if (syncData && syncData.account) {
-                            acc = syncData.account;
-                            txs = localVault.transactions;
+                    const serverIds = new Set((txs || []).map(t => t.id));
+                    const missingOnServer = localVault.transactions.filter(t => !serverIds.has(t.id) && !deletedIds.has(t.id));
+
+                    if (missingOnServer.length > 0) {
+                        console.warn('[YKB] Sunucuda eksik işlemler tespit edildi, yerel kasadan otomatik senkronize ediliyor...', missingOnServer.length);
+                        const mergedTxs = [...missingOnServer, ...(txs || [])].sort((a, b) => (b.id || 0) - (a.id || 0));
+                        try {
+                            const syncRes = await fetch(`${API_BASE}/admin/sync_db`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    account: localVault.account && localVault.account.balance !== undefined ? localVault.account : acc,
+                                    transactions: mergedTxs
+                                })
+                            });
+                            const syncData = await syncRes.json();
+                            if (syncData && syncData.account) {
+                                acc = syncData.account;
+                                txs = mergedTxs;
+                            }
+                        } catch(err) {
+                            console.error('Vault sync error:', err);
+                            txs = mergedTxs;
                         }
                     }
                 }
@@ -394,14 +702,20 @@
                         <td class="text-end fw-bold ${isPlus ? 'text-success' : 'text-danger'}">
                             ${isPlus ? '+' : '-'}${Math.abs(Number(t.amount || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL
                         </td>
-                        <td class="text-end">
-                            <button class="btn btn-sm btn-outline-danger" type="button" onclick="deleteTx(${t.id})">
+                        <td class="text-end text-nowrap">
+                            <button class="btn btn-sm btn-outline-primary me-1" type="button" onclick="openDekontModal(${t.id})" title="e-Dekont PDF İndir / Görüntüle">
+                                <i class="bi bi-file-earmark-pdf"></i> Dekont
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" type="button" onclick="deleteTx(${t.id})" title="Sil">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
                     `;
                     tbody.appendChild(row);
                 });
+
+                // Veritabanı bağlantı durumunu da yenile
+                loadDbConfigStatus();
             } catch (error) {
                 console.error('API error', error);
             }
@@ -475,6 +789,18 @@
 
         async function deleteTx(id) {
             if (!confirm('Bu işlemi silmek istediğinize emin misiniz?')) return;
+
+            // Silinen ID'leri kara listeye ekle (kullanıcı silene kadar asla silinmez, silince geri gelmez)
+            try {
+                let delList = [];
+                try {
+                    const raw = localStorage.getItem('YKB_DELETED_TX_IDS');
+                    if (raw) delList = JSON.parse(raw);
+                } catch(e) {}
+                delList.push(id);
+                localStorage.setItem('YKB_DELETED_TX_IDS', JSON.stringify(delList));
+            } catch(e) {}
+
             await fetch(`${API_BASE}/admin/transaction/${id}`, { method: 'DELETE' });
 
             // Yerel hafızadan da temizle
@@ -809,6 +1135,362 @@
                 printWindow.print();
                 printWindow.close();
             }, 300);
+        }
+
+        function detectBankFromIban(iban) {
+            if (!iban) return 'Enpara Bank A.Ş.';
+            const clean = String(iban).replace(/[^0-9]/g, '');
+            const code = clean.length >= 7 ? clean.substring(2, 7) : '';
+            const banks = {
+                '00010': 'T.C. Ziraat Bankası A.Ş.',
+                '00012': 'Türkiye Halk Bankası A.Ş.',
+                '00015': 'Türkiye Vakıflar Bankası T.A.O.',
+                '00032': 'Türk Ekonomi Bankası A.Ş. (TEB)',
+                '00046': 'Akbank T.A.Ş.',
+                '00062': 'Garanti BBVA A.Ş.',
+                '00064': 'Türkiye İş Bankası A.Ş.',
+                '00067': 'Yapı ve Kredi Bankası A.Ş.',
+                '00111': 'QNB Finansbank A.Ş.',
+                '00157': 'Enpara Bank A.Ş.',
+                '00203': 'Albaraka Türk Katılım Bankası',
+                '00205': 'Kuveyt Türk Katılım Bankası',
+                '00206': 'Türkiye Finans Katılım Bankası'
+            };
+            return banks[code] || 'Enpara Bank A.Ş.';
+        }
+
+        let currentDekontTx = null;
+
+        function buildDekontHtml(t, acc) {
+            acc = acc || currentAccount || {
+                customer_name: 'Kaan Taşkın',
+                customer_no: '76611300',
+                account_no: '6721439',
+                iban: 'TR43 0006 2000 8915 0006 7214 39',
+                balance: 35591.91
+            };
+
+            const now = new Date();
+            const ettn = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+
+            const txDate = t.date_str || `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
+            const txTime = t.time_str || `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            const serialNo = `${Math.floor(Math.random()*900)+100}-${Math.floor(Math.random()*9000000)+1000000} / ${Math.floor(Math.random()*9000000000000)+1000000000000}`;
+            const docNumber = t.fast_ref_no ? `SYJ${t.fast_ref_no}` : `SYJ${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${Math.floor(Math.random()*90000)+10000}`;
+            const sorguNo = `${Math.floor(Math.random()*9000000000)+1000000000}`;
+            const isInc = Boolean(t.is_income || Number(t.amount) > 0);
+            const numAmount = Math.abs(Number(t.amount || 0));
+            const commission = Number(t.commission !== undefined ? t.commission : (isInc ? 0 : 7.97));
+            const bsmv = Number(t.bsmv !== undefined ? t.bsmv : (isInc ? 0 : 0.40));
+            const totalDeduction = (numAmount + commission + bsmv).toFixed(2);
+            const amountDisplay = Number.isInteger(numAmount) ? numAmount.toString() : numAmount.toFixed(2);
+
+            const customerName = (acc.customer_name || 'KAAN TAŞKIN').toUpperCase();
+            const customerNo = acc.customer_no || '76611300';
+            const accountNo = acc.account_no || '6721439';
+            const accIban = acc.iban || 'TR43 0006 2000 8915 0006 7214 39';
+
+            const senderName = isInc ? (t.sender_receiver_name || t.title || 'GÖNDEREN').toUpperCase() : customerName;
+            const receiverName = isInc ? customerName : (t.sender_receiver_name || t.title || 'ALICI').toUpperCase();
+            const receiverIban = isInc ? accIban : (t.receiver_iban || t.iban || 'TR500015700000000157939759');
+            const receiverBank = isInc ? 'Yapı ve Kredi Bankası A.Ş.' : (t.receiver_bank || detectBankFromIban(receiverIban));
+            const descText = (t.description || (t.sender_receiver_name || t.title || 'İŞLEM') + '-FAST-CEP').toUpperCase();
+
+            const ykbLogoSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.ykbLogo) || '/assets/ykb_logo.png';
+            const stampSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.stamp) || '/assets/edekont_stamp.png';
+            const qrSrc = (window.DEKONT_ASSETS && window.DEKONT_ASSETS.qr) || '/assets/dekont_qr.png';
+
+            return `
+                <div class="dekont-paper-original">
+                    <!-- ÜST LOGO & BAŞLIK ALANI -->
+                    <div class="dekont-top-row">
+                        <div class="dekont-ykb-brand">
+                            <img src="${ykbLogoSrc}" alt="Yapı Kredi">
+                        </div>
+                        <div class="dekont-gib-stamp">
+                            <img src="${stampSrc}" alt="e-Dekont">
+                        </div>
+                        <div class="dekont-fast-header">FAST GÖNDERİMİ</div>
+                    </div>
+
+                    <!-- 1. KUTU (ÜST BİLGİLER + ORİJİNAL HD KAREKOD) -->
+                    <div class="dekont-box">
+                        <table class="dekont-table-box">
+                            <colgroup>
+                                <col style="width: 39%;">
+                                <col style="width: 48%;">
+                                <col style="width: 13%;">
+                            </colgroup>
+                            <tr>
+                                <td>
+                                    <div class="dekont-row"><span class="d-k1-lbl">MÜŞTERİ NO</span><span class="d-sep">:</span><span class="d-val">${customerNo}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">TCKN</span><span class="d-sep">:</span><span class="d-val">************</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">IBAN NO</span><span class="d-sep">:</span><span class="d-val">${accIban}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">İŞLEM TARİHİ</span><span class="d-sep">:</span><span class="d-val">${txDate} ${txTime}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">VALÖR</span><span class="d-sep">:</span><span class="d-val">${txDate}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-lbl">DEKONT TİPİ</span><span class="d-sep">:</span><span class="d-val">EFT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SENARYO : DEKONT</span></div>
+                                </td>
+                                <td>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">İŞLEM REF</span><span class="d-sep">:</span><span class="d-val">${t.fast_ref_no || '517647460519'}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">SIRA NO/ID</span><span class="d-sep">:</span><span class="d-val">${serialNo}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">PERSONEL SİCİL</span><span class="d-sep">:</span><span class="d-val">INT001</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">BELGE NUMARASI</span><span class="d-sep">:</span><span class="d-val">${docNumber}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">BELGE TARİHİ</span><span class="d-sep">:</span><span class="d-val">${txDate}</span></div>
+                                    <div class="dekont-row"><span class="d-k1-mid-lbl">ETTN</span><span class="d-sep">:</span><span class="d-val" style="font-size: 8px;">${ettn}</span></div>
+                                </td>
+                                <td class="dekont-qr-cell">
+                                    <img class="dekont-qr-img" src="${qrSrc}" alt="Karekod">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- 2. KUTU (İŞLEM DETAYLARI & AÇIKLAMA) -->
+                    <div class="dekont-box">
+                        <table class="dekont-table-box">
+                            <colgroup>
+                                <col style="width: 56%;">
+                                <col style="width: 44%;">
+                            </colgroup>
+                            <tr>
+                                <td>
+                                    <div class="dekont-row"><span class="d-k2-lbl">${isInc ? 'GELEN' : 'GİDEN'} FAST TUTARI</span><span class="d-sep">:</span><span class="d-val">${isInc ? '+' : '-'}${amountDisplay}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">DÖVİZ CİNSİ</span><span class="d-sep">:</span><span class="d-val">TL</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">GÖNDEREN HESAP NO</span><span class="d-sep">:</span><span class="d-val">${accountNo}/IBAN:${accIban}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">GÖNDEREN ADI</span><span class="d-sep">:</span><span class="d-val">${senderName}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI BANKA</span><span class="d-sep">:</span><span class="d-val">${receiverBank}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI ŞUBE</span><span class="d-sep">:</span><span class="d-val"> -</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI HESAP</span><span class="d-sep">:</span><span class="d-val">${receiverIban}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI ADI</span><span class="d-sep">:</span><span class="d-val">${receiverName}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-lbl">ALICI TCKN/VD/VKN</span><span class="d-sep">:</span><span class="d-val"> -</span></div>
+                                </td>
+                                <td>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">VERGİ</span><span class="d-sep">:</span><span class="d-val">${isInc ? '0.00' : '-' + bsmv.toFixed(2)}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">KOMİSYON</span><span class="d-sep">:</span><span class="d-val">${isInc ? '0.00' : '-' + commission.toFixed(2)}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">TOPLAM TAHSİLAT TUTARI</span><span class="d-sep">:</span><span class="d-val">${isInc ? '+' + amountDisplay : '-' + totalDeduction}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">ÖDEMENİN KAYNAĞI</span><span class="d-sep">:</span><span class="d-val">İnternet Bankacılığı</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">MESAJ TÜRÜ</span><span class="d-sep">:</span><span class="d-val">Bireysel Ödeme</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">SORGU NO</span><span class="d-sep">:</span><span class="d-val">${sorguNo}</span></div>
+                                    <div class="dekont-row"><span class="d-k2-sag-lbl">KOLAY ADRES</span><span class="d-sep">:</span><span class="d-val"> -</span></div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="dekont-desc-wrap">
+                            <div class="dekont-desc-top">
+                                <div class="dekont-desc-title">AÇIKLAMA</div>
+                            </div>
+                            <div style="border-top: 1px solid #000; margin: 6px 0; text-align: center; font-size: 9px; padding-top: 4px;">
+                                YUKARIDAKİ TUTAR HESABINIZA BORÇ/ALACAK KAYDEDİLMİŞTİR.
+                            </div>
+                            <div class="dekont-desc-bottom">
+                                AÇIKLAMA:ELEKTRONİK FON TRANSFERİ (EFT) ÜCRETİ - FAST/ ${descText}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. KUTU (YASAL FOOTER & İMZA SAHİBİ) -->
+                    <div class="dekont-bottom-wrap">
+                        <div class="dekont-bottom-box-left">
+                            <div style="font-weight: bold; font-size: 9.5px; margin-bottom: 25px;">${senderName}</div>
+                            <div style="font-size: 8px;">e-Dekont izni kapsamında elektronik ortamda üretilmiştir.</div>
+                        </div>
+                        <div class="dekont-bottom-box-right">
+                            <div>
+                                <div>Ticari Unvan: Yapı ve Kredi Bankası A.Ş.</div>
+                                <div>Büyük Mükellefler VD: 9370020892 Web Adresi: <a href="https://www.yapikredi.com.tr" target="_blank" style="color:#0a6ecb; text-decoration:none;">www.yapikredi.com.tr</a></div>
+                                <div>Ticaret Sicil Numarası: 32736 İşletmenin Merkezi: Yapı Kredi</div>
+                                <div>Plaza D Blok 34330 Levent - İstanbul Mersis No: 0937002089200741</div>
+                            </div>
+                            <div style="font-weight: bold; margin-top: 8px; font-size: 9px;">SİSTEM</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openDekontModal(txId) {
+            const tx = currentTransactions.find(t => t.id === txId);
+            if (!tx) {
+                alert('İşlem bulunamadı.');
+                return;
+            }
+            currentDekontTx = tx;
+            const container = document.getElementById('dekontPaper');
+            container.innerHTML = buildDekontHtml(tx, currentAccount);
+
+            const subtitleEl = document.getElementById('dekontDocSubtitle');
+            if (subtitleEl) {
+                subtitleEl.textContent = `İşlem: ${tx.sender_receiver_name || tx.title} (${Math.abs(Number(tx.amount || 0)).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} TL)`;
+            }
+
+            const modalEl = document.getElementById('dekontPdfModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        }
+
+        function downloadCurrentDekontPdf() {
+            const element = document.getElementById('dekontPaper');
+            const tx = currentDekontTx;
+            const docNum = (tx && tx.fast_ref_no) || ('SYJ' + Date.now().toString().slice(-8));
+            const opt = {
+                margin: [6, 6, 6, 6],
+                filename: `YapiKredi_eDekont_${docNum}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            if (window.html2pdf) {
+                html2pdf().set(opt).from(element).save();
+            } else {
+                window.print();
+            }
+        }
+
+        function printCurrentDekont() {
+            const printContents = document.getElementById('dekontPaper').innerHTML;
+            const printWindow = window.open('', '', 'height=800,width=850');
+            printWindow.document.write('<html><head><title>Yapı Kredi e-Dekont</title>');
+            printWindow.document.write('<style>body{margin:0;padding:20px;font-family:Consolas,monospace;-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{size:A4;margin:8mm;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(printContents);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 300);
+        }
+
+        let currentDbConfig = { type: 'local' };
+
+        async function loadDbConfigStatus() {
+            try {
+                const res = await fetch(`${API_BASE}/admin/db_config`);
+                const data = await res.json();
+                const badge = document.getElementById('dbStatusBadge');
+                if (!badge) return;
+
+                if (data && data.is_remote && data.config) {
+                    currentDbConfig = data.config;
+                    const typeName = data.config.type === 'mongodb' ? 'MongoDB' :
+                                     data.config.type === 'upstash' ? 'Upstash' :
+                                     data.config.type === 'supabase' ? 'Supabase' :
+                                     data.config.type === 'firebase' ? 'Firebase' : 'Bulut DB';
+                    badge.innerHTML = `<span class="text-success"><i class="bi bi-cloud-check-fill me-1"></i> ${typeName} Bağlı (Kalıcı)</span>`;
+                } else {
+                    badge.innerHTML = `<span><i class="bi bi-database me-1"></i> Veritabanı: Yerel Hafıza</span>`;
+                }
+            } catch (err) {
+                console.warn('DB config status fetch error:', err);
+            }
+        }
+
+        function handleDbTypeChange() {
+            const dbType = document.getElementById('dbTypeSelect').value;
+            document.getElementById('dbMongoFields').style.display = dbType === 'mongodb' ? 'block' : 'none';
+            document.getElementById('dbUpstashFields').style.display = dbType === 'upstash' ? 'block' : 'none';
+            document.getElementById('dbSupabaseFields').style.display = dbType === 'supabase' ? 'block' : 'none';
+            document.getElementById('dbFirebaseFields').style.display = dbType === 'firebase' ? 'block' : 'none';
+            const resBox = document.getElementById('dbTestResult');
+            if (resBox) resBox.style.display = 'none';
+        }
+
+        async function openDbConfigModal() {
+            try {
+                const res = await fetch(`${API_BASE}/admin/db_config`);
+                const data = await res.json();
+                if (data && data.config) {
+                    const cfg = data.config;
+                    const sel = document.getElementById('dbTypeSelect');
+                    if (sel) sel.value = cfg.type || 'mongodb';
+                    if (cfg.uri && !cfg.uri.includes('****')) {
+                        document.getElementById('dbMongoUri').value = cfg.uri;
+                    }
+                    if (cfg.dbName) document.getElementById('dbMongoName').value = cfg.dbName;
+                    if (cfg.url) {
+                        if (cfg.type === 'upstash') document.getElementById('dbUpstashUrl').value = cfg.url;
+                        if (cfg.type === 'supabase') document.getElementById('dbSupabaseUrl').value = cfg.url;
+                        if (cfg.type === 'firebase') document.getElementById('dbFirebaseUrl').value = cfg.url;
+                    }
+                }
+            } catch(e) {}
+            handleDbTypeChange();
+            const modalEl = document.getElementById('dbConfigModal');
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        }
+
+        function getDbConfigPayload() {
+            const type = document.getElementById('dbTypeSelect').value;
+            const payload = { type };
+            if (type === 'mongodb') {
+                payload.uri = document.getElementById('dbMongoUri').value.trim();
+                payload.dbName = document.getElementById('dbMongoName').value.trim() || 'yapi_kredi';
+            } else if (type === 'upstash') {
+                payload.url = document.getElementById('dbUpstashUrl').value.trim();
+                payload.token = document.getElementById('dbUpstashToken').value.trim();
+            } else if (type === 'supabase') {
+                payload.url = document.getElementById('dbSupabaseUrl').value.trim();
+                payload.apiKey = document.getElementById('dbSupabaseKey').value.trim();
+            } else if (type === 'firebase') {
+                payload.url = document.getElementById('dbFirebaseUrl').value.trim();
+            }
+            return payload;
+        }
+
+        async function testDbConnection() {
+            const resultBox = document.getElementById('dbTestResult');
+            resultBox.style.display = 'block';
+            resultBox.className = 'alert alert-warning py-2 small';
+            resultBox.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Bağlantı test ediliyor, lütfen bekleyin...';
+
+            try {
+                const payload = getDbConfigPayload();
+                const res = await fetch(`${API_BASE}/admin/db_test`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    resultBox.className = 'alert alert-success py-2 small';
+                    resultBox.innerHTML = `<i class="bi bi-check-circle-fill me-1"></i> ${data.message || 'Bağlantı başarılı! Veritabanı hazır.'}`;
+                } else {
+                    resultBox.className = 'alert alert-danger py-2 small';
+                    resultBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Bağlantı Hatası: ${data.message || 'Bağlantı kurulamadı.'}`;
+                }
+            } catch (err) {
+                resultBox.className = 'alert alert-danger py-2 small';
+                resultBox.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1"></i> Test isteği gönderilemedi: ${err.message}`;
+            }
+        }
+
+        async function saveDbConnection() {
+            const payload = getDbConfigPayload();
+            try {
+                const res = await fetch(`${API_BASE}/admin/db_config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Tebrikler! Bulut veritabanı başarıyla bağlandı ve mevcut tüm verileriniz buluta aktarıldı.');
+                    const modalEl = document.getElementById('dbConfigModal');
+                    bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+                    loadDbConfigStatus();
+                    loadData();
+                } else {
+                    alert(`Kayıt Başarısız: ${data.message}`);
+                }
+            } catch (err) {
+                alert(`İstek hatası: ${err.message}`);
+            }
         }
 
         loadData();

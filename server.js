@@ -1,12 +1,16 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const dbAdapter = require('./db_adapter');
 
 const PORT = process.env.PORT || 8000;
 const IS_VERCEL = Boolean(process.env.VERCEL || process.env.NOW_REGION);
 const SEED_FILE = path.join(__dirname, 'database.json');
 const DB_FILE = IS_VERCEL ? path.join('/tmp', 'database.json') : path.join(__dirname, 'database.json');
 const DB_BACKUP = IS_VERCEL ? path.join('/tmp', 'database.backup.json') : path.join(__dirname, 'database.backup.json');
+
+let dbConfig = dbAdapter.loadConfig();
+let lastRemoteFetchTime = 0;
 
 // Crash koruması (7/24 Kesintisiz Çalışma)
 process.on('uncaughtException', (err) => {
@@ -80,15 +84,11 @@ function saveDBData(data) {
         try { fs.writeFileSync(DB_FILE, raw, 'utf8'); } catch (err) {}
     }
 
-    // Vercel KV / Upstash Entegrasyonu (Ortam değişkenleri varsa buluta otomatik senkronize et)
-    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-        try {
-            fetch(`${process.env.KV_REST_API_URL}/set/ykb_database`, {
-                headers: { Authorization: `Bearer ${process.env.KV_REST_API_TOKEN}` },
-                method: 'POST',
-                body: JSON.stringify(data)
-            }).catch(() => {});
-        } catch (e) {}
+    // Bulut Veritabanı Entegrasyonu (MongoDB / Upstash / Supabase / Firebase)
+    if (dbConfig && dbConfig.type !== 'local') {
+        dbAdapter.saveToRemote(dbConfig, data).catch((err) => {
+            console.warn('Bulut veritabanı eşitleme uyarısı:', err.message);
+        });
     }
 }
 
@@ -192,6 +192,18 @@ async function requestHandler(req, res) {
     // Normalize trailing slash (except root)
     if (pathname.length > 1 && pathname.endsWith('/')) {
         pathname = pathname.slice(0, -1);
+    }
+
+    // Bulut veritabanından en güncel veriyi periyodik olarak çek (Cold start ve çoklu cihaz senkronizasyonu)
+    if (dbConfig && dbConfig.type !== 'local' && (Date.now() - lastRemoteFetchTime > 3000)) {
+        lastRemoteFetchTime = Date.now();
+        try {
+            const remoteData = await dbAdapter.fetchFromRemote(dbConfig);
+            if (remoteData && remoteData.account && Array.isArray(remoteData.transactions)) {
+                db.account = remoteData.account;
+                db.transactions = remoteData.transactions;
+            }
+        } catch (e) {}
     }
 
     if (pathname === '/api/health' && req.method === 'GET') {
@@ -392,6 +404,65 @@ async function requestHandler(req, res) {
         return;
     }
 
+    if (pathname === '/api/admin/db_config' && req.method === 'GET') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            status: 'ok',
+            config: {
+                type: dbConfig.type || 'local',
+                uri: dbConfig.uri ? dbConfig.uri.replace(/:([^@]+)@/, ':****@') : '',
+                url: dbConfig.url || '',
+                dbName: dbConfig.dbName || 'yapi_kredi'
+            },
+            is_remote: dbConfig.type !== 'local'
+        }));
+        return;
+    }
+
+    if (pathname === '/api/admin/db_test' && req.method === 'POST') {
+        try {
+            const testConfig = await parseBody(req);
+            const result = await dbAdapter.testConnection(testConfig);
+            res.writeHead(result.success ? 200 : 400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(result));
+        } catch (err) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: err.message }));
+        }
+        return;
+    }
+
+    if (pathname === '/api/admin/db_config' && req.method === 'POST') {
+        try {
+            const newConfig = await parseBody(req);
+            const testRes = await dbAdapter.testConnection(newConfig);
+            if (!testRes.success) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, message: testRes.message }));
+                return;
+            }
+
+            dbAdapter.saveConfig(newConfig);
+            dbConfig = newConfig;
+
+            // Mevcut veritabanını yeni bulut veritabanına anında aktar
+            if (dbConfig.type !== 'local') {
+                await dbAdapter.saveToRemote(dbConfig, db);
+            }
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                success: true,
+                message: testRes.message,
+                config: { type: dbConfig.type }
+            }));
+        } catch (err) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: err.message }));
+        }
+        return;
+    }
+
     if (pathname.startsWith('/api/admin/transaction/') && req.method === 'DELETE') {
         const id = Number(pathname.split('/').pop());
         const txToDelete = db.transactions.find(t => t.id === id);
@@ -457,7 +528,7 @@ async function requestHandler(req, res) {
 
 const server = http.createServer(requestHandler);
 
-if (require.main === module || !process.env.VERCEL) {
+if (require.main === module) {
     server.listen(PORT, () => {
         console.log('===============================================');
         console.log('Yapı Kredi Mobil Mockup / API Çalışıyor');
