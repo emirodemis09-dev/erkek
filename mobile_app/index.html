@@ -1785,21 +1785,7 @@
                 <button class="menu-btn" aria-label="Menü" onclick="openUserProfileModal()"><i class="bi bi-list"></i></button>
                 <div class="search-field"><span>Yapı Kredi Mobil'de Ara</span></div>
                 <div class="profile-ring"><i class="bi bi-bell"></i></div>
-                <div class="profile-avatar" onclick="openUserProfileModal()" style="cursor: pointer;"><i class="bi bi-person-fill"></i></div>
-            </div>
-
-            <!-- Kullanıcı Karşılama ve Hızlı Profil Alanı -->
-            <div class="app-user-greeting-banner d-flex justify-content-between align-items-center" style="margin: 0 18px 12px; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="avatar-circle-sm" style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #0789c9, #00b4d8); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px;" id="headerUserInitials">KT</div>
-                    <div>
-                        <div style="font-size: 11px; color: #8fa0b5;">Hoş Geldiniz</div>
-                        <div style="font-weight: 700; font-size: 13.5px; color: #ffffff;" id="headerCustomerName">Kaan Taşkın</div>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-light px-2 py-1 rounded-pill" onclick="openUserProfileModal()" style="font-size: 11px; font-weight: 600;" title="Hesap Profili">
-                    <i class="bi bi-person-gear me-1"></i> Profil
-                </button>
+                <div class="profile-avatar" onclick="openUserProfileModal()" style="cursor: pointer;" title="Profil"><i class="bi bi-person-fill"></i></div>
             </div>
 
             <div class="bank-toggle">
@@ -2096,7 +2082,8 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center pt-3">
-                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #0789c9, #00b4d8); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin: 0 auto 12px;" id="profileModalInitials">KT</div>
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #0789c9, #00b4d8); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin: 0 auto 10px;" id="profileModalInitials">KT</div>
+                    <div style="font-size: 12px; color: #8fa0b5; margin-bottom: 2px;">Hoş Geldiniz</div>
                     <h5 class="fw-bold mb-1" id="profileModalName">Kaan Taşkın</h5>
                     <div class="badge bg-primary-subtle text-primary mb-3" id="profileModalUsername">@kaan</div>
 
