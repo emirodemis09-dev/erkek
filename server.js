@@ -772,6 +772,20 @@ async function requestHandler(req, res) {
         return;
     }
 
+    if (pathname.endsWith('.webp') || pathname.endsWith('.png') || pathname.endsWith('.jpg') || pathname.endsWith('.svg')) {
+        let filePath = path.join(__dirname, 'mobile_app', path.basename(pathname));
+        if (!fs.existsSync(filePath)) {
+            filePath = path.join(__dirname, 'admin_panel', path.basename(pathname));
+        }
+        if (fs.existsSync(filePath)) {
+            const ext = path.extname(filePath).toLowerCase();
+            const contentType = ext === '.webp' ? 'image/webp' : ext === '.png' ? 'image/png' : ext === '.svg' ? 'image/svg+xml' : 'image/jpeg';
+            res.writeHead(200, { 'Content-Type': contentType });
+            fs.createReadStream(filePath).pipe(res);
+            return;
+        }
+    }
+
     if (pathname.endsWith('.js')) {
         let filePath = path.join(__dirname, 'mobile_app', path.basename(pathname));
         if (!fs.existsSync(filePath)) {
