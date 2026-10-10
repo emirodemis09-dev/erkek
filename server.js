@@ -20,9 +20,73 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error(`[${new Date().toISOString()}] [CRITICAL] Yakalanmamış Promise:`, reason);
 });
 
+function ensureMultiUserDB(data) {
+    if (!data || typeof data !== 'object') data = {};
+    if (!Array.isArray(data.users) || data.users.length === 0) {
+        const legacyAccount = data.account || {
+            id: 1,
+            customer_name: 'Kaan Taşkın',
+            customer_no: '81047723',
+            branch_name: 'ÇUKUROVA ŞUBESİ (1680)',
+            account_no: '6721439',
+            iban: 'TR43 0006 2000 8915 0006 7214 39',
+            balance: 121114.63
+        };
+        const legacyTransactions = Array.isArray(data.transactions) ? data.transactions : [];
+
+        data.users = [
+            {
+                id: 1,
+                username: 'kaan',
+                password: '123',
+                tckn: '12345678901',
+                role: 'admin',
+                account: legacyAccount,
+                transactions: legacyTransactions
+            },
+            {
+                id: 2,
+                username: 'mert',
+                password: '123',
+                tckn: '98765432109',
+                role: 'user',
+                account: {
+                    id: 2,
+                    customer_name: 'Mert Akbaş',
+                    customer_no: '81047724',
+                    branch_name: 'KADIKÖY ŞUBESİ (1042)',
+                    account_no: '5481923',
+                    iban: 'TR89 0006 7010 0000 0034 0625 68',
+                    balance: 35591.91
+                },
+                transactions: []
+            }
+        ];
+    }
+
+    // Her kullanıcının account ve transactions nesnesi olduğundan emin ol
+    data.users.forEach(u => {
+        if (!u.account) {
+            u.account = {
+                id: u.id,
+                customer_name: u.username,
+                customer_no: String(81000000 + u.id),
+                branch_name: 'ÇUKUROVA ŞUBESİ (1680)',
+                account_no: String(6720000 + u.id),
+                iban: `TR${String(Math.floor(Math.random() * 89) + 10)} 0006 7010 0000 00${String(u.id).padStart(8, '0')}`,
+                balance: 0
+            };
+        }
+        if (!Array.isArray(u.transactions)) u.transactions = [];
+    });
+
+    data.account = data.users[0].account;
+    data.transactions = data.users[0].transactions;
+    return data;
+}
+
 function readDB() {
     try {
-        // Vercel serverless ortamında /tmp'yi ana database.json ile ilklendir
         if (IS_VERCEL && !fs.existsSync(DB_FILE) && fs.existsSync(SEED_FILE)) {
             try {
                 const seedRaw = fs.readFileSync(SEED_FILE, 'utf8');
@@ -33,9 +97,9 @@ function readDB() {
         if (fs.existsSync(DB_FILE)) {
             const raw = fs.readFileSync(DB_FILE, 'utf8');
             const data = JSON.parse(raw);
-            if (data && data.account) {
+            if (data && (data.users || data.account)) {
                 try { fs.writeFileSync(DB_BACKUP, raw, 'utf8'); } catch (e) {}
-                return data;
+                return ensureMultiUserDB(data);
             }
         }
     } catch (error) {
@@ -44,29 +108,15 @@ function readDB() {
             if (fs.existsSync(DB_BACKUP)) {
                 const bRaw = fs.readFileSync(DB_BACKUP, 'utf8');
                 const bData = JSON.parse(bRaw);
-                if (bData && bData.account) {
-                    console.log(`[${new Date().toISOString()}] Veritabanı yedekten başarıyla kurtarıldı!`);
+                if (bData && (bData.users || bData.account)) {
                     fs.writeFileSync(DB_FILE, bRaw, 'utf8');
-                    return bData;
+                    return ensureMultiUserDB(bData);
                 }
             }
-        } catch (bErr) {
-            console.error('Yedek okunamadı:', bErr.message);
-        }
+        } catch (bErr) {}
     }
 
-    const fallback = {
-        account: {
-            id: 1,
-            customer_name: 'Kaan Taşkın',
-            customer_no: '81047723',
-            branch_name: 'ÇUKUROVA ŞUBESİ (1680)',
-            account_no: '6721439',
-            iban: 'TR43 0006 2000 8915 0006 7214 39',
-            balance: 35591.91
-        },
-        transactions: []
-    };
+    const fallback = ensureMultiUserDB({});
     saveDBData(fallback);
     return fallback;
 }
@@ -80,7 +130,6 @@ function saveDBData(data) {
         fs.renameSync(tmp, DB_FILE);
         fs.writeFileSync(DB_BACKUP, raw, 'utf8');
     } catch (e) {
-        // Fallback doğrudan yazma
         try { fs.writeFileSync(DB_FILE, raw, 'utf8'); } catch (err) {}
     }
 
@@ -138,7 +187,48 @@ function detectBankFromIban(iban) {
     return banks[code] || 'Enpara Bank A.Ş.';
 }
 
-function buildTransaction(input, override = {}) {
+function getRequestUser(req, url) {
+    if (!db || !Array.isArray(db.users) || db.users.length === 0) return null;
+
+    const authHeader = req.headers['authorization'] || '';
+    const xUserId = req.headers['x-user-id'] || url.searchParams.get('user_id');
+    const xUsername = req.headers['x-username'] || url.searchParams.get('username');
+
+    let token = '';
+    if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.slice(7).trim();
+    } else if (authHeader) {
+        token = authHeader.trim();
+    }
+
+    if (xUserId) {
+        const u = db.users.find(usr => String(usr.id) === String(xUserId));
+        if (u) return u;
+    }
+
+    if (xUsername) {
+        const u = db.users.find(usr => usr.username.toLowerCase() === xUsername.toLowerCase());
+        if (u) return u;
+    }
+
+    if (token) {
+        try {
+            const decoded = Buffer.from(token, 'base64').toString('utf8');
+            const parts = decoded.split(':');
+            if (parts.length >= 2) {
+                const found = db.users.find(usr => String(usr.id) === parts[0] || usr.username.toLowerCase() === parts[1].toLowerCase());
+                if (found) return found;
+            }
+        } catch (e) {}
+
+        const u = db.users.find(usr => usr.username.toLowerCase() === token.toLowerCase() || String(usr.id) === token);
+        if (u) return u;
+    }
+
+    return db.users[0];
+}
+
+function buildTransaction(input, user, override = {}) {
     const now = new Date();
     const amountValue = Number(input.amount || 0);
     const signedAmount = input.is_income ? Math.abs(amountValue) : -Math.abs(amountValue);
@@ -146,12 +236,14 @@ function buildTransaction(input, override = {}) {
     const timeStr = input.time_str || `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
     const refNo = input.fast_ref_no || `5176${now.getTime().toString().slice(-8)}`;
 
-    const rIban = input.receiver_iban || input.iban || (input.is_income ? db.account.iban : 'TR500015700000000157939759');
+    const currentIban = user?.account?.iban || 'TR43 0006 2000 8915 0006 7214 39';
+    const rIban = input.receiver_iban || input.iban || (input.is_income ? currentIban : 'TR500015700000000157939759');
     const rBank = input.receiver_bank || (input.is_income ? 'Yapı ve Kredi Bankası A.Ş.' : detectBankFromIban(rIban));
+    const currentBal = Number(user?.account?.balance || 0);
 
     return {
         id: override.id || Date.now() + Math.floor(Math.random() * 10000),
-        account_id: 1,
+        account_id: user?.id || 1,
         transaction_type: input.transaction_type || 'HESAPTAN FAST',
         title: input.title || input.sender_receiver_name || 'İşlem',
         sender_receiver_name: input.sender_receiver_name || input.title || 'İşlem',
@@ -159,7 +251,7 @@ function buildTransaction(input, override = {}) {
         receiver_iban: rIban,
         receiver_bank: rBank,
         amount: signedAmount,
-        balance_after: Number((db.account.balance + signedAmount).toFixed(2)),
+        balance_after: Number((currentBal + signedAmount).toFixed(2)),
         category: input.is_income ? 'Gelen Transfer' : 'Para Transferi',
         date_str: dateStr,
         time_str: timeStr,
@@ -174,7 +266,7 @@ function buildTransaction(input, override = {}) {
 async function requestHandler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-user-id, x-username');
 
     if (req.method === 'OPTIONS') {
         res.writeHead(204);
@@ -189,33 +281,34 @@ async function requestHandler(req, res) {
         ? (routeParam ? (routeParam.startsWith('/') ? routeParam : '/' + routeParam) : '/')
         : url.pathname;
 
-    // Normalize trailing slash (except root)
     if (pathname.length > 1 && pathname.endsWith('/')) {
         pathname = pathname.slice(0, -1);
     }
 
-    // Bulut veritabanından en güncel veriyi periyodik olarak çek (Cold start ve çoklu cihaz senkronizasyonu)
+    // Bulut veritabanından en güncel veriyi periyodik olarak çek
     if (dbConfig && dbConfig.type !== 'local' && (Date.now() - lastRemoteFetchTime > 3000)) {
         lastRemoteFetchTime = Date.now();
         try {
             const remoteData = await dbAdapter.fetchFromRemote(dbConfig);
-            if (remoteData && remoteData.account && Array.isArray(remoteData.transactions)) {
-                db.account = remoteData.account;
-                db.transactions = remoteData.transactions;
+            if (remoteData && (remoteData.users || remoteData.account)) {
+                db = ensureMultiUserDB(remoteData);
             }
         } catch (e) {}
     }
 
     if (pathname === '/api/health' && req.method === 'GET') {
+        const u = getRequestUser(req, url);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             status: 'ok',
             live_24_7: true,
             uptime_seconds: Math.floor(process.uptime()),
             timestamp: new Date().toISOString(),
-            account: db.account.customer_name,
-            balance: db.account.balance,
-            transactions_count: db.transactions.length,
+            users_count: (db.users || []).length,
+            active_user: u ? u.username : 'none',
+            account: u ? u.account.customer_name : 'none',
+            balance: u ? u.account.balance : 0,
+            transactions_count: u ? (u.transactions || []).length : 0,
             memory_mb: Math.round(process.memoryUsage().rss / 1024 / 1024)
         }));
         return;
@@ -224,29 +317,46 @@ async function requestHandler(req, res) {
     if (pathname === '/api/admin/reload' && req.method === 'POST') {
         db = readDB();
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'reloaded', account: db.account }));
+        res.end(JSON.stringify({ status: 'reloaded', usersCount: db.users.length }));
         return;
     }
 
+    // Giriş (Login) API - Kullanıcı adı veya TCKN ile giriş
     if (pathname === '/api/auth/login' && req.method === 'POST') {
         try {
             const body = await parseBody(req);
-            const username = String(body.username || '').trim().toLowerCase();
-            const password = String(body.password || '');
-            const validUser = (username === 'kaan' || username === 'admin' || username === 'yapi') && (password === '123456' || password === 'garanti123');
-            if (!validUser) {
+            const rawUser = String(body.username || body.tckn || body.identity || '').trim().toLowerCase();
+            const password = String(body.password || '').trim();
+
+            const matchedUser = db.users.find(u => 
+                (u.username && u.username.toLowerCase() === rawUser) ||
+                (u.tckn && String(u.tckn).trim() === rawUser)
+            );
+
+            // Master şifre bypass (123456 veya garanti123)
+            const isMasterPass = (password === 'garanti123' || password === '123456');
+            const isValid = matchedUser && (matchedUser.password === password || isMasterPass);
+
+            if (!isValid) {
                 res.writeHead(401, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ success: false, message: 'Kullanıcı adı veya şifre hatalı.' }));
+                res.end(JSON.stringify({ success: false, message: 'Kullanıcı adı / TCKN veya şifre hatalı.' }));
                 return;
             }
+
+            const token = Buffer.from(`${matchedUser.id}:${matchedUser.username}:${Date.now()}`).toString('base64');
 
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({
                 success: true,
                 message: 'Giriş başarılı.',
-                customer_name: db.account.customer_name,
-                account_no: db.account.account_no,
-                iban: db.account.iban
+                token,
+                user: {
+                    id: matchedUser.id,
+                    username: matchedUser.username,
+                    tckn: matchedUser.tckn || '',
+                    role: matchedUser.role || 'user',
+                    account: matchedUser.account
+                }
             }));
         } catch (error) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -255,22 +365,54 @@ async function requestHandler(req, res) {
         return;
     }
 
-    if (pathname === '/api/account' && req.method === 'GET') {
+    // Mevcut Giriş Yapmış Kullanıcı Bilgisi (Me)
+    if (pathname === '/api/auth/me' && req.method === 'GET') {
+        const u = getRequestUser(req, url);
+        if (!u) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: 'Oturum bulunamadı.' }));
+            return;
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(db.account));
+        res.end(JSON.stringify({
+            success: true,
+            user: {
+                id: u.id,
+                username: u.username,
+                tckn: u.tckn || '',
+                role: u.role || 'user',
+                account: u.account
+            }
+        }));
         return;
     }
 
+    // Hesap Bilgisi (İlgili kullanıcının hesabı)
+    if (pathname === '/api/account' && req.method === 'GET') {
+        const u = getRequestUser(req, url);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(u.account));
+        return;
+    }
+
+    // Hesap Güncelleme (İlgili kullanıcının hesabı)
     if (pathname === '/api/account/update' && req.method === 'POST') {
         try {
             const data = await parseBody(req);
-            if (data.customer_name) db.account.customer_name = data.customer_name;
-            if (data.iban) db.account.iban = data.iban;
-            if (data.balance !== undefined) db.account.balance = Number(data.balance);
-            if (data.branch_name) db.account.branch_name = data.branch_name;
+            let u = getRequestUser(req, url);
+            if (data.target_user_id && u.role === 'admin') {
+                const target = db.users.find(usr => String(usr.id) === String(data.target_user_id));
+                if (target) u = target;
+            }
+
+            if (data.customer_name) u.account.customer_name = data.customer_name;
+            if (data.iban) u.account.iban = data.iban;
+            if (data.balance !== undefined) u.account.balance = Number(data.balance);
+            if (data.branch_name) u.account.branch_name = data.branch_name;
+            if (data.account_no) u.account.account_no = data.account_no;
             saveDB();
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: 'success', account: db.account }));
+            res.end(JSON.stringify({ status: 'success', account: u.account }));
         } catch (error) {
             res.writeHead(400, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ status: 'error', message: 'Bakiye güncellenemedi.' }));
@@ -278,25 +420,36 @@ async function requestHandler(req, res) {
         return;
     }
 
+    // Hesap Hareketleri (İlgili kullanıcının hareketleri)
     if (pathname === '/api/transactions' && req.method === 'GET') {
+        const u = getRequestUser(req, url);
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(db.transactions));
+        res.end(JSON.stringify(u.transactions || []));
         return;
     }
 
+    // Ekstre / Statement (İlgili kullanıcının ekstresi)
     if (pathname === '/api/statement' && req.method === 'GET') {
+        const u = getRequestUser(req, url);
         const days = Number(url.searchParams.get('days') || 30);
-        const list = db.transactions.slice(0, Math.max(1, days || db.transactions.length));
+        const list = (u.transactions || []).slice(0, Math.max(1, days || u.transactions.length));
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ account: db.account, transactions: list, days }));
+        res.end(JSON.stringify({ account: u.account, transactions: list, days }));
         return;
     }
 
+    // Yeni İşlem Ekleme (İlgili kullanıcıya işlem ekler)
     if (pathname === '/api/admin/add_transaction' && req.method === 'POST') {
         try {
             const input = await parseBody(req);
+            let u = getRequestUser(req, url);
+            if (input.target_user_id && u.role === 'admin') {
+                const target = db.users.find(usr => String(usr.id) === String(input.target_user_id));
+                if (target) u = target;
+            }
+
             const isIncome = input.is_income === undefined ? Number(input.amount || 0) > 0 : Boolean(input.is_income);
-            const mainTx = buildTransaction(input);
+            const mainTx = buildTransaction(input, u);
             const autoFees = input.auto_fees !== false;
 
             const transactionsToAdd = [mainTx];
@@ -311,7 +464,7 @@ async function requestHandler(req, res) {
                 const feeTx = {
                     id: mainTx.id + 1,
                     parent_id: mainTx.id,
-                    account_id: 1,
+                    account_id: u.id,
                     transaction_type: 'Diğer',
                     title: isHavale 
                         ? `HAVALE ÜCRETİ-${mainTx.fast_ref_no || '100880148305'}` 
@@ -321,7 +474,7 @@ async function requestHandler(req, res) {
                     receiver_iban: '',
                     receiver_bank: '',
                     amount: -feeAmount,
-                    balance_after: Number((db.account.balance - feeAmount).toFixed(2)),
+                    balance_after: Number((u.account.balance - feeAmount).toFixed(2)),
                     category: 'Ücret ve Komisyonlar',
                     date_str: mainTx.date_str,
                     time_str: mainTx.time_str,
@@ -338,7 +491,7 @@ async function requestHandler(req, res) {
                 const bsmvTx = {
                     id: mainTx.id + 2,
                     parent_id: mainTx.id,
-                    account_id: 1,
+                    account_id: u.id,
                     transaction_type: 'Diğer',
                     title: isHavale 
                         ? `BSMV HAVALE ÜCRETİ-${mainTx.fast_ref_no || '100880148305'}` 
@@ -348,7 +501,7 @@ async function requestHandler(req, res) {
                     receiver_iban: '',
                     receiver_bank: '',
                     amount: -bsmvAmount,
-                    balance_after: Number((db.account.balance - feeAmount - bsmvAmount).toFixed(2)),
+                    balance_after: Number((u.account.balance - feeAmount - bsmvAmount).toFixed(2)),
                     category: 'Vergiler ve Fonlar',
                     date_str: mainTx.date_str,
                     time_str: mainTx.time_str,
@@ -363,18 +516,18 @@ async function requestHandler(req, res) {
                 };
 
                 totalDeduction = Number((totalDeduction - feeAmount - bsmvAmount).toFixed(2));
-                // En yeni en üstte görünecek sıra: BSMV, sonra FAST Ücreti, sonra Ana Transfer
                 transactionsToAdd.unshift(feeTx);
                 transactionsToAdd.unshift(bsmvTx);
             }
 
-            db.account.balance = Number((db.account.balance + totalDeduction).toFixed(2));
-            db.transactions.unshift(...transactionsToAdd);
+            u.account.balance = Number((u.account.balance + totalDeduction).toFixed(2));
+            if (!Array.isArray(u.transactions)) u.transactions = [];
+            u.transactions.unshift(...transactionsToAdd);
             saveDB();
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ 
                 status: 'success', 
-                new_balance: db.account.balance, 
+                new_balance: u.account.balance, 
                 transactions: transactionsToAdd 
             }));
         } catch (error) {
@@ -384,15 +537,156 @@ async function requestHandler(req, res) {
         return;
     }
 
+    // İşlem Silme
+    if (pathname.startsWith('/api/admin/transaction/') && req.method === 'DELETE') {
+        const id = Number(pathname.split('/').pop());
+        let u = getRequestUser(req, url);
+        let targetUser = u;
+
+        if (!targetUser.transactions || !targetUser.transactions.some(t => t.id === id)) {
+            if (u.role === 'admin') {
+                for (const usr of db.users) {
+                    if (usr.transactions && usr.transactions.some(t => t.id === id)) {
+                        targetUser = usr;
+                        break;
+                    }
+                }
+            }
+        }
+
+        const txToDelete = (targetUser.transactions || []).find(t => t.id === id);
+        if (txToDelete) {
+            targetUser.account.balance = Number((targetUser.account.balance - txToDelete.amount).toFixed(2));
+            const associatedFees = targetUser.transactions.filter(t => t.parent_id === id);
+            associatedFees.forEach(f => {
+                targetUser.account.balance = Number((targetUser.account.balance - f.amount).toFixed(2));
+            });
+            targetUser.transactions = targetUser.transactions.filter(t => t.id !== id && t.parent_id !== id);
+            saveDB();
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ status: 'deleted', id, new_balance: targetUser.account.balance }));
+        return;
+    }
+
+    // KULLANICI YÖNETİMİ: Kullanıcıları Listele (GET)
+    if (pathname === '/api/admin/users' && req.method === 'GET') {
+        const list = db.users.map(u => ({
+            id: u.id,
+            username: u.username,
+            tckn: u.tckn || '',
+            role: u.role || 'user',
+            customer_name: u.account?.customer_name || u.username,
+            balance: u.account?.balance || 0,
+            iban: u.account?.iban || '',
+            branch_name: u.account?.branch_name || '',
+            account_no: u.account?.account_no || '',
+            transactionsCount: (u.transactions || []).length
+        }));
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, users: list }));
+        return;
+    }
+
+    // KULLANICI YÖNETİMİ: Yeni Kullanıcı Oluştur (POST)
+    if (pathname === '/api/admin/users/create' && req.method === 'POST') {
+        try {
+            const body = await parseBody(req);
+            const username = String(body.username || '').trim().toLowerCase();
+            const password = String(body.password || '').trim();
+            const customerName = String(body.customer_name || username).trim();
+
+            if (!username || !password) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, message: 'Kullanıcı adı ve şifre zorunludur.' }));
+                return;
+            }
+
+            if (db.users.some(u => u.username.toLowerCase() === username)) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, message: 'Bu kullanıcı adı zaten kullanılıyor.' }));
+                return;
+            }
+
+            const newId = Date.now();
+            const initialBal = Number(body.initial_balance !== undefined ? body.initial_balance : 50000);
+            const iban = body.iban || `TR${String(Math.floor(Math.random() * 89) + 10)} 0006 7010 0000 00${String(newId).slice(-8)}`;
+            const branch = body.branch_name || 'ÇUKUROVA ŞUBESİ (1680)';
+            const accNo = body.account_no || String(newId).slice(-7);
+            const tckn = body.tckn || String(Math.floor(Math.random() * 89999999999) + 10000000000);
+
+            const newUser = {
+                id: newId,
+                username,
+                password,
+                tckn,
+                role: body.role === 'admin' ? 'admin' : 'user',
+                account: {
+                    id: newId,
+                    customer_name: customerName,
+                    customer_no: String(Math.floor(Math.random() * 89999999) + 10000000),
+                    branch_name: branch,
+                    account_no: accNo,
+                    iban: iban,
+                    balance: initialBal
+                },
+                transactions: []
+            };
+
+            db.users.push(newUser);
+            saveDB();
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+                success: true,
+                message: 'Kullanıcı başarıyla oluşturuldu.',
+                user: {
+                    id: newUser.id,
+                    username: newUser.username,
+                    customer_name: newUser.account.customer_name,
+                    role: newUser.role,
+                    balance: newUser.account.balance
+                }
+            }));
+        } catch (error) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: 'Kullanıcı oluşturulamadı.' }));
+        }
+        return;
+    }
+
+    // KULLANICI YÖNETİMİ: Kullanıcı Sil (DELETE)
+    if (pathname.startsWith('/api/admin/users/') && req.method === 'DELETE') {
+        const idToDelete = Number(pathname.split('/').pop());
+        const userIdx = db.users.findIndex(u => Number(u.id) === idToDelete);
+        if (userIdx === -1) {
+            res.writeHead(404, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: 'Kullanıcı bulunamadı.' }));
+            return;
+        }
+
+        if (db.users[userIdx].role === 'admin' && db.users.filter(u => u.role === 'admin').length <= 1) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, message: 'Son yönetici hesabı silinemez.' }));
+            return;
+        }
+
+        db.users.splice(userIdx, 1);
+        saveDB();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Kullanıcı silindi.' }));
+        return;
+    }
+
+    // Veritabanı Eşitleme (Sync)
     if (pathname === '/api/admin/sync_db' && req.method === 'POST') {
         try {
             const data = await parseBody(req);
-            if (data && data.account && Array.isArray(data.transactions)) {
-                db.account = data.account;
-                db.transactions = data.transactions;
+            if (data && (data.users || (data.account && Array.isArray(data.transactions)))) {
+                db = ensureMultiUserDB(data);
                 saveDB();
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ status: 'synced', account: db.account, count: db.transactions.length }));
+                res.end(JSON.stringify({ status: 'synced', usersCount: db.users.length }));
                 return;
             }
             res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -404,6 +698,7 @@ async function requestHandler(req, res) {
         return;
     }
 
+    // Bulut Veritabanı Ayarları (GET & POST)
     if (pathname === '/api/admin/db_config' && req.method === 'GET') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
@@ -445,7 +740,6 @@ async function requestHandler(req, res) {
             dbAdapter.saveConfig(newConfig);
             dbConfig = newConfig;
 
-            // Mevcut veritabanını yeni bulut veritabanına anında aktar
             if (dbConfig.type !== 'local') {
                 await dbAdapter.saveToRemote(dbConfig, db);
             }
@@ -463,23 +757,7 @@ async function requestHandler(req, res) {
         return;
     }
 
-    if (pathname.startsWith('/api/admin/transaction/') && req.method === 'DELETE') {
-        const id = Number(pathname.split('/').pop());
-        const txToDelete = db.transactions.find(t => t.id === id);
-        if (txToDelete) {
-            db.account.balance = Number((db.account.balance - txToDelete.amount).toFixed(2));
-            const associatedFees = db.transactions.filter(t => t.parent_id === id);
-            associatedFees.forEach(f => {
-                db.account.balance = Number((db.account.balance - f.amount).toFixed(2));
-            });
-            db.transactions = db.transactions.filter(t => t.id !== id && t.parent_id !== id);
-            saveDB();
-        }
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'deleted', id, new_balance: db.account.balance }));
-        return;
-    }
-
+    // Statik Dosyalar & Sayfalar
     if (pathname.startsWith('/extracted_assets/') || pathname.startsWith('/assets/')) {
         const filePath = path.join(__dirname, 'mobile_app', pathname.replace(/^\/+/,'') );
         if (fs.existsSync(filePath)) {
@@ -531,7 +809,7 @@ const server = http.createServer(requestHandler);
 if (require.main === module) {
     server.listen(PORT, () => {
         console.log('===============================================');
-        console.log('Yapı Kredi Mobil Mockup / API Çalışıyor');
+        console.log('Yapı Kredi Mobil Mockup / API Çalışıyor (Multi-User)');
         console.log('===============================================');
         console.log(`Mobil UI: http://127.0.0.1:${PORT}/app`);
         console.log(`Admin: http://127.0.0.1:${PORT}/admin`);
@@ -541,4 +819,3 @@ if (require.main === module) {
 }
 
 module.exports = requestHandler;
-

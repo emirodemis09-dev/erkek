@@ -165,8 +165,8 @@ async function fetchFromRemote(config) {
             const client = await getMongoClient(config.uri);
             const col = client.db(config.dbName || 'yapi_kredi').collection('vault');
             const doc = await col.findOne({ _id: 'master' });
-            if (doc && doc.account && Array.isArray(doc.transactions)) {
-                return { account: doc.account, transactions: doc.transactions };
+            if (doc && (doc.users || doc.account)) {
+                return { users: doc.users, account: doc.account, transactions: doc.transactions };
             }
             return null;
         }
@@ -181,7 +181,7 @@ async function fetchFromRemote(config) {
                 const json = await res.json();
                 if (json && json.result) {
                     const parsed = typeof json.result === 'string' ? JSON.parse(json.result) : json.result;
-                    if (parsed && parsed.account) return parsed;
+                    if (parsed && (parsed.users || parsed.account)) return parsed;
                 }
             }
             return null;
@@ -202,7 +202,7 @@ async function fetchFromRemote(config) {
                 const rows = await res.json();
                 if (Array.isArray(rows) && rows.length > 0 && rows[0].data) {
                     const data = rows[0].data;
-                    if (data && data.account) return data;
+                    if (data && (data.users || data.account)) return data;
                 }
             }
             return null;
@@ -213,7 +213,7 @@ async function fetchFromRemote(config) {
             const res = await fetch(getUrl, { signal: AbortSignal.timeout(4000) });
             if (res.ok) {
                 const data = await res.json();
-                if (data && data.account) return data;
+                if (data && (data.users || data.account)) return data;
             }
             return null;
         }
@@ -224,7 +224,7 @@ async function fetchFromRemote(config) {
 }
 
 async function saveToRemote(config, data) {
-    if (!config || !config.type || config.type === 'local' || !data || !data.account) return false;
+    if (!config || !config.type || config.type === 'local' || !data || (!data.account && !data.users)) return false;
 
     try {
         if (config.type === 'mongodb') {
@@ -234,6 +234,7 @@ async function saveToRemote(config, data) {
                 { _id: 'master' },
                 {
                     $set: {
+                        users: data.users || [],
                         account: data.account,
                         transactions: data.transactions || [],
                         updatedAt: new Date()
@@ -263,6 +264,7 @@ async function saveToRemote(config, data) {
             const body = JSON.stringify([{
                 id: 'master',
                 data: {
+                    users: data.users || [],
                     account: data.account,
                     transactions: data.transactions || []
                 }

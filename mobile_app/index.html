@@ -1501,18 +1501,305 @@
         border: none !important;
         padding: 10px !important;
     }
-}
-   </style>
+        /* YAPİ KREDİ MOBİL GİRİŞ EKRANI */
+        .mobile-login-screen {
+            min-height: 100vh;
+            width: 100%;
+            background: radial-gradient(circle at 50% 0%, #0d2847 0%, #040d1a 60%, #00040a 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 34px 22px 24px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 100;
+        }
+        .login-brand-header {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 24px;
+        }
+        .login-logo-title {
+            font-size: 27px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .login-logo-title span {
+            color: #0099e6;
+        }
+        .login-segment-switch {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 25px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            margin-bottom: 22px;
+        }
+        .login-segment-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: #8da2ba;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 9px 0;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+        }
+        .login-segment-btn.active {
+            background: #007bc7;
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 123, 199, 0.4);
+        }
+        .login-input-card {
+            background: rgba(16, 27, 43, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            backdrop-filter: blur(14px);
+            border-radius: 22px;
+            padding: 24px 20px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        }
+        .login-field-group {
+            margin-bottom: 18px;
+        }
+        .login-field-label {
+            display: block;
+            font-size: 12.5px;
+            color: #8da2ba;
+            font-weight: 600;
+            margin-bottom: 7px;
+        }
+        .login-field-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .login-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 13px;
+            color: #ffffff;
+            font-size: 15px;
+            padding: 13px 44px 13px 15px;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+            box-sizing: border-box;
+        }
+        .login-input:focus {
+            border-color: #0099e6;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 153, 230, 0.25);
+        }
+        .login-input-icon {
+            position: absolute;
+            right: 15px;
+            color: #8da2ba;
+            font-size: 19px;
+            cursor: pointer;
+        }
+        .login-toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0 22px;
+        }
+        .login-remember-label {
+            font-size: 13px;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            margin: 0;
+        }
+        .login-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .login-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .login-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155;
+            transition: .3s;
+            border-radius: 24px;
+        }
+        .login-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        .login-switch input:checked + .login-slider {
+            background-color: #0099e6;
+        }
+        .login-switch input:checked + .login-slider:before {
+            transform: translateX(20px);
+        }
+        .login-submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #007bc7 0%, #00a4fa 100%);
+            border: none;
+            color: white;
+            font-size: 15.5px;
+            font-weight: 700;
+            padding: 14px;
+            border-radius: 14px;
+            box-shadow: 0 4px 16px rgba(0, 153, 230, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        .login-submit-btn:active {
+            transform: scale(0.98);
+        }
+        .login-footer-links {
+            margin-top: 22px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12.5px;
+        }
+        .login-footer-links a {
+            color: #0099e6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-security-notice {
+            text-align: center;
+            font-size: 11.5px;
+            color: #64748b;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .login-error-box {
+            display: none;
+            background: rgba(220, 38, 38, 0.18);
+            border: 1px solid rgba(220, 38, 38, 0.45);
+            color: #fca5a5;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 12.5px;
+            margin-bottom: 16px;
+        }
+    </style>
 </head>
 <body>
 
     <div class="app-container">
+        <!-- YAPİ KREDİ MOBİL GİRİŞ EKRANI -->
+        <div id="mobileLoginPage" class="mobile-login-screen" style="display: none;">
+            <div>
+                <div class="login-brand-header">
+                    <div class="login-logo-title">
+                        <i class="bi bi-shield-shaded" style="font-size: 28px; color: #0099e6;"></i>
+                        Yapı<span>Kredi</span>
+                    </div>
+                    <div style="font-size: 11.5px; color: #8da2ba; margin-top: 5px; letter-spacing: 0.5px;">MOBİL BANKACILIK</div>
+                </div>
+
+                <div class="login-segment-switch">
+                    <button class="login-segment-btn active" type="button" onclick="setLoginSegment(this, 'bireysel')">Bireysel</button>
+                    <button class="login-segment-btn" type="button" onclick="setLoginSegment(this, 'kurumsal')">Kurumsal</button>
+                </div>
+
+                <div class="login-input-card">
+                    <div id="mobileLoginError" class="login-error-box">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> <span id="mobileLoginErrorText">Kullanıcı adı / TCKN veya şifre hatalı.</span>
+                    </div>
+
+                    <form id="mobileLoginForm" onsubmit="handleMobileLogin(event)">
+                        <div class="login-field-group">
+                            <label class="login-field-label" for="loginUser">Kullanıcı Adı veya T.C. Kimlik No</label>
+                            <div class="login-field-wrapper">
+                                <input id="loginUser" type="text" class="login-input" placeholder="Örn: kaan veya TCKN" required autocomplete="username" />
+                                <i class="bi bi-person login-input-icon"></i>
+                            </div>
+                        </div>
+
+                        <div class="login-field-group">
+                            <label class="login-field-label" for="loginPassword">Şifre</label>
+                            <div class="login-field-wrapper">
+                                <input id="loginPassword" type="password" class="login-input" placeholder="••••••••" required autocomplete="current-password" />
+                                <i class="bi bi-eye login-input-icon" id="loginPassEye" onclick="toggleLoginPassword()"></i>
+                            </div>
+                        </div>
+
+                        <div class="login-toggle-row">
+                            <label class="login-remember-label">
+                                <div class="login-switch">
+                                    <input type="checkbox" id="loginRememberMe" checked />
+                                    <span class="login-slider"></span>
+                                </div>
+                                <span>Beni Hatırla</span>
+                            </label>
+                            <a href="javascript:void(0)" onclick="alert('Şifreniz admin panelden belirlenen şifredir.')" style="color: #0099e6; font-size: 12px; text-decoration: none;">Şifremi Unuttum</a>
+                        </div>
+
+                        <button class="login-submit-btn" type="submit" id="loginSubmitBtn">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span>GİRİŞ YAP</span>
+                        </button>
+                    </form>
+
+                    <div class="login-footer-links">
+                        <a href="javascript:void(0)" onclick="quickFillDemo('kaan', '123456')">Kaan ile Giriş</a>
+                        <a href="javascript:void(0)" onclick="quickFillDemo('mert', '123456')">Mert ile Giriş</a>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="login-security-notice">
+                    <i class="bi bi-lock-fill text-success"></i> 256-bit SSL Güvenli Bankacılık Bağlantısı
+                </div>
+                <div style="text-align: center; font-size: 10px; color: #475569; margin-top: 4px;">Yapı Kredi Mobil v3.4.2</div>
+            </div>
+        </div>
+
         <div class="dark-home-panel">
             <div class="app-header-ykb">
-                <button class="menu-btn" aria-label="Menü"><i class="bi bi-list"></i></button>
+                <button class="menu-btn" aria-label="Menü" onclick="openUserProfileModal()"><i class="bi bi-list"></i></button>
                 <div class="search-field"><span>Yapı Kredi Mobil'de Ara</span></div>
                 <div class="profile-ring"><i class="bi bi-bell"></i></div>
-                <div class="profile-avatar"><i class="bi bi-person-fill"></i></div>
+                <div class="profile-avatar" onclick="openUserProfileModal()" style="cursor: pointer;"><i class="bi bi-person-fill"></i></div>
+            </div>
+
+            <!-- Kullanıcı Karşılama ve Hızlı Profil Alanı -->
+            <div class="app-user-greeting-banner d-flex justify-content-between align-items-center" style="margin: 0 18px 12px; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="avatar-circle-sm" style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #0789c9, #00b4d8); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px;" id="headerUserInitials">KT</div>
+                    <div>
+                        <div style="font-size: 11px; color: #8fa0b5;">Hoş Geldiniz</div>
+                        <div style="font-weight: 700; font-size: 13.5px; color: #ffffff;" id="headerCustomerName">Kaan Taşkın</div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-light px-2 py-1 rounded-pill" onclick="openUserProfileModal()" style="font-size: 11px; font-weight: 600;" title="Hesap Profili">
+                    <i class="bi bi-person-gear me-1"></i> Profil
+                </button>
             </div>
 
             <div class="bank-toggle">
@@ -1798,6 +2085,48 @@
         </div>
     </div>
 
+    <!-- Kullanıcı Profili ve Güvenli Çıkış Modalı -->
+    <div class="modal fade modal-ykb" id="userProfileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3" style="background: #111a28; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; color: #fff;">
+                <div class="modal-header border-0 pb-0 d-flex justify-content-between">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center gap-2">
+                        <i class="bi bi-person-circle text-primary"></i> Kullanıcı Profili
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center pt-3">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #0789c9, #00b4d8); color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; margin: 0 auto 12px;" id="profileModalInitials">KT</div>
+                    <h5 class="fw-bold mb-1" id="profileModalName">Kaan Taşkın</h5>
+                    <div class="badge bg-primary-subtle text-primary mb-3" id="profileModalUsername">@kaan</div>
+
+                    <div class="p-3 rounded-3 text-start mb-3" style="background: rgba(255,255,255,0.04); font-size: 12.5px; border: 1px solid rgba(255,255,255,0.06);">
+                        <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                            <span class="text-secondary">T.C. Kimlik No:</span>
+                            <span class="fw-bold font-monospace" id="profileModalTckn">12345678901</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                            <span class="text-secondary">Şube:</span>
+                            <span class="fw-bold" id="profileModalBranch">Çukurova Şubesi</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1 border-bottom border-secondary border-opacity-25">
+                            <span class="text-secondary">Hesap No:</span>
+                            <span class="fw-bold font-monospace" id="profileModalAccNo">6721439</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-secondary">IBAN:</span>
+                            <span class="fw-bold font-monospace text-truncate ms-2" style="max-width: 190px;" id="profileModalIban">TR43 0006...</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-danger w-100 py-2 fw-bold rounded-3" onclick="logoutMobile()">
+                        <i class="bi bi-box-arrow-right me-2"></i> Güvenli Çıkış Yap
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/html2pdf.bundle.min.js"></script>
     <script src="/dekont_assets.js"></script>
@@ -1805,11 +2134,177 @@
         const API_BASE = window.location.origin && window.location.origin.startsWith('http') 
             ? `${window.location.origin}/api` 
             : 'http://127.0.0.1:8000/api';
+        let currentMobileUser = null;
         let currentAccount = null;
         let currentSelectedTx = null;
         let currentMovementTransaction = null;
         let currentAccountTransactions = [];
         let activeTransactionFilter = 'all';
+
+        // MOBİL KULLANICI OTURUMU & GİRİŞ YÖNETİMİ
+        function checkMobileAuth() {
+            try {
+                const raw = localStorage.getItem('YKB_MOBILE_AUTH') || sessionStorage.getItem('YKB_MOBILE_AUTH');
+                if (raw) {
+                    currentMobileUser = JSON.parse(raw);
+                    if (currentMobileUser && currentMobileUser.id) {
+                        showMainAppView();
+                        return true;
+                    }
+                }
+            } catch (e) {}
+            showLoginView();
+            return false;
+        }
+
+        function showLoginView() {
+            const loginPage = document.getElementById('mobileLoginPage');
+            const homeTop = document.querySelector('.dark-home-panel');
+            const homeBottom = document.querySelector('.lower-home-panel');
+            if (loginPage) loginPage.style.display = 'flex';
+            if (homeTop) homeTop.style.display = 'none';
+            if (homeBottom) homeBottom.style.display = 'none';
+            const accDetail = document.getElementById('accountDetailPage');
+            if (accDetail) accDetail.style.display = 'none';
+            const txDetail = document.getElementById('accountTransactionsPage');
+            if (txDetail) txDetail.style.display = 'none';
+            const mvDetail = document.getElementById('movementDetailPage');
+            if (mvDetail) mvDetail.style.display = 'none';
+            const rcpDetail = document.getElementById('demoReceiptPage');
+            if (rcpDetail) rcpDetail.style.display = 'none';
+        }
+
+        function showMainAppView() {
+            const loginPage = document.getElementById('mobileLoginPage');
+            const homeTop = document.querySelector('.dark-home-panel');
+            const homeBottom = document.querySelector('.lower-home-panel');
+            if (loginPage) loginPage.style.display = 'none';
+            if (homeTop) homeTop.style.display = '';
+            if (homeBottom) homeBottom.style.display = '';
+        }
+
+        function toggleLoginPassword() {
+            const passInput = document.getElementById('loginPassword');
+            const eye = document.getElementById('loginPassEye');
+            if (!passInput) return;
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                if (eye) eye.className = 'bi bi-eye-slash login-input-icon';
+            } else {
+                passInput.type = 'password';
+                if (eye) eye.className = 'bi bi-eye login-input-icon';
+            }
+        }
+
+        function setLoginSegment(btn, seg) {
+            document.querySelectorAll('.login-segment-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function quickFillDemo(username, password) {
+            const u = document.getElementById('loginUser');
+            const p = document.getElementById('loginPassword');
+            if (u) u.value = username;
+            if (p) p.value = password;
+        }
+
+        async function handleMobileLogin(e) {
+            e.preventDefault();
+            const userVal = document.getElementById('loginUser').value.trim();
+            const passVal = document.getElementById('loginPassword').value.trim();
+            const rememberMe = document.getElementById('loginRememberMe').checked;
+            const errBox = document.getElementById('mobileLoginError');
+            const errText = document.getElementById('mobileLoginErrorText');
+            const submitBtn = document.getElementById('loginSubmitBtn');
+
+            if (errBox) errBox.style.display = 'none';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Giriş Yapılıyor...';
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: userVal, password: passVal })
+                });
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    if (errText) errText.textContent = data.message || 'Kullanıcı adı / TCKN veya şifre hatalı.';
+                    if (errBox) errBox.style.display = 'block';
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i><span>GİRİŞ YAP</span>';
+                    }
+                    return;
+                }
+
+                currentMobileUser = {
+                    id: data.user.id,
+                    username: data.user.username,
+                    tckn: data.user.tckn,
+                    role: data.user.role,
+                    token: data.token,
+                    account: data.user.account
+                };
+
+                if (rememberMe) {
+                    localStorage.setItem('YKB_MOBILE_AUTH', JSON.stringify(currentMobileUser));
+                    sessionStorage.removeItem('YKB_MOBILE_AUTH');
+                } else {
+                    sessionStorage.setItem('YKB_MOBILE_AUTH', JSON.stringify(currentMobileUser));
+                    localStorage.removeItem('YKB_MOBILE_AUTH');
+                }
+
+                showMainAppView();
+                await loadMobileApp();
+            } catch (err) {
+                console.error('Login network error:', err);
+                if (errText) errText.textContent = 'Sunucuya bağlanılamadı. Lütfen tekrar deneyin.';
+                if (errBox) errBox.style.display = 'block';
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i><span>GİRİŞ YAP</span>';
+                }
+            }
+        }
+
+        function logoutMobile() {
+            localStorage.removeItem('YKB_MOBILE_AUTH');
+            sessionStorage.removeItem('YKB_MOBILE_AUTH');
+            currentMobileUser = null;
+            const profileModalEl = document.getElementById('userProfileModal');
+            if (profileModalEl) {
+                const modal = bootstrap.Modal.getInstance(profileModalEl);
+                if (modal) modal.hide();
+            }
+            showLoginView();
+        }
+
+        function openUserProfileModal() {
+            if (!currentMobileUser) return;
+            const acc = currentAccount || currentMobileUser.account || {};
+            const name = acc.customer_name || currentMobileUser.username;
+            const initials = name.split(' ').filter(Boolean).map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'YK';
+
+            const setEl = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            };
+
+            setEl('profileModalName', name);
+            setEl('profileModalInitials', initials);
+            setEl('profileModalUsername', `@${currentMobileUser.username}`);
+            setEl('profileModalTckn', currentMobileUser.tckn || '12345678901');
+            setEl('profileModalBranch', acc.branch_name || 'Çukurova Şubesi');
+            setEl('profileModalAccNo', acc.account_no || '6721439');
+            setEl('profileModalIban', acc.iban || 'TR43 0006...');
+
+            new bootstrap.Modal(document.getElementById('userProfileModal')).show();
+        }
 
         function openAccountDetail() {
             document.querySelector('.dark-home-panel').style.display = 'none';
@@ -2046,18 +2541,35 @@
         }
 
         async function loadMobileApp() {
+            if (!currentMobileUser) {
+                const authed = checkMobileAuth();
+                if (!authed) return;
+            }
+
             try {
-                const accRes = await fetch(`${API_BASE}/account`);
+                const headers = { 'Content-Type': 'application/json' };
+                if (currentMobileUser) {
+                    if (currentMobileUser.token) headers['Authorization'] = `Bearer ${currentMobileUser.token}`;
+                    if (currentMobileUser.id) headers['x-user-id'] = String(currentMobileUser.id);
+                }
+
+                const accRes = await fetch(`${API_BASE}/account`, { headers });
                 const acc = await accRes.json();
                 currentAccount = acc;
+
+                const customerName = acc.customer_name || (currentMobileUser ? currentMobileUser.username : 'KAAN TAŞKIN');
+                const initials = customerName.split(' ').filter(Boolean).map(p => p[0]).join('').slice(0, 2).toUpperCase() || 'YK';
 
                 const setText = (id, value) => {
                     const el = document.getElementById(id);
                     if (el) el.innerText = value;
                 };
 
+                setText('headerCustomerName', customerName);
+                setText('headerUserInitials', initials);
+
                 setText('uiIban', acc.account_no || acc.iban || '34062568');
-                const balanceText = acc.balance.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL';
+                const balanceText = (Number(acc.balance) || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 }) + ' TL';
                 setText('uiAvailableBalance', balanceText);
                 setText('uiCurrentBalance', balanceText);
                 setText('detailAccountNumber', acc.account_no || '34062568');
@@ -2075,7 +2587,7 @@
 
                 let txs = [];
                 try {
-                    const txRes = await fetch(`${API_BASE}/transactions`);
+                    const txRes = await fetch(`${API_BASE}/transactions`, { headers });
                     if (txRes.ok) {
                         txs = await txRes.json();
                     }
@@ -2083,7 +2595,7 @@
                     console.warn('Transactions fetch error:', e);
                 }
 
-                const MOBILE_CACHE_KEY = 'YKB_MOBILE_TX_CACHE_V2';
+                const MOBILE_CACHE_KEY = `YKB_MOBILE_TX_CACHE_${currentMobileUser ? currentMobileUser.id : 'v2'}`;
                 if (Array.isArray(txs) && txs.length > 0) {
                     try { localStorage.setItem(MOBILE_CACHE_KEY, JSON.stringify({ account: acc, txs })); } catch(e) {}
                 } else {
@@ -2573,16 +3085,22 @@
             });
         })();
 
-        loadMobileApp().then(() => {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('dekont') === '1' || window.location.hash === '#dekont') {
-                if (currentAccountTransactions && currentAccountTransactions.length > 0) {
-                    currentMovementTransaction = currentAccountTransactions[0];
+        if (checkMobileAuth()) {
+            loadMobileApp().then(() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('dekont') === '1' || window.location.hash === '#dekont') {
+                    if (currentAccountTransactions && currentAccountTransactions.length > 0) {
+                        currentMovementTransaction = currentAccountTransactions[0];
+                    }
+                    showOriginalDekont();
                 }
-                showOriginalDekont();
+            });
+        }
+        setInterval(() => {
+            if (currentMobileUser) {
+                loadMobileApp();
             }
-        });
-        setInterval(loadMobileApp, 2000);
+        }, 2000);
     </script>
 </body>
 </html>

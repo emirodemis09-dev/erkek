@@ -244,16 +244,95 @@
     </style>
 </head>
 <body>
+    <!-- ADMİN PANEL GİRİŞ EKRANI (OVERLAY) -->
+    <div id="adminLoginOverlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at 50% 20%, #0a2342 0%, #051426 60%, #020912 100%); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;">
+        <div class="card shadow-lg border-0 rounded-4 p-4 text-white" style="background: rgba(15, 33, 56, 0.94); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.12); max-width: 420px; width: 100%;">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex p-3 rounded-circle mb-3" style="background: linear-gradient(135deg, #0a6ecb, #0094e8); box-shadow: 0 4px 20px rgba(10, 110, 203, 0.4);">
+                    <i class="bi bi-shield-lock-fill fs-2 text-white"></i>
+                </div>
+                <h4 class="fw-bold mb-1">Yapı Kredi Yönetici Paneli</h4>
+                <p class="text-white-50 small mb-0">Hesap ve hareketleri yönetmek için giriş yapın</p>
+            </div>
+
+            <div id="adminLoginError" class="alert alert-danger py-2 small border-0 mb-3" style="display: none;">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> <span id="adminLoginErrorText">Kullanıcı adı veya şifre hatalı.</span>
+            </div>
+
+            <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                <div class="mb-3">
+                    <label class="form-label text-white-50 small fw-bold">Kullanıcı Adı veya TCKN</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white bg-opacity-10 border-0 text-white-50"><i class="bi bi-person"></i></span>
+                        <input id="adminLoginUsername" type="text" class="form-control bg-white bg-opacity-10 border-0 text-white" placeholder="Örn: kaan veya mert" required autocomplete="username" />
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-white-50 small fw-bold">Şifre</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white bg-opacity-10 border-0 text-white-50"><i class="bi bi-key"></i></span>
+                        <input id="adminLoginPassword" type="password" class="form-control bg-white bg-opacity-10 border-0 text-white" placeholder="••••••••" required autocomplete="current-password" />
+                        <button class="btn btn-outline-secondary border-0 bg-white bg-opacity-10 text-white-50" type="button" onclick="toggleAdminPassEye()">
+                            <i class="bi bi-eye" id="adminPassEye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button class="btn btn-ykb w-100 py-3 fw-bold shadow" type="submit" id="btnAdminLoginSubmit">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Yönetici Girişi Yap
+                </button>
+            </form>
+
+            <div class="d-flex justify-content-between mt-3 pt-3 border-top border-white border-opacity-10">
+                <a href="javascript:void(0)" onclick="quickAdminFill('kaan', '123456')" class="text-white-50 small text-decoration-none">
+                    <i class="bi bi-arrow-right-short text-primary"></i> Kaan (Admin)
+                </a>
+                <a href="javascript:void(0)" onclick="quickAdminFill('mert', '123456')" class="text-white-50 small text-decoration-none">
+                    <i class="bi bi-arrow-right-short text-primary"></i> Mert (User)
+                </a>
+            </div>
+        </div>
+    </div>
+
     <nav class="navbar navbar-expand topbar py-3">
-        <div class="container-fluid px-4">
-            <div class="brand">YapıKredi</div>
-            <div class="d-flex align-items-center gap-2">
+        <div class="container-fluid px-4 flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="brand">YapıKredi</div>
+                <span class="badge bg-primary bg-opacity-25 text-white border border-light border-opacity-25 rounded-pill px-3 py-1 fw-normal" style="font-size: 0.78rem;">
+                    Admin Control
+                </span>
+            </div>
+
+            <!-- Kullanıcı Seçici ve Giriş Yapan Kullanıcı Rozeti -->
+            <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+                <!-- Yönetici için Kullanıcı Değiştir Dropdown -->
+                <div class="d-flex align-items-center gap-1 bg-white bg-opacity-10 rounded-pill px-2 py-1" id="userSwitcherGroup" style="display: none !important;">
+                    <span class="text-white-50 small ms-1"><i class="bi bi-people-fill me-1"></i>Kullanıcı:</span>
+                    <select id="adminUserSelect" class="form-select form-select-sm border-0 bg-light text-dark fw-bold rounded-pill" style="min-width: 140px; font-size: 0.8rem;" onchange="handleAdminUserSwitch(this.value)">
+                        <option value="">Yükleniyor...</option>
+                    </select>
+                </div>
+
+                <!-- Kullanıcı Yönetimi Butonu (Yalnızca Admin) -->
+                <button class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3 shadow-sm" type="button" id="btnOpenUserManagement" onclick="openUserManagementModal()" style="display: none;">
+                    <i class="bi bi-person-gear me-1"></i> Kullanıcı Yönetimi
+                </button>
+
                 <button class="btn btn-sm btn-outline-light rounded-pill px-3 fw-bold" type="button" onclick="openDbConfigModal()">
                     <i class="bi bi-database-fill-gear me-1"></i> <span id="dbStatusBadge">Veritabanı: Kontrol Ediliyor...</span>
                 </button>
-                <span class="badge bg-light text-primary rounded-pill px-3 py-2 fw-bold">
-                    <i class="bi bi-circle-fill me-1 small"></i> API Canlı
-                </span>
+
+                <!-- Giriş Yapan Profil Rozeti -->
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3 dropdown-toggle shadow-sm d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" id="adminUserPill">
+                        <i class="bi bi-person-circle text-primary"></i> <span id="adminCurrentUserName">Giriş Yapılmadı</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-1">
+                        <li><h6 class="dropdown-header" id="adminUserDropdownHeader">Hesap</h6></li>
+                        <li><a class="dropdown-item text-danger fw-bold" href="javascript:void(0)" onclick="logoutAdmin()"><i class="bi bi-box-arrow-right me-2"></i>Çıkış Yap</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -579,6 +658,116 @@
         </div>
     </div>
 
+    <!-- Modal for User Management (Kullanıcı Yönetimi) -->
+    <div class="modal fade" id="userManagementModal" tabindex="-1" aria-labelledby="userManagementModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-white border-bottom py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="p-2 rounded-circle bg-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-people-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0 text-dark" id="userManagementModalLabel">Kullanıcı Yönetimi & Çoklu Hesap Sistemi</h5>
+                            <small class="text-muted">Her kullanıcı kendi bağımsız bakiyesine, hesap detayına ve hareketlerine sahiptir</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+
+                <div class="modal-body p-4 bg-light">
+                    <!-- Üst: Yeni Kullanıcı Oluşturma Kartı -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                        <h6 class="fw-bold text-primary mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-person-plus-fill"></i> Yeni Kullanıcı & Hesap Tanımla
+                        </h6>
+                        <form id="createUserForm" onsubmit="handleCreateUser(event)">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label class="form-label muted-note fw-bold">Kullanıcı Adı *</label>
+                                    <input id="newUsername" type="text" class="form-control" placeholder="Örn: ahmet" required />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label muted-note fw-bold">Giriş Şifresi *</label>
+                                    <input id="newPassword" type="password" class="form-control" placeholder="Örn: 123456" required />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label muted-note fw-bold">Hesap Sahibi Ad Soyad *</label>
+                                    <input id="newCustomerName" type="text" class="form-control" placeholder="Örn: Ahmet Yılmaz" required />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label muted-note fw-bold">T.C. Kimlik No</label>
+                                    <input id="newTckn" type="text" class="form-control" placeholder="Örn: 11111111111" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label muted-note fw-bold">Başlangıç Bakiyesi (TL) *</label>
+                                    <input id="newBalance" type="number" step="0.01" class="form-control text-success fw-bold" placeholder="50000.00" required />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label muted-note fw-bold">Rol</label>
+                                    <select id="newRole" class="form-select">
+                                        <option value="user">Kullanıcı (Standart)</option>
+                                        <option value="admin">Yönetici (Tüm hesapları yönetebilir)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label muted-note fw-bold">Şube Adı</label>
+                                    <input id="newBranchName" type="text" class="form-control" placeholder="Örn: ÇUKUROVA ŞUBESİ (1680)" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label muted-note fw-bold">IBAN (Opsiyonel)</label>
+                                    <input id="newIban" type="text" class="form-control font-monospace" placeholder="Boşsa otomatik üretilir" />
+                                </div>
+                                <div class="col-12 text-end mt-3">
+                                    <button class="btn btn-primary px-4 fw-bold rounded-pill" type="submit" id="btnCreateUserSubmit">
+                                        <i class="bi bi-check-circle me-1"></i> Kullanıcıyı Oluştur
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Alt: Mevcut Kullanıcılar Tablosu -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-people"></i> Sistemdeki Kayıtlı Kullanıcılar (<span id="userCountBadge">0</span>)
+                            </h6>
+                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="loadAdminUsersList()">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Listeyi Yenile
+                            </button>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Kullanıcı Adı</th>
+                                        <th>Hesap Sahibi</th>
+                                        <th>Rol</th>
+                                        <th>Bakiye</th>
+                                        <th>İşlem Sayısı</th>
+                                        <th>IBAN</th>
+                                        <th class="text-end">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminUsersTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-white border-top py-2">
+                    <small class="text-muted me-auto">
+                        <i class="bi bi-shield-check text-success me-1"></i> Kullanıcılar oluşturulduğunda mobil uygulamadan ve admin panelden kendi kullanıcı adı ve şifreleriyle doğrudan giriş yapabilirler.
+                    </small>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- External Libraries for Modal & PDF -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/dekont_assets.js"></script>
@@ -593,6 +782,9 @@
         let isIncome = false;
         let currentAccount = null;
         let currentTransactions = [];
+        let currentAdminAuth = null;
+        let selectedUserId = null;
+        let allAdminUsers = [];
 
         function setIncomeState(income) {
             isIncome = income;
@@ -613,41 +805,352 @@
             }
         }
 
-        const VAULT_KEY = 'YKB_VAULT_MASTER_V2';
+        // ADMİN OTURUM & ÇOKLU KULLANICI YÖNETİMİ
+        function checkAdminAuth() {
+            try {
+                const raw = localStorage.getItem('YKB_ADMIN_AUTH') || sessionStorage.getItem('YKB_ADMIN_AUTH');
+                if (raw) {
+                    currentAdminAuth = JSON.parse(raw);
+                    if (currentAdminAuth && currentAdminAuth.user) {
+                        applyAdminAuthState();
+                        return true;
+                    }
+                }
+            } catch (e) {}
+            showAdminLoginOverlay();
+            return false;
+        }
+
+        function showAdminLoginOverlay() {
+            const overlay = document.getElementById('adminLoginOverlay');
+            if (overlay) overlay.style.display = 'flex';
+        }
+
+        function hideAdminLoginOverlay() {
+            const overlay = document.getElementById('adminLoginOverlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        function toggleAdminPassEye() {
+            const inp = document.getElementById('adminLoginPassword');
+            const eye = document.getElementById('adminPassEye');
+            if (!inp) return;
+            if (inp.type === 'password') {
+                inp.type = 'text';
+                if (eye) eye.className = 'bi bi-eye-slash';
+            } else {
+                inp.type = 'password';
+                if (eye) eye.className = 'bi bi-eye';
+            }
+        }
+
+        function quickAdminFill(u, p) {
+            const uEl = document.getElementById('adminLoginUsername');
+            const pEl = document.getElementById('adminLoginPassword');
+            if (uEl) uEl.value = u;
+            if (pEl) pEl.value = p;
+        }
+
+        async function handleAdminLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('adminLoginUsername').value.trim();
+            const password = document.getElementById('adminLoginPassword').value.trim();
+            const errBox = document.getElementById('adminLoginError');
+            const errText = document.getElementById('adminLoginErrorText');
+            const btn = document.getElementById('btnAdminLoginSubmit');
+
+            if (errBox) errBox.style.display = 'none';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Giriş Yapılıyor...';
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    if (errText) errText.textContent = data.message || 'Kullanıcı adı / TCKN veya şifre hatalı.';
+                    if (errBox) errBox.style.display = 'block';
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Yönetici Girişi Yap';
+                    }
+                    return;
+                }
+
+                currentAdminAuth = {
+                    token: data.token,
+                    user: data.user
+                };
+                localStorage.setItem('YKB_ADMIN_AUTH', JSON.stringify(currentAdminAuth));
+                selectedUserId = data.user.id;
+
+                applyAdminAuthState();
+                await loadData();
+            } catch (err) {
+                console.error('Admin login error:', err);
+                if (errText) errText.textContent = 'Sunucuya bağlanılamadı. Lütfen sunucunun açık olduğundan emin olun.';
+                if (errBox) errBox.style.display = 'block';
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i> Yönetici Girişi Yap';
+                }
+            }
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('YKB_ADMIN_AUTH');
+            sessionStorage.removeItem('YKB_ADMIN_AUTH');
+            currentAdminAuth = null;
+            selectedUserId = null;
+            showAdminLoginOverlay();
+        }
+
+        function applyAdminAuthState() {
+            if (!currentAdminAuth || !currentAdminAuth.user) return;
+            hideAdminLoginOverlay();
+
+            const user = currentAdminAuth.user;
+            if (!selectedUserId) selectedUserId = user.id;
+
+            const nameEl = document.getElementById('adminCurrentUserName');
+            const headEl = document.getElementById('adminUserDropdownHeader');
+            const roleBadge = user.role === 'admin' ? 'Yönetici' : 'Kullanıcı';
+            if (nameEl) nameEl.textContent = `${user.account?.customer_name || user.username} (${roleBadge})`;
+            if (headEl) headEl.textContent = `${user.username} • ${roleBadge}`;
+
+            const userSwitchGroup = document.getElementById('userSwitcherGroup');
+            const btnManage = document.getElementById('btnOpenUserManagement');
+
+            if (user.role === 'admin') {
+                if (userSwitchGroup) userSwitchGroup.style.setProperty('display', 'flex', 'important');
+                if (btnManage) btnManage.style.display = 'inline-block';
+                loadAdminUsersList();
+            } else {
+                if (userSwitchGroup) userSwitchGroup.style.setProperty('display', 'none', 'important');
+                if (btnManage) btnManage.style.display = 'none';
+            }
+        }
+
+        async function loadAdminUsersList() {
+            if (!currentAdminAuth) return;
+            try {
+                const headers = {
+                    'Authorization': `Bearer ${currentAdminAuth.token}`,
+                    'x-user-id': String(currentAdminAuth.user.id)
+                };
+                const res = await fetch(`${API_BASE}/admin/users`, { headers });
+                if (!res.ok) return;
+                const data = await res.json();
+                allAdminUsers = data.users || [];
+
+                // Dropdown doldur
+                const selectEl = document.getElementById('adminUserSelect');
+                if (selectEl) {
+                    selectEl.innerHTML = '';
+                    allAdminUsers.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.id;
+                        opt.textContent = `${u.customer_name || u.username} (${(Number(u.balance) || 0).toLocaleString('tr-TR')} TL)`;
+                        if (String(u.id) === String(selectedUserId)) opt.selected = true;
+                        selectEl.appendChild(opt);
+                    });
+                }
+
+                // Modal tablosunu doldur
+                const tbody = document.getElementById('adminUsersTableBody');
+                const badge = document.getElementById('userCountBadge');
+                if (badge) badge.textContent = allAdminUsers.length;
+
+                if (tbody) {
+                    tbody.innerHTML = '';
+                    allAdminUsers.forEach(u => {
+                        const tr = document.createElement('tr');
+                        const isSelf = String(u.id) === String(currentAdminAuth.user.id);
+                        const isCurrentActive = String(u.id) === String(selectedUserId);
+                        tr.innerHTML = `
+                            <td><span class="badge bg-light text-dark border">#${u.id}</span></td>
+                            <td><strong class="font-monospace">${u.username}</strong></td>
+                            <td><div class="fw-bold">${u.customer_name}</div><small class="text-muted">${u.branch_name || '-'}</small></td>
+                            <td><span class="badge ${u.role === 'admin' ? 'bg-danger' : 'bg-primary'}">${u.role === 'admin' ? 'Yönetici' : 'Kullanıcı'}</span></td>
+                            <td class="fw-bold text-success font-monospace">${(Number(u.balance) || 0).toLocaleString('tr-TR', {minimumFractionDigits: 2})} TL</td>
+                            <td><span class="badge bg-secondary-subtle text-secondary">${u.transactionsCount || 0} işlem</span></td>
+                            <td><small class="font-monospace text-muted" style="font-size: 0.76rem;">${u.iban || '-'}</small></td>
+                            <td class="text-end text-nowrap">
+                                <button class="btn btn-sm ${isCurrentActive ? 'btn-success' : 'btn-outline-primary'} me-1 py-1 px-2" type="button" onclick="handleAdminUserSwitch(${u.id})" ${isCurrentActive ? 'disabled' : ''}>
+                                    <i class="bi bi-${isCurrentActive ? 'check2-circle' : 'box-arrow-in-right'} me-1"></i>${isCurrentActive ? 'Aktif' : 'Yönet'}
+                                </button>
+                                ${!isSelf ? `
+                                <button class="btn btn-sm btn-outline-danger py-1 px-2" type="button" onclick="handleDeleteUser(${u.id}, '${u.username}')" title="Kullanıcıyı Sil">
+                                    <i class="bi bi-trash"></i>
+                                </button>` : ''}
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (err) {
+                console.warn('Users list fetch error:', err);
+            }
+        }
+
+        function handleAdminUserSwitch(userId) {
+            selectedUserId = Number(userId);
+            const selectEl = document.getElementById('adminUserSelect');
+            if (selectEl) selectEl.value = String(selectedUserId);
+
+            const modalEl = document.getElementById('userManagementModal');
+            if (modalEl && modalEl.classList.contains('show')) {
+                loadAdminUsersList();
+            }
+
+            loadData();
+        }
+
+        function openUserManagementModal() {
+            loadAdminUsersList();
+            new bootstrap.Modal(document.getElementById('userManagementModal')).show();
+        }
+
+        async function handleCreateUser(e) {
+            e.preventDefault();
+            const username = document.getElementById('newUsername').value.trim().toLowerCase();
+            const password = document.getElementById('newPassword').value.trim();
+            const customerName = document.getElementById('newCustomerName').value.trim();
+            const tckn = document.getElementById('newTckn').value.trim();
+            const balance = Number(document.getElementById('newBalance').value);
+            const role = document.getElementById('newRole').value;
+            const branchName = document.getElementById('newBranchName').value.trim();
+            const iban = document.getElementById('newIban').value.trim();
+            const btn = document.getElementById('btnCreateUserSubmit');
+
+            if (!username || !password || !customerName) {
+                alert('Lütfen zorunlu alanları doldurun.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Ekleniyor...';
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentAdminAuth.token}`,
+                    'x-user-id': String(currentAdminAuth.user.id)
+                };
+
+                const res = await fetch(`${API_BASE}/admin/users/create`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        customer_name: customerName,
+                        tckn,
+                        balance,
+                        role,
+                        branch_name: branchName,
+                        iban
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    alert(`Hata: ${data.message || 'Kullanıcı oluşturulamadı.'}`);
+                    return;
+                }
+
+                alert(`Kullanıcı (${username}) başarıyla oluşturuldu! Artık mobil uygulamadan ve admin panelden giriş yapabilir.`);
+                document.getElementById('createUserForm').reset();
+                selectedUserId = data.user.id;
+                await loadAdminUsersList();
+                await loadData();
+            } catch (err) {
+                alert('Sunucu hatası: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Kullanıcıyı Oluştur';
+            }
+        }
+
+        async function handleDeleteUser(userId, username) {
+            if (!confirm(`"${username}" kullanıcısını ve hesaba ait tüm verileri silmek istediğinize emin misiniz?`)) return;
+
+            try {
+                const headers = {
+                    'Authorization': `Bearer ${currentAdminAuth.token}`,
+                    'x-user-id': String(currentAdminAuth.user.id)
+                };
+                const res = await fetch(`${API_BASE}/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('Kullanıcı silindi.');
+                    if (String(selectedUserId) === String(userId)) {
+                        selectedUserId = currentAdminAuth.user.id;
+                    }
+                    await loadAdminUsersList();
+                    await loadData();
+                } else {
+                    alert(`Silme başarısız: ${data.message}`);
+                }
+            } catch (err) {
+                alert('Hata: ' + err.message);
+            }
+        }
 
         async function loadData() {
+            if (!currentAdminAuth) {
+                if (!checkAdminAuth()) return;
+            }
+
             try {
+                const targetId = selectedUserId || currentAdminAuth.user.id;
+                const VAULT_KEY = `YKB_VAULT_USER_${targetId}`;
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${currentAdminAuth.token}`,
+                    'x-user-id': String(targetId)
+                };
+
                 // 1. Yerel kalıcı hafızayı ve silinmiş ID listesini kontrol et
                 let localVault = null;
                 let deletedIds = new Set();
                 try {
                     const rawVault = localStorage.getItem(VAULT_KEY);
                     if (rawVault) localVault = JSON.parse(rawVault);
-                    const rawDel = localStorage.getItem('YKB_DELETED_TX_IDS');
+                    const rawDel = localStorage.getItem(`YKB_DELETED_TX_IDS_${targetId}`);
                     if (rawDel) deletedIds = new Set(JSON.parse(rawDel));
                 } catch(e) {}
 
                 // 2. Sunucudan verileri çek
-                const accRes = await fetch(`${API_BASE}/account`);
+                const accRes = await fetch(`${API_BASE}/account`, { headers });
                 let acc = await accRes.json();
 
-                const txRes = await fetch(`${API_BASE}/transactions`);
+                const txRes = await fetch(`${API_BASE}/transactions`, { headers });
                 let txs = await txRes.json();
 
                 // 3. Sıfırlanma / veri kaybı koruması (Smart Forward-Merge):
-                // Sunucuda eksik olan ancak localVault'ta bulunan (ve silinmemiş) işlemler varsa sunucuyla anında birleştir
                 if (localVault && Array.isArray(localVault.transactions) && localVault.transactions.length > 0) {
                     const serverIds = new Set((txs || []).map(t => t.id));
                     const missingOnServer = localVault.transactions.filter(t => !serverIds.has(t.id) && !deletedIds.has(t.id));
 
                     if (missingOnServer.length > 0) {
-                        console.warn('[YKB] Sunucuda eksik işlemler tespit edildi, yerel kasadan otomatik senkronize ediliyor...', missingOnServer.length);
                         const mergedTxs = [...missingOnServer, ...(txs || [])].sort((a, b) => (b.id || 0) - (a.id || 0));
                         try {
                             const syncRes = await fetch(`${API_BASE}/admin/sync_db`, {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers,
                                 body: JSON.stringify({
+                                    target_user_id: targetId,
                                     account: localVault.account && localVault.account.balance !== undefined ? localVault.account : acc,
                                     transactions: mergedTxs
                                 })
@@ -658,7 +1161,6 @@
                                 txs = mergedTxs;
                             }
                         } catch(err) {
-                            console.error('Vault sync error:', err);
                             txs = mergedTxs;
                         }
                     }
@@ -675,9 +1177,9 @@
                 }));
 
                 // Form alanlarını güncelle
-                document.getElementById('accCustomerName').value = acc.customer_name;
-                document.getElementById('accBranch').value = `${acc.branch_name} / ${acc.account_no}`;
-                document.getElementById('accIban').value = acc.iban;
+                document.getElementById('accCustomerName').value = acc.customer_name || '';
+                document.getElementById('accBranch').value = `${acc.branch_name || ''} / ${acc.account_no || ''}`;
+                document.getElementById('accIban').value = acc.iban || '';
                 document.getElementById('accBalance').value = acc.balance;
 
                 const tbody = document.getElementById('txTableBody');
@@ -714,7 +1216,6 @@
                     tbody.appendChild(row);
                 });
 
-                // Veritabanı bağlantı durumunu da yenile
                 loadDbConfigStatus();
             } catch (error) {
                 console.error('API error', error);
@@ -722,7 +1223,16 @@
         }
 
         async function updateAccountInfo() {
+            if (!currentAdminAuth) return;
+            const targetId = selectedUserId || currentAdminAuth.user.id;
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentAdminAuth.token}`,
+                'x-user-id': String(targetId)
+            };
+
             const payload = {
+                target_user_id: targetId,
                 customer_name: document.getElementById('accCustomerName').value,
                 branch_name: document.getElementById('accBranch').value.split(' / ')[0],
                 account_no: document.getElementById('accBranch').value.split(' / ')[1],
@@ -732,12 +1242,13 @@
 
             await fetch(`${API_BASE}/account/update`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify(payload)
             });
 
             // Yerel hafızayı güncelle
             try {
+                const VAULT_KEY = `YKB_VAULT_USER_${targetId}`;
                 const rawVault = localStorage.getItem(VAULT_KEY);
                 if (rawVault) {
                     const vault = JSON.parse(rawVault);
@@ -747,15 +1258,25 @@
             } catch(e) {}
 
             alert('Müşteri bilgisi güncellendi.');
+            if (currentAdminAuth.user.role === 'admin') loadAdminUsersList();
             loadData();
         }
 
         async function handleAddTransaction(e) {
             e.preventDefault();
+            if (!currentAdminAuth) return;
+            const targetId = selectedUserId || currentAdminAuth.user.id;
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${currentAdminAuth.token}`,
+                'x-user-id': String(targetId)
+            };
+
             const autoFeeCheck = document.getElementById('autoFeeCheck');
             const autoFees = autoFeeCheck ? autoFeeCheck.checked : true;
 
             const payload = {
+                target_user_id: targetId,
                 transaction_type: document.getElementById('txType').value,
                 sender_receiver_name: document.getElementById('txName').value,
                 title: document.getElementById('txName').value,
@@ -775,7 +1296,7 @@
 
             await fetch(`${API_BASE}/admin/add_transaction`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify(payload)
             });
 
@@ -784,27 +1305,34 @@
             document.getElementById('txBank').value = '';
             document.getElementById('txAmount').value = '';
             document.getElementById('txDesc').value = '';
+            if (currentAdminAuth.user.role === 'admin') loadAdminUsersList();
             loadData();
         }
 
         async function deleteTx(id) {
             if (!confirm('Bu işlemi silmek istediğinize emin misiniz?')) return;
+            if (!currentAdminAuth) return;
+            const targetId = selectedUserId || currentAdminAuth.user.id;
+            const headers = {
+                'Authorization': `Bearer ${currentAdminAuth.token}`,
+                'x-user-id': String(targetId)
+            };
 
-            // Silinen ID'leri kara listeye ekle (kullanıcı silene kadar asla silinmez, silince geri gelmez)
+            const DEL_KEY = `YKB_DELETED_TX_IDS_${targetId}`;
             try {
                 let delList = [];
                 try {
-                    const raw = localStorage.getItem('YKB_DELETED_TX_IDS');
+                    const raw = localStorage.getItem(DEL_KEY);
                     if (raw) delList = JSON.parse(raw);
                 } catch(e) {}
                 delList.push(id);
-                localStorage.setItem('YKB_DELETED_TX_IDS', JSON.stringify(delList));
+                localStorage.setItem(DEL_KEY, JSON.stringify(delList));
             } catch(e) {}
 
-            await fetch(`${API_BASE}/admin/transaction/${id}`, { method: 'DELETE' });
+            await fetch(`${API_BASE}/admin/transaction/${id}`, { method: 'DELETE', headers });
 
-            // Yerel hafızadan da temizle
             try {
+                const VAULT_KEY = `YKB_VAULT_USER_${targetId}`;
                 const rawVault = localStorage.getItem(VAULT_KEY);
                 if (rawVault) {
                     const vault = JSON.parse(rawVault);
@@ -813,6 +1341,7 @@
                 }
             } catch(e) {}
 
+            if (currentAdminAuth.user.role === 'admin') loadAdminUsersList();
             loadData();
         }
 
@@ -1493,7 +2022,9 @@
             }
         }
 
-        loadData();
+        if (checkAdminAuth()) {
+            loadData();
+        }
     </script>
 </body>
 </html>
