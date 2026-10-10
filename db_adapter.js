@@ -108,17 +108,38 @@ async function testConnection(config) {
         }
 
         if (config.type === 'supabase') {
-            if (!config.url || !config.key) throw new Error('Supabase URL ve API Key gereklidir.');
-            const testUrl = `${config.url.replace(/\/$/, '')}/rest/v1/`;
+            const key = config.key || config.apiKey;
+            if (!config.url || !key) throw new Error('Supabase URL ve API Key (anon veya service_role) gereklidir.');
+            const baseUrl = config.url.replace(/\/$/, '');
+            const testUrl = `${baseUrl}/rest/v1/`;
             const res = await fetch(testUrl, {
                 headers: {
-                    apikey: config.key,
-                    Authorization: `Bearer ${config.key}`
+                    apikey: key,
+                    Authorization: `Bearer ${key}`
                 },
                 signal: AbortSignal.timeout(5000)
             });
+            if (!res.ok) throw new Error(`Supabase API Hatası: ${res.status} ${res.statusText}`);
+
+            // vault tablosunun varlığını kontrol et
+            const tableCheck = await fetch(`${baseUrl}/rest/v1/vault?select=id&limit=1`, {
+                headers: {
+                    apikey: key,
+                    Authorization: `Bearer ${key}`
+                },
+                signal: AbortSignal.timeout(5000)
+            });
+
             const latency = Date.now() - startTime;
-            return { success: true, message: `Supabase bağlantısı doğrulandı! (${latency}ms)`, latency };
+            if (!tableCheck.ok) {
+                return {
+                    success: true,
+                    tableMissing: true,
+                    message: `Supabase bağlantısı doğrulandı! (${latency}ms) Not: "vault" tablosunu henüz oluşturmadıysanız SQL Editor'den oluşturun.`,
+                    latency
+                };
+            }
+            return { success: true, message: `Supabase ve vault tablosu başarıyla bağlandı! (${latency}ms)`, latency };
         }
 
         if (config.type === 'firebase') {
@@ -161,6 +182,27 @@ async function fetchFromRemote(config) {
                 if (json && json.result) {
                     const parsed = typeof json.result === 'string' ? JSON.parse(json.result) : json.result;
                     if (parsed && parsed.account) return parsed;
+                }
+            }
+            return null;
+        }
+
+        if (config.type === 'supabase') {
+            const key = config.key || config.apiKey;
+            const baseUrl = config.url.replace(/\/$/, '');
+            const getUrl = `${baseUrl}/rest/v1/vault?id=eq.master&select=data`;
+            const res = await fetch(getUrl, {
+                headers: {
+                    apikey: key,
+                    Authorization: `Bearer ${key}`
+                },
+                signal: AbortSignal.timeout(4000)
+            });
+            if (res.ok) {
+                const rows = await res.json();
+                if (Array.isArray(rows) && rows.length > 0 && rows[0].data) {
+                    const data = rows[0].data;
+                    if (data && data.account) return data;
                 }
             }
             return null;
@@ -212,6 +254,31 @@ async function saveToRemote(config, data) {
                 signal: AbortSignal.timeout(4000)
             });
             return true;
+        }
+
+        if (config.type === 'supabase') {
+            const key = config.key || config.apiKey;
+            const baseUrl = config.url.replace(/\/$/, '');
+            const postUrl = `${baseUrl}/rest/v1/vault`;
+            const body = JSON.stringify([{
+                id: 'master',
+                data: {
+                    account: data.account,
+                    transactions: data.transactions || []
+                }
+            }]);
+            const res = await fetch(postUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    apikey: key,
+                    Authorization: `Bearer ${key}`,
+                    Prefer: 'resolution=merge-duplicates'
+                },
+                body,
+                signal: AbortSignal.timeout(4000)
+            });
+            return res.ok;
         }
 
         if (config.type === 'firebase') {
